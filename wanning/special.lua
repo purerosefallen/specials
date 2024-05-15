@@ -430,6 +430,24 @@ function c72283691_atkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetAttacker()
 	destroyGold(tc)
 end
+
+addSkill(12607053, function(e1)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	  e1:SetProperty(e1:GetProperty()|EFFECT_FLAG_PLAYER_TARGET)
+	  e1:SetTargetRange(1,0)
+	  e1:SetCode(EFFECT_CHANGE_DAMAGE)
+	  e1:SetValue(0)
+	  e1:SetCondition(function (e)
+		return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_DECK,0)>=25
+	  end)
+  end)
+oneTimeSkill(12607053, function(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_DECK,0)==35 then
+		local tc=Duel.CreateToken(tp,95308449)
+		Duel.SendtoHand(tc,tp,REASON_RULE)
+		Duel.ConfirmCards(1-tp,tc)
+	end
+  end)
 --[[
 wrapDeckSkill(72283691, function(e4)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
