@@ -431,6 +431,7 @@ function c72283691_atkop(e,tp,eg,ep,ev,re,r,rp)
 	destroyGold(tc)
 end
 
+--桃李代僵（和睦的使者）
 addSkill(12607053, function(e1)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	  e1:SetProperty(e1:GetProperty()|EFFECT_FLAG_PLAYER_TARGET)
@@ -440,14 +441,102 @@ addSkill(12607053, function(e1)
 	  e1:SetCondition(function (e)
 		return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_DECK,0)>=25
 	  end)
-  end)
+end)
+
 oneTimeSkill(12607053, function(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_DECK,0)==35 then
 		local tc=Duel.CreateToken(tp,95308449)
 		Duel.SendtoHand(tc,tp,REASON_RULE)
 		Duel.ConfirmCards(1-tp,tc)
 	end
-  end)
+end)
+
+--兵临城下（六武之门）
+oneTimeSkill(27970830, function(e,tp,eg,ep,ev,re,r,rp)
+	for i=1,3 do
+		local tc=Duel.CreateToken(tp,27970830)
+		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+		local e1=Effect.CreateEffect(tc)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e1:SetRange(LOCATION_SZONE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+		e1:SetValue(1)
+		tc:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(tc)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e2:SetCode(EFFECT_CANNOT_REMOVE)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e2:SetRange(LOCATION_SZONE)
+		tc:RegisterEffect(e2)
+		tc:CompleteProcedure()
+		tc:AddCounter(0x3,99)
+	end
+end)
+
+--草船借箭（敌人操纵器）
+endPhaseSkill(98045062, function(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(nil,tp,0,LOCATION_MZONE,nil)
+	local ct=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if g:GetCount()>ct then
+		g=g:Select(tp,ct,ct,nil)
+	end
+	for tc in aux.Next(g) do
+		Duel.GetControl(tc,tp)
+	end
+	local sg=Duel.GetMatchingGroup(nil,tp,0,LOCATION_MZONE,nil)
+	for tc in aux.Next(sg) do
+		Duel.SendtoGrave(tc,REASON_RULE)
+	end
+end, function(e,tp)
+	return Duel.GetTurnPlayer()==1-tp
+end, true)
+
+--4个2（赌博）
+wrapDeckSkill(37313786, function(e1)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e1:SetOperation(c37313786_op)
+end)
+
+endPhaseSkill(37313786, function (e,tp,eg,ep,ev,re,r,rp)
+	c37313786_op(e,tp,eg,ep,ev,re,r,rp)
+end, nil, true)
+
+function c37313786_op(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local ct=0
+	local dice=0
+	for i=1,4 do
+		local dc=Duel.TossDice(tp,1)
+		if dc==2 then ct=ct+1 end
+		dice=dice+dc
+	end
+	if ct>0 then
+		if Duel.GetAttacker() then
+			Duel.NegateAttack()
+		end
+        if Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)>=2*ct then
+			local g=Duel.GetDecktopGroup(1-tp,2*ct)
+            Duel.DisableShuffleCheck()
+            Duel.Remove(g,POS_FACEUP,REASON_RULE)
+        end
+		if ct==4 then
+			local lp=Duel.GetLP(1-tp)-20220222
+			if lp<0 then lp=0 end
+			Duel.SetLP(1-tp,lp)
+		end
+	end
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetValue(dice*100)
+	Duel.RegisterEffect(e1,tp)
+end
+
 --[[
 wrapDeckSkill(72283691, function(e4)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -470,16 +559,24 @@ end
 local function initialize()
   local skillSelections={}
   local skillCodes=getAllSkillCodes()
-  for tp=0,1 do
-	local g=Group.CreateGroup()
+  local res=Duel.TossCoin(0,1)
+  for tp=1-res, res, 2*res-1 do
+    local codes={}
 	for _,code in ipairs(skillCodes) do
-	  local c=Duel.CreateToken(tp,code)
-	  Duel.Remove(c,POS_FACEDOWN,REASON_RULE)
-	  g:AddCard(c)
+		table.insert(codes,code)
 	end
-	local tc=g:Select(tp,1,1,nil):GetFirst()
-	skillSelections[tp]=tc:GetOriginalCode()
-	Duel.Exile(g,REASON_RULE)
+    table.sort(codes)
+    local afilter={codes[1],OPCODE_ISCODE}
+    if #codes>1 then
+        for i=2,#codes do
+            table.insert(afilter,codes[i])
+            table.insert(afilter,OPCODE_ISCODE)
+            table.insert(afilter,OPCODE_OR)
+        end
+    end
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CODE)
+    local ac=Duel.AnnounceCard(tp,table.unpack(afilter))
+	skillSelections[tp]=ac
   end
   for tp=0,1 do
 	registerSkillForPlayer(tp,skillSelections[tp])
