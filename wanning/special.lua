@@ -259,9 +259,10 @@ addSkill(9952083, function(e1)
 end)
 
 local function destroyReplaceFilter(c,tp)
-  return c:IsControler(tp) and (c:IsReason(REASON_EFFECT) or c:IsReason(REASON_BATTLE))
+  return c:IsControler(tp) and (c:IsReason(REASON_EFFECT) or c:IsReason(REASON_BATTLE)) and c:GetReasonPlayer()==1-tp
 end
 
+--雾状躯体
 addSkill(47529357, function(e1)
   e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetProperty(e1:GetProperty()|EFFECT_FLAG_IGNORE_IMMUNE)
@@ -276,6 +277,15 @@ addSkill(47529357, function(e1)
 	e1:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,47529357)
   end)
+end)
+addSkill(47529357, function(e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CANNOT_REMOVE)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetTargetRange(0,1)
+	e1:SetTarget(function (e,c,p)
+		return c:IsControler(e:GetHandlerPlayer())
+	end)
 end)
 
 standbyPhaseSkill(73915051, function(e,tp,eg,ep,ev,re,r,rp)
