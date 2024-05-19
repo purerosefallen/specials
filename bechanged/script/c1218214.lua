@@ -20,7 +20,7 @@ function c1218214.initial_effect(c)
 	e3:SetCategory(CATEGORY_HANDES+CATEGORY_DRAW)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetCountLimit(1,1218214)
+	e3:SetCountLimit(1)
 	e3:SetTarget(c1218214.drawtg)
 	e3:SetOperation(c1218214.drawop)
 	c:RegisterEffect(e3)
@@ -53,7 +53,7 @@ function c1218214.drawop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c1218214.thfilter(c)
-	return c:IsSetCard(0xe3) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(0xe3) and c:IsType(TYPE_MONSTER+TYPE_TRAP) and c:IsAbleToHand()
 end
 function c1218214.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c1218214.thfilter(chkc) end

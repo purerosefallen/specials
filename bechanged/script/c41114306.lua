@@ -23,15 +23,15 @@ function c41114306.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c41114306.filter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(0xe3) and c:IsAbleToGraveAsCost() and Duel.GetMZoneCount(tp,c)>0
+	return c:IsFaceupEx() and c:IsSetCard(0xe3) and c:IsAbleToGraveAsCost() and Duel.GetMZoneCount(tp,c)>0
 end
 function c41114306.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.IsExistingMatchingCard(c41114306.filter,tp,LOCATION_MZONE,0,1,nil,tp)
+	return Duel.IsExistingMatchingCard(c41114306.filter,tp,LOCATION_MZONE+LOCATION_DECK,0,1,nil,tp)
 end
 function c41114306.sptg(e,tp,eg,ep,ev,re,r,rp,chk,c)
-	local g=Duel.GetMatchingGroup(c41114306.filter,tp,LOCATION_MZONE,0,nil,tp)
+	local g=Duel.GetMatchingGroup(c41114306.filter,tp,LOCATION_MZONE+LOCATION_DECK,0,nil,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local tc=g:SelectUnselect(nil,tp,false,true,1,1)
 	if tc then
