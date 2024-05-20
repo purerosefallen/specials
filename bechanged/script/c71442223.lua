@@ -20,7 +20,7 @@ function c71442223.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():IsControler(1-tp) and Duel.GetAttackTarget()==nil
 end
 function c71442223.spfilter1(c,e,tp)
-	return c:IsSetCard(0xe3) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+	return c:IsSetCard(0xe3) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function c71442223.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local at=Duel.GetAttacker()
