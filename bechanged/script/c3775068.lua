@@ -41,16 +41,16 @@ function c3775068.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c3775068.spcfilter(c)
-	return c:IsFaceupEx() and c:IsSetCard(0xe3) and c:IsAbleToGraveAsCost()
+	return c:IsFaceupEx() and c:IsSetCard(0xe3) and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()
 end
 function c3775068.sprcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local mg=Duel.GetMatchingGroup(c3775068.spcfilter,tp,LOCATION_MZONE+LOCATION_DECK,0,nil)
+	local mg=Duel.GetMatchingGroup(c3775068.spcfilter,tp,LOCATION_MZONE+LOCATION_DECK+LOCATION_HAND,0,c)
 	return mg:CheckSubGroup(aux.mzctcheck,3,3,tp)
 end
 function c3775068.sprtg(e,tp,eg,ep,ev,re,r,rp,chk,c)
-	local mg=Duel.GetMatchingGroup(c3775068.spcfilter,tp,LOCATION_MZONE+LOCATION_DECK,0,nil)
+	local mg=Duel.GetMatchingGroup(c3775068.spcfilter,tp,LOCATION_MZONE+LOCATION_DECK+LOCATION_HAND,0,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local sg=mg:SelectSubGroup(tp,aux.mzctcheck,true,3,3,tp)
 	if sg then
