@@ -10,20 +10,37 @@ function c71442223.initial_effect(c)
 	e1:SetTarget(c71442223.target)
 	e1:SetOperation(c71442223.activate)
 	c:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(71442223,0))
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	c:RegisterEffect(e2)
+	local e3=e1:Clone()
+	e3:SetCode(EVENT_CHAINING)
+	e3:SetCondition(c71442223.condition1)
+	e3:SetTarget(c71442223.target1)
+	c:RegisterEffect(e3)
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	c:RegisterEffect(e0)
 end
 function c71442223.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():IsControler(1-tp) and Duel.GetAttackTarget()==nil
+end
+function c71442223.condition1(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return ep==1-tp and re:GetHandler():IsOnField() and re:GetHandler():IsRelateToEffect(re) and re:IsActiveType(TYPE_MONSTER)
 end
 function c71442223.spfilter1(c,e,tp)
 	return c:IsSetCard(0xe3) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function c71442223.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local at=Duel.GetAttacker()
+	if chkc then return chkc==at end
+	if chk==0 then return at:IsOnField() and at:IsCanBeEffectTarget(e)
+		and Duel.IsExistingMatchingCard(c71442223.spfilter1,tp,LOCATION_HAND,0,1,nil,e,tp)
+		and Duel.IsCanAddCounter(tp) end
+	Duel.SetTargetCard(at)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
+end
+function c71442223.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local at=re:GetHandler()
 	if chkc then return chkc==at end
 	if chk==0 then return at:IsOnField() and at:IsCanBeEffectTarget(e)
 		and Duel.IsExistingMatchingCard(c71442223.spfilter1,tp,LOCATION_HAND,0,1,nil,e,tp)
