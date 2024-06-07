@@ -26,11 +26,10 @@ function c8837932.initial_effect(c)
 	e3:SetCondition(c8837932.descon)
 	e3:SetOperation(c8837932.desop)
 	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(8837932,0))
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	c:RegisterEffect(e4)
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	c:RegisterEffect(e0)
 end
 function c8837932.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xe3)
@@ -38,19 +37,18 @@ end
 function c8837932.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c8837932.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
-function c8837932.spfilter(c,e,tp,tid)
-	return c:IsReason(REASON_DESTROY) and c:IsType(TYPE_MONSTER) and c:GetTurnID()==tid
+function c8837932.spfilter(c,e,tp)
+	return c:IsType(TYPE_MONSTER)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp) and Duel.IsCanAddCounter(tp,0x1038,1,c)
 end
 function c8837932.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local tid=Duel.GetTurnCount()
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and c8837932.spfilter(chkc,e,tp,tid) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and c8837932.spfilter(chkc,e,tp) end
 	local ft=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
 	if chk==0 then return ft>0
-		and Duel.IsExistingTarget(c8837932.spfilter,tp,0,LOCATION_GRAVE,1,nil,e,tp,tid) end
+		and Duel.IsExistingTarget(c8837932.spfilter,tp,0,LOCATION_GRAVE,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	if Duel.IsPlayerAffectedByEffect(tp,59822133) then ft=1 end
-	local g=Duel.SelectTarget(tp,c8837932.spfilter,tp,0,LOCATION_GRAVE,1,ft,nil,e,tp,tid)
+	local g=Duel.SelectTarget(tp,c8837932.spfilter,tp,0,LOCATION_GRAVE,1,ft,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),0,0)
 end
 function c8837932.activate(e,tp,eg,ep,ev,re,r,rp)

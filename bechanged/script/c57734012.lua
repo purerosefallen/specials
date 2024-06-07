@@ -5,9 +5,25 @@ function c57734012.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_ACTIVATE)
 	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetCountLimit(1,57734012)
 	e2:SetTarget(c57734012.target)
 	e2:SetOperation(c57734012.activate)
 	c:RegisterEffect(e2)
+end
+function c57734012.regcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return Duel.GetFlagEffect(tp,57734012)==0 and Duel.GetCurrentPhase()==PHASE_DRAW and c:IsReason(REASON_RULE)
+end
+function c57734012.regop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if Duel.SelectYesNo(tp,aux.Stringid(57734012,0)) then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_PUBLIC)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_MAIN1)
+		c:RegisterEffect(e1)
+		c:RegisterFlagEffect(57734012,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_MAIN1,EFFECT_FLAG_CLIENT_HINT,1,0,66)
+	end
 end
 function c57734012.filter1(c,e,tp)
 	local no=aux.GetXyzNumber(c)
@@ -28,12 +44,14 @@ function c57734012.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then loc=loc+LOCATION_GRAVE end
 	if Duel.GetLocationCountFromEx(tp,tp,nil,TYPE_XYZ)>0 and (ect==nil or ect>1) then loc=loc+LOCATION_EXTRA end
 	if chk==0 then return Duel.IsPlayerCanSpecialSummonCount(tp,2)
-		and loc~=0
+		and Duel.GetFlagEffect(tp,57734012)==0 and loc~=0
 		and aux.MustMaterialCheck(nil,tp,EFFECT_MUST_BE_XMATERIAL)
 		and Duel.IsExistingMatchingCard(c57734012.filter1,tp,loc,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE+LOCATION_EXTRA)
 end
 function c57734012.activate(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetFlagEffect(tp,57734012)~=0 then return end
+	Duel.RegisterFlagEffect(tp,57734012,0,0,0)
 	local loc=0
 	local ect=aux.ExtraDeckSummonCountLimit and Duel.IsPlayerAffectedByEffect(tp,92345028)
 		and aux.ExtraDeckSummonCountLimit[tp]
