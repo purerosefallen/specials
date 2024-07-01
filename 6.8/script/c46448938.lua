@@ -11,11 +11,35 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
+function s.spfilter(c,e,tp)
+	return c:IsRace(RACE_SPELLCASTER) and c:IsLevelAbove(2) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,c)
+end
+function s.thfilter(c)
+	return not c:IsCode(id) and c:IsSetCard(0x106e) and c:IsAbleToHand()
+end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
+	local tc=g:GetFirst()
+	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)~=0
+		and Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+		local tg=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
+		if tg:GetCount()>0 then
+			Duel.SendtoHand(tg,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,tg)
+		end
+	end
+	Duel.SpecialSummonComplete()
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_CHAIN_SOLVED)
@@ -32,14 +56,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e2,tp)
 	e2:SetLabelObject(e1)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_PHASE+PHASE_END)
-	e3:SetCountLimit(1)
-	e3:SetCondition(s.effcon)
-	e3:SetOperation(s.effop)
-	e3:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e3,tp)
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local v=e:GetLabel()
@@ -57,7 +73,6 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
-		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 	end
 end
 function s.regcon(e,tp,eg,ep,ev,re,r,rp)
@@ -65,22 +80,4 @@ function s.regcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.regop1(e,tp,eg,ep,ev,re,r,rp)
 	e:GetLabelObject():SetLabel(ev)
-end
-function s.effcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(tp,id)>0
-end
-function s.spfilter(c,lv,e,tp)
-	return c:IsLevelBelow(lv) and c:IsRace(RACE_SPELLCASTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-function s.effop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_CARD,0,id)
-	local lv=Duel.GetFlagEffect(tp,id)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,lv,e,tp)
-		and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
-		Duel.BreakEffect()
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sg=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,lv,e,tp)
-		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
-	end
 end
