@@ -6,13 +6,13 @@ function c77402960.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	--e1:SetCondition(c77402960.condition)
+	e1:SetCondition(c77402960.condition)
 	e1:SetTarget(c77402960.target)
 	e1:SetOperation(c77402960.activate)
 	c:RegisterEffect(e1)
 end
 function c77402960.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,41418852)
+	return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,41418852)
 end
 function c77402960.spfilter(c,e,tp)
 	return c:IsSetCard(0x14a) and c:IsAttackBelow(1000) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
