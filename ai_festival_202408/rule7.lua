@@ -8,7 +8,7 @@ SP_RULE.AdjustCountLimit = 0
 
 SP_RULE.RuleName="贪欲沼泽"
 --虽然没有限制，但ygopro最多显示5行文字
-SP_RULE.Message=["双方场上各发动1张【蛇毒沼泽】。"]
+SP_RULE.Message={"双方场上各发动1张【蛇毒沼泽】。"}
 
 --第一个抽卡阶段执行，tp是AI
 function SP_RULE.InitAdjust(tp)

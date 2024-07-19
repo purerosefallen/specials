@@ -23,7 +23,7 @@ end
 --战斗破坏时发动的效果。
 function CHEST.BattleDestroyedEffect(e,rp)
     if Duel.GetMZoneCount(rp)<5 then return end
-    for i in [33396958,8124921,44519536,70903634,7902349] do
+    for i in {33396958,8124921,44519536,70903634,7902349} do
         local c=Duel.CreateToken(rp,i)
         Duel.SpecialSummon(c,0,rp,rp,true,true,POS_FACEUP)
     end

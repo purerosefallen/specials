@@ -23,7 +23,7 @@ end
 function CHEST.BattleDestroyedEffect(e,rp)
     local code=0
     local c=nil
-    for p in [0,1] do
+    for p in 0,1 do
         code=CUNGUI.GambleCards[math.random(#CUNGUI.GambleCards)]
         c=Duel.CreateToken(p,code)
         while Duel.SSet(p,c)>0 do

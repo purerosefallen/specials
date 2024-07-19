@@ -8,7 +8,7 @@ SP_RULE.AdjustCountLimit = 0
 
 SP_RULE.RuleName="讨价还价"
 --虽然没有限制，但ygopro最多显示5行文字
-SP_RULE.Message=["双方的所有怪兽得到以下效果外文本：","·这张卡造成战斗伤害时发动。自己回复战斗伤害的数值。"]
+SP_RULE.Message={"双方的所有怪兽得到以下效果外文本：","·这张卡造成战斗伤害时发动。自己回复战斗伤害的数值。"}
 
 --第一个抽卡阶段执行，tp是AI
 function SP_RULE.InitAdjust(tp)

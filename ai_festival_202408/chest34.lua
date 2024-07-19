@@ -22,6 +22,6 @@ end
 --战斗破坏时发动的效果。
 function CHEST.BattleDestroyedEffect(e,rp)
     local g=Duel.GetFieldGroup(1-rp,LOCATION_HAND,0)
-    if #g>3 then g=g:RandomSelect(1-rp,3)
+    if #g>3 then g=g:RandomSelect(1-rp,3) end
     Duel.SendtoGrave(g,REASON_RULE+REASON_DISCARD)
 end

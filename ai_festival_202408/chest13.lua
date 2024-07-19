@@ -20,9 +20,9 @@ end
 --战斗破坏时发动的效果。
 function CHEST.BattleDestroyedEffect(e,rp)
     local c={}
-    local c[1]=Duel.CreateToken(1-rp,44095762)
-    local c[2]=Duel.CreateToken(1-rp,61740673)
-    local c[3]=Duel.CreateToken(1-rp,62279055)
+    c[1]=Duel.CreateToken(1-rp,44095762)
+    c[2]=Duel.CreateToken(1-rp,61740673)
+    c[3]=Duel.CreateToken(1-rp,62279055)
     if Duel.GetLocationCount(1-rp,LOCATION_SZONE)>0 then
         Duel.SSet(1-rp,c[1])
     end

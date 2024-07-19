@@ -8,7 +8,7 @@ SP_RULE.AdjustCountLimit = 0
 
 SP_RULE.RuleName="拳拳到肉"
 --虽然没有限制，但ygopro最多显示5行文字
-SP_RULE.Message=["双方场上各发动1张【最终突击命令】。双方受到的战斗伤害变为2倍。"]
+SP_RULE.Message={"双方场上各发动1张【最终突击命令】。双方受到的战斗伤害变为2倍。"}
 
 --第一个抽卡阶段执行，tp是AI
 function SP_RULE.InitAdjust(tp)

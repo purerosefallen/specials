@@ -8,7 +8,7 @@ SP_RULE.AdjustCountLimit = 0
 
 SP_RULE.RuleName="不得不赌"
 --虽然没有限制，但ygopro最多显示5行文字
-SP_RULE.Message=["AI场上召唤一只宝箱怪。"]
+SP_RULE.Message={"AI场上召唤一只宝箱怪。"}
 
 --开局执行；此时还无法得知谁是AI。
 function SP_RULE.Init()

@@ -8,7 +8,7 @@ SP_RULE.AdjustCountLimit = 0
 
 SP_RULE.RuleName="规则名称"
 --虽然没有限制，但ygopro最多显示5行文字
-SP_RULE.Message=["规则详细介绍第一行","规则详细介绍第二行"]
+SP_RULE.Message={"规则详细介绍第一行","规则详细介绍第二行"}
 
 --开局执行；此时还无法得知谁是AI。
 function SP_RULE.Init()

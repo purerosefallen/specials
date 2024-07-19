@@ -8,7 +8,7 @@ SP_RULE.AdjustCountLimit = 0
 
 SP_RULE.RuleName="财富之轮"
 --虽然没有限制，但ygopro最多显示5行文字
-SP_RULE.Message=["双方场上特殊召唤3张宝箱怪。","那些宝箱怪的攻击力守备力变为2000。"]
+SP_RULE.Message={"双方场上特殊召唤3张宝箱怪。","那些宝箱怪的攻击力守备力变为2000。"}
 
 --第一个抽卡阶段执行，tp是AI
 function SP_RULE.InitAdjust(tp)

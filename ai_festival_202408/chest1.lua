@@ -7,7 +7,7 @@ CHEST={}
 
 function CHEST.EffectMessageAbsolute(e,rp)
     local g=Duel.GetFieldGroup(rp,LOCATION_MZONE,0)
-    if #g == 0 then return "然而什么都没有发生……"
+    if #g == 0 then return "然而什么都没有发生……" end
     return "被风刮到的怪兽们似乎变大了！"
 end
 

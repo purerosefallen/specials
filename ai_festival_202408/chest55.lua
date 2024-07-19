@@ -14,7 +14,7 @@ function CHEST.EffectMessageAbsolute(e,rp)
     local name2=CUNGUI.GetAIName()
     if rp == CUNGUI.AI then name2,name = name,name2 end
     local g=Duel.GetFieldGroup(1-rp,LOCATION_ONFIELD,0)
-    if #g<1 then return "但" .. name2 .. "站得太远了！"
+    if #g<1 then return "但" .. name2 .. "站得太远了！" end
     return name2 .. "受到了技能黑洞的影响！"
 end
 

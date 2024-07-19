@@ -22,7 +22,7 @@ end
 
 --战斗破坏时发动的效果。
 function CHEST.BattleDestroyedEffect(e,rp)
-    for i in [10000000,10000010,10000020] do
+    for i in {10000000,10000010,10000020} do
         local c=Duel.CreateToken(rp,i)
         Duel.SpecialSummon(c,0,rp,rp,true,true,POS_FACEUP)
     end

@@ -8,7 +8,7 @@ SP_RULE.AdjustCountLimit = 0
 
 SP_RULE.RuleName="葬送的宝箱怪"
 --虽然没有限制，但ygopro最多显示5行文字
-SP_RULE.Message=["本局游戏中，宝箱怪出现时攻防皆为5000点。"]
+SP_RULE.Message={"本局游戏中，宝箱怪出现时攻防皆为5000点。"}
 
 local ccs = CUNGUI.CreateChestStep
 CUNGUI.CreateChestStep = function(tp)

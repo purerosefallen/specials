@@ -16,10 +16,10 @@
 
 --兜底
 math.random = Duel.GetRandomNumber or math.random
-local CUNGUI={}
+CUNGUI={}
 
-local CUNGUI.AI = 0
-local CUNGUI.SummoningChest = false
+CUNGUI.AI = 0
+CUNGUI.SummoningChest = false
 
 
 --赌博卡列表

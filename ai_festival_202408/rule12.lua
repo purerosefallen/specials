@@ -8,8 +8,8 @@ SP_RULE.AdjustCountLimit = 0
 
 SP_RULE.RuleName="人均胡狗"
 --虽然没有限制，但ygopro最多显示5行文字
-SP_RULE.Message=["硬币投掷出的结果无论正反均当作正面，骰子投掷出的结果无论数值均当作6处理。",
-                    "仍可用卡片效果修改结果，但没有实际意义，仍当作正面/6点处理。"]
+SP_RULE.Message={"硬币投掷出的结果无论正反均当作正面，骰子投掷出的结果无论数值均当作6处理。",
+                    "仍可用卡片效果修改结果，但没有实际意义，仍当作正面/6点处理。"}
 
 local dueltd = Duel.TossDice
 Duel.TossDice = function(tp,p1,p2)

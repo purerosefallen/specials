@@ -13,7 +13,7 @@ CHEST.EffectMessage = "得到了无穷的力量！"
 
 --战斗破坏时发动的效果。
 function CHEST.BattleDestroyedEffect(e,rp)
-    for i in [33396958,8124921,44519536,70903634,7902349] do
+    for i in {33396958,8124921,44519536,70903634,7902349} do
         local c=Duel.CreateToken(rp,i)
         Duel.SendtoHand(c,nil,REASON_RULE)
     end
