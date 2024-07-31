@@ -328,25 +328,33 @@ end, function(e,tp)
   return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)==0 and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD+LOCATION_HAND,1,nil) and Duel.GetTurnPlayer()==1-tp and Duel.GetActivityCount(1-tp,ACTIVITY_ATTACK)==0 and Duel.GetTurnCount()>1
 end, true)
 
-oneTimeSkill(13171876, function(e,tp,eg,ep,ev,re,r,rp)
-  local g=Duel.GetDecktopGroup(1-tp,8)
-  Duel.Exile(g,REASON_RULE)
-  for i=1,8 do
-		local tc=Duel.CreateToken(1-tp,13171876)
-		local e1=Effect.CreateEffect(tc)
-		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-		e1:SetCode(EVENT_DRAW)
-		e1:SetCountLimit(1)
-		e1:SetOperation(c13171876_op)
-		tc:RegisterEffect(e1)
-		Duel.SendtoDeck(tc,nil,0,REASON_RULE)
-  end
-	local hg=Duel.GetFieldGroup(1-tp,LOCATION_HAND,0)
-	local startCount=#hg
-  Duel.SendtoDeck(hg,nil,0,REASON_RULE)
-	Duel.ShuffleDeck(1-tp)
-  Duel.Draw(1-tp,startCount,REASON_RULE)
+wrapDeckSkill(13171876, function(e1)
+	local code=13171876
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_PREDRAW)
+	e1:SetCountLimit(1,0x7ffffff-code)
+	e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+		return Duel.GetTurnPlayer()==1-tp
+	end)
+	e1:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
+		Duel.Hint(HINT_CARD,0,code)
+		local v=1
+		local g=Duel.GetFieldGroup(tp,0x7f,0x7f)
+		g=g:RandomSelect(tp,1):GetFirst()
+		v=v+g:GetSequence()%2
+		for i=1,v do
+			local tc=Duel.CreateToken(1-tp,code)
+			local e2=Effect.CreateEffect(tc)
+			e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+			e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+			e2:SetCode(EVENT_DRAW)
+			e2:SetCountLimit(1)
+			e2:SetOperation(c13171876_op)
+			tc:RegisterEffect(e2)
+			Duel.SendtoDeck(tc,nil,0,REASON_RULE)
+		end
+		Duel.ShuffleDeck(1-tp)
+	end)
 end)
 
 function c13171876_op(e,tp,eg,ep,ev,re,r,rp)
@@ -354,6 +362,14 @@ function c13171876_op(e,tp,eg,ep,ev,re,r,rp)
 	if lp<0 then lp=0 end
 	Duel.SetLP(tp,lp)
 end
+
+addSkill(13171876, function(e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CHANGE_DAMAGE)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetTargetRange(1,0)
+    e1:SetValue(HALF_DAMAGE)
+end)
 
 oneTimeSkill(66957584,function(e,tp,eg,ep,ev,re,r,rp)
   for i=1,3 do
@@ -444,7 +460,7 @@ wrapDeckSkill(4392470, function(e1)
 end)
 
 --釜底抽薪(强引的番兵)
-phaseSkill(42829885, PHASE_DRAW, function(e,tp,eg,ep,ev,re,r,rp)
+endPhaseSkill(42829885, function(e,tp,eg,ep,ev,re,r,rp)
   local p=tp
 	local g=Duel.GetFieldGroup(p,0,LOCATION_DECK)
 	if g:GetCount()>=8 then
@@ -561,8 +577,61 @@ endPhaseSkill(98045062, function(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(tc,REASON_RULE)
 	end
 end, function(e,tp)
-	return Duel.GetTurnPlayer()==1-tp
+	return Duel.GetTurnPlayer()==1-tp and Duel.GetMatchingGroupCount(nil,tp,0,LOCATION_MZONE,nil)>=3
 end, true)
+
+wrapDeckSkill(98045062, function (e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CANNOT_MSET)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetTargetRange(0,1)
+    e1:SetTarget(aux.TRUE)
+end)
+
+wrapDeckSkill(98045062, function (e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CANNOT_SSET)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetTargetRange(0,1)
+    e1:SetTarget(aux.TRUE)
+end)
+
+wrapDeckSkill(98045062, function (e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CANNOT_TURN_SET)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetTargetRange(0,1)
+    e1:SetTarget(aux.TRUE)
+end)
+
+wrapDeckSkill(98045062, function (e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_LIMIT_SPECIAL_SUMMON_POSITION)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetTargetRange(0,1)
+    e1:SetTarget(aux.TRUE)
+end)
+
+wrapDeckSkill(98045062, function (e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetTargetRange(0,1)
+    e1:SetValue(function (e,te,tp)
+		if not te:IsHasType(EFFECT_TYPE_ACTIVATE) or not te:IsActiveType(TYPE_TRAP) then return false end
+		return te:GetHandler():IsLocation(LOCATION_HAND)
+	end)
+end)
+
+wrapDeckSkill(98045062, function (e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CANNOT_BP)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetCondition(function (e,tp,eg,ep,ev,re,r,rp)
+		return Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)==0
+	end)
+    e1:SetTargetRange(0,1)
+end)
 
 --4个2（赌博）
 wrapDeckSkill(37313786, function(e1)
