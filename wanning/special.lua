@@ -368,7 +368,12 @@ addSkill(13171876, function(e1)
     e1:SetCode(EFFECT_CHANGE_DAMAGE)
     e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
     e1:SetTargetRange(1,0)
-    e1:SetValue(HALF_DAMAGE)
+    e1:SetValue(function (e,re,val,r,rp,rc)
+		if bit.band(r,REASON_BATTLE+REASON_EFFECT)~=0 then
+			return val/2
+		end
+		return val
+	end)
 end)
 
 oneTimeSkill(66957584,function(e,tp,eg,ep,ev,re,r,rp)
