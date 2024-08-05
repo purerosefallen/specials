@@ -22,6 +22,7 @@ function c78063197.initial_effect(c)
 	e2:SetOperation(c78063197.eqop)
 	c:RegisterEffect(e2)
 end
+c78063197.fusion_effect=true
 function c78063197.filter0(c)
 	return c:IsAbleToRemove()
 end
@@ -29,7 +30,7 @@ function c78063197.filter1(c,e)
 	return c:IsAbleToRemove() and not c:IsImmuneToEffect(e)
 end
 function c78063197.filter2(c,e,tp,m,f,chkf)
-	return c:IsType(TYPE_FUSION) and (not f or f(c))
+	return c:IsType(TYPE_FUSION) and (not f or f(c)) and c:IsSetCard(0x1110)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,nil,chkf)
 end
 function c78063197.filter3(c)
@@ -89,37 +90,7 @@ function c78063197.activate(e,tp,eg,ep,ev,re,r,rp)
 			fop(ce,e,tp,tc,mat2)
 		end
 		tc:CompleteProcedure()
-		if tc:IsSetCard(0x1110) and Duel.IsExistingMatchingCard(c78063197.setfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
-			Duel.BreakEffect()
-			local c=e:GetHandler()
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-			local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c78063197.setfilter),tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
-			local tc=g:GetFirst()
-			if tc and Duel.SSet(tp,tc)~=0 then
-				if tc:IsType(TYPE_QUICKPLAY) then
-					local e1=Effect.CreateEffect(c)
-					e1:SetDescription(aux.Stringid(78063197,2))
-					e1:SetType(EFFECT_TYPE_SINGLE)
-					e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-					e1:SetCode(EFFECT_QP_ACT_IN_SET_TURN)
-					e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-					tc:RegisterEffect(e1)
-				end
-				if tc:IsType(TYPE_TRAP) then
-					local e1=Effect.CreateEffect(c)
-					e1:SetDescription(aux.Stringid(78063197,2))
-					e1:SetType(EFFECT_TYPE_SINGLE)
-					e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
-					e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-					e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-					tc:RegisterEffect(e1)
-				end
-			end
-		end
 	end
-end
-function c78063197.setfilter(c)
-	return c:IsCode(23446369) and c:IsSSetable()
 end
 function c78063197.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and c:IsAbleToChangeControler()
