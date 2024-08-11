@@ -102,7 +102,7 @@ function c83629030.desop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.HintSelection(g)
 		Duel.Destroy(g,REASON_EFFECT)
 	end
-	if c:IsRelateToEffect(e) then
+	if e:GetHandler():IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_OATH)
