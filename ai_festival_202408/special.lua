@@ -16,7 +16,7 @@
 
 --兜底
 math.random = Duel.GetRandomNumber or math.random
-CUNGUI={}
+local CUNGUI={}
 
 CUNGUI.AI = 0
 CUNGUI.SummoningChest = false
@@ -38,16 +38,15 @@ function Auxiliary.PreloadUds()
 
 	--要执行的特殊规则
 	--本次活动中，一阶段=8，二阶段=13
-	local RULE_MAX_INDEX = 8
+	local RULE_MAX_INDEX = 13
 	Duel.LoadScript("rule" .. tostring(math.random(RULE_MAX_INDEX)) .. ".lua")
 	if SP_RULE and SP_RULE.Init then
 		SP_RULE.Init()
 	end
---[[第一阶段的宝箱怪被抠辣.jpg
     if math.random(2)==1 then
         InitRefreshChest()
+		Debug.Message("宝箱怪们在蠢蠢欲动……")
     end
-]]--
 end
 
 CUNGUI.ChestCheck=10
@@ -74,8 +73,9 @@ function CUNGUI.RefreshChestCheck(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function CUNGUI.CreateChest(tp)
-	CUNGUI.CreateChestStep(tp)
+	local c = CUNGUI.CreateChestStep(tp)
 	Duel.SpecialSummonComplete()
+	return c
 end
 
 CUNGUI.Chests={}
@@ -191,7 +191,7 @@ function CUNGUI.CheckAI(e)
     end
 	if SP_RULE then
 		if SP_RULE.Card then
-			SP_RULE.CardGroup={}
+			CUNGUI.RuleCardGroup={}
 			--创造并固定规则卡
 			local e1=Effect.GlobalEffect()
 			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -244,7 +244,7 @@ function RuleCardMove(e,tp)
 			SP_RULE.InitRuleCard(c)
 		end
 		e:SetLabelObject(c)
-		SP_RULE.CardGroup[tp]=c
+		CUNGUI.RuleCardGroup[tp]=c
 	end
 	if c:IsLocation(LOCATION_REMOVED) and c:IsFacedown() then
 		Duel.SendtoGrave(c,REASON_RULE)
@@ -304,10 +304,10 @@ function CUNGUI.StartAI(tp)
 end
 
 function CUNGUI.SpecialRuleAdjustCond(e,tp)
-	return (not SP_RULE.Card) or (SP_RULE.CardGroup and SP_RULE.CardGroup[tp])
+	return (not SP_RULE.Card) or not (CUNGUI.RuleCardGroup and CUNGUI.RuleCardGroup[tp])
 end
 
-function SpecialRuleAdjust(e,tp)
+function CUNGUI.SpecialRuleAdjust(e,tp)
 	if e:GetLabel()==1 then return end
 	e:SetLabel(1)
 	SP_RULE.InitAdjust(e,tp)

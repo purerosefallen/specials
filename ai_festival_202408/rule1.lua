@@ -12,7 +12,7 @@ SP_RULE.Message={"决斗开始时，双方从卡组随机将20张卡里侧除外
 
 --第一个抽卡阶段执行，tp是AI
 function SP_RULE.InitAdjust(e,tp)
-    if not SP_RULE.Init then
+    if not SP_RULE.IsInit then
         local g=Duel.GetFieldGroup(0,LOCATION_DECK,0):RandomSelect(tp,20)
         local g2=Duel.GetFieldGroup(0,LOCATION_DECK,0):RandomSelect(tp,20)
         g:Merge(g2)
@@ -20,7 +20,7 @@ function SP_RULE.InitAdjust(e,tp)
         for c in aux.Next(g) do
             c:RegisterFlagEffect(98765432,RESET_EVENT+RESETS_STANDARD,0,1)
         end
-        SP_RULE.Init = true
+        SP_RULE.IsInit = true
     end
 
     local m = Duel.GetMatchingGroup(SP_RULE.filter,Duel.GetTurnPlayer(),LOCATION_REMOVED,0,nil)
