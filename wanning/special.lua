@@ -1133,7 +1133,7 @@ addSkill(51684157, function (e1)
     e1:SetCode(EFFECT_CANNOT_SUMMON)
     e1:SetTargetRange(1,0)
     e1:SetTarget(function (e,c)
-		return not (tc:IsRace(RACE_WYRM) or tc:IsSetCard(0x1a2))
+		return not (c:IsRace(RACE_WYRM) or c:IsSetCard(0x1a2))
 	end)
 end)
 
