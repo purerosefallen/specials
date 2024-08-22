@@ -1034,13 +1034,24 @@ function c37626500_filter(c)
 end
 
 addSkill(94820406, function(e1)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_EXTRA_FUSION_MATERIAL)
-	e1:SetTargetRange(LOCATION_DECK+LOCATION_EXTRA,0)
-	e1:SetValue(function (e,c)
-		if not c then return true end
-		return e:GetHandler():IsCode(94820406)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CHAIN_MATERIAL)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetTargetRange(1,0)
+    e1:SetReset(RESET_PHASE+PHASE_END)
+    e1:SetTarget(function (e,te,tp)
+		if te:GetHandler():GetOriginalCode()~=94820406 then return Group.CreateGroup() end
+		return Duel.GetMatchingGroup(function (c)
+			return c:IsType(TYPE_MONSTER) and c:IsCanBeFusionMaterial() and c:IsAbleToGrave() and not c:IsImmuneToEffect(te)
+		end,tp,LOCATION_EXTRA+LOCATION_DECK+LOCATION_ONFIELD+LOCATION_HAND,0,nil)
 	end)
+    e1:SetOperation(function (e,te,tp,tc,mat,sumtype)
+		if not sumtype then sumtype=SUMMON_TYPE_FUSION end
+		tc:SetMaterial(mat)
+		Duel.SendtoGrave(mat,POS_FACEUP,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
+		Duel.SpecialSummon(tc,sumtype,tp,tp,false,false,POS_FACEUP)
+		end)
+    e1:SetValue(aux.TRUE)
 end)
 
 addSkill(94820406, function(e1)
