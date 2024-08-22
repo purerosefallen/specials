@@ -628,8 +628,8 @@ wrapDeckSkill(98045062, function (e1)
     e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
     e1:SetTargetRange(0,1)
     e1:SetValue(function (e,te,tp)
-		if not te:IsHasType(EFFECT_TYPE_ACTIVATE) or not te:IsActiveType(TYPE_TRAP) then return false end
-		return te:GetHandler():IsLocation(LOCATION_HAND)
+		if not te:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
+		return te:GetHandler():IsLocation(LOCATION_HAND) and te:IsActiveType(TYPE_TRAP)
 	end)
 end)
 
