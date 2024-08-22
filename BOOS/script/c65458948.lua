@@ -51,7 +51,7 @@ function c65458948.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and not Duel.IsExistingMatchingCard(c65458948.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
+		and not Duel.IsExistingMatchingCard(c65458948.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c65458948.sfilter(c)
 	return c:IsReason(REASON_DESTROY) and c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousCodeOnField()==15259703 and c:IsPreviousLocation(LOCATION_ONFIELD)

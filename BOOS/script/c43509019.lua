@@ -26,7 +26,7 @@ function c43509019.stfilter(c,tp)
 end
 function c43509019.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c43509019.stfilter,tp,LOCATION_DECK,0,nil)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(43509019,2)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 		local tc=Duel.SelectMatchingCard(tp,c43509019.stfilter,tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
 		if tc then
