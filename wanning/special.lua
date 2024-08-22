@@ -338,10 +338,10 @@ wrapDeckSkill(13171876, function(e1)
 	end)
 	e1:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_CARD,0,code)
-		local v=1
-		local g=Duel.GetFieldGroup(tp,0x7f,0x7f)
-		g=g:RandomSelect(tp,1):GetFirst()
-		v=v+g:GetSequence()%2
+		local n=Duel.GetMatchingGroupCount(function (tc)
+			return tc:IsFaceupEx() and tc:IsCode(13171876)
+		end,tp,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,nil)
+		v=2+n
 		for i=1,v do
 			local tc=Duel.CreateToken(1-tp,code)
 			local e2=Effect.CreateEffect(tc)
@@ -368,6 +368,11 @@ addSkill(13171876, function(e1)
     e1:SetCode(EFFECT_CHANGE_DAMAGE)
     e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
     e1:SetTargetRange(1,0)
+	e1:SetCondition(function (e,tp)
+		local lp_tp=Duel.GetLP(tp)
+		local lp_op=Duel.GetLP(1-tp)
+		return lp_tp>lp_op and lp_tp-lp_op>=1000
+	end)
     e1:SetValue(function (e,re,val,r,rp,rc)
 		if bit.band(r,REASON_BATTLE+REASON_EFFECT)~=0 then
 			return val/2
@@ -1027,6 +1032,155 @@ end)
 function c37626500_filter(c)
 	return c:IsType(TYPE_RITUAL) or c:IsRace(RACE_FAIRY) or c:IsSetCard(0x1a6)
 end
+
+addSkill(94820406, function(e1)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_EXTRA_FUSION_MATERIAL)
+	e1:SetTargetRange(LOCATION_DECK+LOCATION_EXTRA,0)
+	e1:SetValue(function (e,c)
+		if not c then return true end
+		return e:GetHandler():IsCode(94820406)
+	end)
+end)
+
+addSkill(94820406, function(e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+    e1:SetValue(aux.tgoval)
+	e1:SetTarget(function (e,c)
+		return c:IsType(TYPE_FUSION) and c:IsSetCard(0x6008) and c:IsFaceup()
+	end)
+end)
+
+addSkill(94820406, function(e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CANNOT_REMOVE)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetCondition(function (e)
+		local ph=Duel.GetCurrentPhase()
+		return ph>=PHASE_BATTLE_START and ph<=PHASE_BATTLE
+	end)
+	e1:SetTarget(function (e,c)
+		return c:IsType(TYPE_FUSION) and c:IsSetCard(0x6008) and c:IsFaceup()
+	end)
+end)
+
+addSkill(94820406, function(e1)
+    e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+    e1:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e1:SetOperation(function (e,tp)
+		local c=Duel.GetAttacker()
+		if c:IsType(TYPE_FUSION) and c:IsSetCard(0x6008) and c:IsFaceup() then
+            local e1=Effect.CreateEffect(e:GetHandler())
+            e1:SetType(EFFECT_TYPE_SINGLE)
+            e1:SetCode(EFFECT_SET_BASE_ATTACK)
+            e1:SetValue(c:GetBaseAttack()*2)
+            e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+            c:RegisterEffect(e1)
+		end
+	end)
+end)
+
+addSkill(51684157, function(e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CANNOT_REMOVE)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetCondition(function (e)
+		local ph=Duel.GetCurrentPhase()
+		return ph>=PHASE_BATTLE_START and ph<=PHASE_BATTLE
+	end)
+	e1:SetTarget(function (e,c)
+		return c:IsType(TYPE_SYNCHRO) and c:GetMaterial():IsExists(function (tc)
+			return (tc:IsRace(RACE_WYRM) or tc:IsSetCard(0x1a2)) and tc:IsType(TYPE_SYNCHRO)
+		end,1,nil) and c:IsFaceup()
+	end)
+end)
+
+addSkill(51684157, function(e1)
+	e1:SetDescription(aux.Stringid(37991342,0))
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_SUMMON_PROC)
+	e1:SetTargetRange(LOCATION_HAND,0)
+    e1:SetCondition(function (e,c,minc)
+		if c==nil then return true end
+		return minc==0 and (tc:IsRace(RACE_WYRM) or tc:IsSetCard(0x1a2)) and c:IsLevelAbove(5) and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	end)
+end)
+
+addSkill(51684157, function (e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_SET_SUMMON_COUNT_LIMIT)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetTargetRange(1,0)
+    e1:SetValue(999)
+end)
+
+addSkill(51684157, function (e1)
+	e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetCode(EFFECT_CANNOT_SUMMON)
+    e1:SetTargetRange(1,0)
+    e1:SetTarget(function (e,c)
+		return not (tc:IsRace(RACE_WYRM) or tc:IsSetCard(0x1a2))
+	end)
+end)
+
+addSkill(51684157, function (e1)
+	e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetCode(EFFECT_CANNOT_MSET)
+    e1:SetTargetRange(1,0)
+    e1:SetTarget(function (e,c)
+		return not c:IsRace(RACE_WYRM)
+	end)
+end)
+
+standbyPhaseSkill(51684157, function (e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,function (tc)
+		return tc:IsRace(RACE_WYRM) or tc:IsSetCard(0x1a2)
+	end,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,5,nil)
+	if g:GetCount()>0 then
+		Duel.SendtoHand(g,nil,REASON_RULE)
+	end
+end)
+
+addSkill(92714517, function(e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CANNOT_REMOVE)
+	e1:SetTargetRange(LOCATION_ONFIELD,0)
+	e1:SetCondition(function (e)
+		return Duel.IsExistingMatchingCard(function (tc)
+			return tc:IsLevelAbove(8) and c:IsSetCard(0x17e) and c:IsFaceup()
+		end,tp,LOCATION_MZONE,0,1,nil)
+	end)
+	e1:SetTarget(function (e,c)
+		return (c:IsSetCard(0x17e) and c:IsFaceup()) or c:IsFacedown()
+	end)
+end)
+
+standbyPhaseSkill(92714517, function (e,tp,eg,ep,ev,re,r,rp)
+	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
+	if ft>5 then ft=5 end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+	local g=Duel.SelectMatchingCard(tp,function (tc)
+		return tc:GetType()==TYPE_TRAP
+	end,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,ft,nil)
+	if g:GetCount()>0 then
+		Duel.SSet(tp,g)
+	end
+end, nil, true)
+
+addSkill(92714517, function(e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+    e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+    e1:SetTargetRange(LOCATION_SZONE,0)
+    e1:SetTarget(function (e,c)
+		return c:GetType()==TYPE_TRAP
+	end)
+end)
 
 local function initialize()
   local skillCodes=getAllSkillCodes()
