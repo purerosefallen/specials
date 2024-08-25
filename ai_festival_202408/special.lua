@@ -16,7 +16,7 @@
 
 --兜底
 math.random = Duel.GetRandomNumber or math.random
-local CUNGUI={}
+CUNGUI={}
 
 CUNGUI.AI = 0
 CUNGUI.SummoningChest = false

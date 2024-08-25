@@ -17,14 +17,14 @@ function SP_RULE.InitAdjust(tp)
     for tc in aux.Next(g) do
         if tc:IsType(TYPE_MONSTER) then
             --Atk update
-            local e1=Effect.CreateEffect(c)
+            local e1=Effect.CreateEffect(tc)
             e1:SetType(EFFECT_TYPE_SINGLE)
             e1:SetCode(EFFECT_UPDATE_ATTACK)
             e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE+EFFECT_FLAG_CANNOT_INACTIVATE+EFFECT_FLAG_UNCOPYABLE)
             e1:SetRange(LOCATION_MZONE)
             e1:SetValue(SP_RULE.atkval)
-            c:RegisterEffect(e1)
-            local e2=Effect.CreateEffect(c)
+            tc:RegisterEffect(e1)
+            local e2=Effect.CreateEffect(tc)
             e2:SetDescription(aux.Stringid(97342942,0))
             e2:SetCategory(CATEGORY_DAMAGE)
             e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
@@ -33,7 +33,7 @@ function SP_RULE.InitAdjust(tp)
             e2:SetCode(EVENT_PHASE+PHASE_END)
             e2:SetCountLimit(1,98765432)
             e2:SetOperation(SP_RULE.operation)
-            c:RegisterEffect(e2)
+            tc:RegisterEffect(e2)
         end
     end
 end

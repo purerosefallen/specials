@@ -18,13 +18,13 @@ function SP_RULE.InitAdjust(tp)
     local g=Duel.GetFieldGroup(tp,LOCATION_DECK+LOCATION_EXTRA+LOCATION_HAND,LOCATION_DECK+LOCATION_EXTRA+LOCATION_HAND)
     for tc in aux.Next(g) do
         if tc:IsType(TYPE_MONSTER) then
-            local e2=Effect.CreateEffect(c)
+            local e2=Effect.CreateEffect(tc)
             e2:SetDescription(aux.Stringid(1050186,0))
             e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
             e2:SetCode(EVENT_BATTLE_DAMAGE)
             e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE+EFFECT_FLAG_CANNOT_INACTIVATE+EFFECT_FLAG_UNCOPYABLE)
             e2:SetOperation(SP_RULE.operation)
-            c:RegisterEffect(e2)
+            tc:RegisterEffect(e2)
         end
     end
 end
