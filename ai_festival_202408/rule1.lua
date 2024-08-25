@@ -11,7 +11,7 @@ SP_RULE.Message={"决斗开始时，双方从卡组随机将20张卡里侧除外
                     "（那些卡发生过移动后，即从随机列表中除外）"}
 
 --第一个抽卡阶段执行，tp是AI
-function SP_RULE.InitAdjust(e,tp)
+function SP_RULE.InitAdjust(tp)
     if not SP_RULE.IsInit then
         local g=Duel.GetFieldGroup(0,LOCATION_DECK,0):RandomSelect(tp,20)
         local g2=Duel.GetFieldGroup(0,LOCATION_DECK,0):RandomSelect(tp,20)

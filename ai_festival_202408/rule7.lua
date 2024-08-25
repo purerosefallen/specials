@@ -12,8 +12,8 @@ SP_RULE.Message={"双方场上各发动1张【蛇毒沼泽】。"}
 
 --第一个抽卡阶段执行，tp是AI
 function SP_RULE.InitAdjust(tp)
-    local c=Duel.CreateToken(tp,54306223)
-    Duel.MoveToField(c,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
-    c=Duel.CreateToken(1-tp,54306223)
-    Duel.MoveToField(c,1-tp,1-tp,LOCATION_FZONE,POS_FACEUP,true)
+    for p=0,1 do
+        local c=Duel.CreateToken(p,54306223)
+        Duel.MoveToField(c,p,p,LOCATION_FZONE,POS_FACEUP,true)
+    end
 end

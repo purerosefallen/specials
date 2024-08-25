@@ -19,7 +19,7 @@ function SP_RULE.InitAdjust(tp)
             e2:SetDescription(aux.Stringid(545781,0))
             e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
             e2:SetCode(EVENT_BATTLE_DAMAGE)
-            e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE+EFFECT_FLAG_CANNOT_INACTIVATE+EFFECT_FLAG_UNCOPYABLE)
+            e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CAN_FORBIDDEN+EFFECT_FLAG_CANNOT_INACTIVATE+EFFECT_FLAG_UNCOPYABLE)
             e2:SetOperation(SP_RULE.operation)
             tc:RegisterEffect(e2)
         end
