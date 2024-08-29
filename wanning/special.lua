@@ -619,7 +619,9 @@ wrapDeckSkill(98045062, function (e1)
     e1:SetCode(EFFECT_LIMIT_SPECIAL_SUMMON_POSITION)
     e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
     e1:SetTargetRange(0,1)
-    e1:SetTarget(aux.TRUE)
+    e1:SetTarget(function (e,c,sump,sumtype,sumpos,targetp)
+		return bit.band(sumpos,POS_FACEDOWN)~=0
+	end)
 end)
 
 wrapDeckSkill(98045062, function (e1)
