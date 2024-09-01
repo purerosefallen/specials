@@ -8,13 +8,14 @@ SP_RULE.AdjustCountLimit = 0
 
 SP_RULE.RuleName="魂之解放"
 --虽然没有限制，但ygopro最多显示5行文字
-SP_RULE.Message={"开局时，双方LP回复92000，所有怪兽得到以下效果外文本：",
+SP_RULE.Message={"开局时，双方LP变成10000，所有怪兽得到以下效果外文本：",
                     "·这张卡给对方造成战斗伤害时发动。","从对方卡组顶端把伤害量/500（向上取整）的数量的卡送去墓地。"}
 
 --第一个抽卡阶段执行，tp是AI
 function SP_RULE.InitAdjust(tp)
-    Duel.Recover(tp,92000,REASON_RULE)
-    Duel.Recover(1-tp,92000,REASON_RULE)
+    for p=0,1 do
+        Duel.SetLP(p,100000)
+    end
     local g=Duel.GetFieldGroup(tp,LOCATION_DECK+LOCATION_EXTRA+LOCATION_HAND,LOCATION_DECK+LOCATION_EXTRA+LOCATION_HAND)
     for tc in aux.Next(g) do
         if tc:IsType(TYPE_MONSTER) then

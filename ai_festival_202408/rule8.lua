@@ -12,21 +12,23 @@ SP_RULE.Message={"双方场上各发动1张【最终突击命令】。双方受�
 
 --第一个抽卡阶段执行，tp是AI
 function SP_RULE.InitAdjust(tp)
-    local c=Duel.CreateToken(tp,52503575)
-    Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-    c=Duel.CreateToken(1-tp,52503575)
-    Duel.MoveToField(c,1-tp,1-tp,LOCATION_SZONE,POS_FACEUP,true)
+	for p=0,1 do
+		local c=Duel.CreateToken(p,52503575)
+		Duel.MoveToField(c,p,p,LOCATION_SZONE,POS_FACEUP,true)
+	end
 end
 
 --给规则卡添加效果。只会执行一次。
 function SP_RULE.InitRuleCard(c)
 	--double damage
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_CHANGE_BATTLE_DAMAGE)
-	e3:SetRange(LOCATION_REMOVED)
-	e3:SetTargetRange(LOCATION_MZONE,0)
-	e3:SetTarget(aux.TRUE)
-	e3:SetValue(aux.ChangeBattleDamage(1,DOUBLE_DAMAGE))
-	c:RegisterEffect(e3)
+    local e1=Effect.CreateEffect(c)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CHANGE_DAMAGE)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetRange(LOCATION_REMOVED)
+    e1:SetTargetRange(1,0)
+    e1:SetValue(function (e,re,val,r,rp,rc)
+		return val*2
+	end)
+    c:RegisterEffect(e1)
 end

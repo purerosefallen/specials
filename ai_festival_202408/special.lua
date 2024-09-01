@@ -124,9 +124,11 @@ CUNGUI.ChestEffectIndex=10 --待调整
 
 function CUNGUI.chesttg(e,tp,eg,ep,ev,re,r,rp)
 	if chk==0 then return true end
-	if e:GetLabel()==1 then rp = tp end
+	local ct=e:GetLabel()
+	if aux.GetValueType(ct)~="number" then ct=0 end
+	if ct==1 then rp = tp end
 	local i=math.random(CUNGUI.ChestEffectIndex)
-	e:SetLabelObject(i)
+	e:SetLabel(ct,i)
 	Duel.LoadScript("chest" .. tostring(i) .. ".lua")
 
 	if CHEST then
@@ -154,9 +156,10 @@ function CUNGUI.GetPlayerName()
 end
 
 function CUNGUI.chestop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetLabel()==1 then rp = tp end
+	local ct,i=e:GetLabel()
+	if ct==1 then rp = tp end
 	--对撞会同时触发2个，在这里要重新载入一次
-	Duel.LoadScript("chest" .. tostring(e:GetLabelObject()) .. ".lua")
+	Duel.LoadScript("chest" .. tostring(i) .. ".lua")
 	if CHEST and CHEST.BattleDestroyedEffect then
 		if CHEST.EffectMessage then
 			local name = CUNGUI.GetPlayerName()
