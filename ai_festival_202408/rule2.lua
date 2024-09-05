@@ -8,13 +8,14 @@ SP_RULE.AdjustCountLimit = 0
 
 SP_RULE.RuleName="死亡轮盘"
 --虽然没有限制，但ygopro最多显示5行文字
-SP_RULE.Message={"开局时，双方LP变为100000，所有怪兽得到以下效果外文本：",
+SP_RULE.Message={"开局时，双方LP变成100000，所有怪兽得到以下效果外文本：",
                     "·这张卡给对方造成战斗伤害时发动。自己投1次骰子。","投到6的场合，给对方造成100000点伤害。"}
 
 --开局执行；此时还无法得知谁是AI。
 function SP_RULE.Init()
-    Duel.SetLP(0,92000)
-    Duel.SetLP(1,92000)
+    for p=0,1 do
+        Duel.SetLP(p,100000)
+    end
 end
 
 --第一个抽卡阶段执行，tp是AI
