@@ -1208,6 +1208,165 @@ addSkill(92714517, function(e1)
 	end)
 end)
 
+standbyPhaseSkill(55795155, function (e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(24094258,3))
+	local g=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_DECK+LOCATION_GRAVE,0,0,2,nil,TYPE_PENDULUM)
+	if g:GetCount()>0 then
+        Duel.SendtoExtraP(g,nil,REASON_EFFECT)
+    end
+end)
+
+addSkill(55795155, function(e1)
+	e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetCode(EFFECT_SKIP_DP)
+	e1:SetTargetRange(1,0)
+	e1:SetCondition(function (e)
+		local tp=e:GetHandlerPlayer()
+		return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)==0
+	end)
+end)
+
+addSkill(55795155, function(e1)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+    e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCondition(function (e,tp,eg)
+		return eg:IsExists(function (c)
+		return c:IsSummonPlayer(tp) and c:IsSummonType(SUMMON_TYPE_PENDULUM)
+		end,1,nil)
+	end)
+	e1:SetOperation(function(e,tp)
+		local pendulum_count=function (chk)
+			if not chk then chk=1 end
+			local flag=Duel.GetFlagEffectLabel(tp,55795155)
+			if not flag then flag=0 end
+			flag=flag+1
+			if chk==0 then return flag end
+			if Duel.GetFlagEffectLabel(tp,55795155) then Duel.ResetFlagEffect(tp,55795155) end
+			Duel.RegisterFlagEffect(tp,55795155,RESET_PHASE+PHASE_END,0,1,flag)
+		end
+		if pendulum_count(0)<=2 then
+			if tp==0 then
+				Auxiliary.PendulumReset()
+				pendulum_count()
+			else
+				Auxiliary.PendulumReset()
+				pendulum_count()
+			end
+		end
+	end)
+end)
+
+standbyPhaseSkill(21570001, function (e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.SelectMatchingCard(tp,function (tc)
+		return tc:IsSetCard(0x181) or tc:IsSetCard(0x189) or tc:IsSetCard(0x190) or tc:IsSetCard(0x17a) or tc:IsCode(56099748) or aux.IsCodeListed(tc,56099748)
+	end,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,0,10,nil)
+	local ct=5
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<ct then
+		ct=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local sg=g:FilterSelect(tp,Card.IsCanBeSpecialSummoned,0,ct,nil,e,0,tp,false,false)
+	if sg:GetCount()>0 then g:Sub(sg) Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP) end
+	if g:GetCount()>0 then Duel.SendtoHand(g,nil,REASON_RULE) end
+end)
+
+addSkill(21570001, function (e1)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(function (e,c)
+		return c:IsCode(56099748) and Duel.GetAttacker() and Duel.GetAttacker()==c and c:IsControler(e:GetHandlerPlayer())
+	end)
+    e1:SetValue(function (e,c)
+		return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED)*(800)
+	end)
+end)
+
+addSkill(21570001, function (e1)
+	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+    e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+    e1:SetCode(EFFECT_DESTROY_REPLACE)
+	e1:SetTarget(function (e,tp,eg,ep,ev,re,r,rp,chk)
+		local g=Duel.GetDecktopGroup(tp,1)
+		if chk==0 then return eg:IsExists(function (c)
+			return c:IsControler(tp) and c:IsOnField()
+				and c:IsReason(REASON_EFFECT) and not c:IsReason(REASON_REPLACE)
+			end,1,nil,tp) and g:GetCount()>0
+		end
+		return Duel.SelectEffectYesNo(tp,c,96)
+	end)
+    e1:SetValue(function (e,c)
+		local tp=e:GetHandlerPlayer()
+		return c:IsControler(tp) and c:IsOnField()
+			and c:IsReason(REASON_EFFECT) and not c:IsReason(REASON_REPLACE)
+	end)
+    e1:SetOperation(function (e,tp,eg,ep,ev,re,r,rp)
+		Duel.Hint(HINT_CARD,0,21570001)
+		local g=Duel.GetDecktopGroup(tp,1)
+		if g:GetCount()>0 then
+			Duel.SendtoGrave(g,REASON_RULE+REASON_REPLACE)
+		end
+	end)
+end)
+
+addSkill(48356796, function (e1)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+    e1:SetCode(EVENT_PAY_LPCOST)
+	e1:SetOperation(function (e,tp)
+		local lp=Duel.GetLP(tp)
+		lp=lp+10000
+		Duel.SetLP(tp,lp)
+		Duel.Recover(tp,5000,REASON_RULE)
+	end)
+end)
+
+wrapDeckSkill(48356796, function (e2)
+	e2:SetType(EFFECT_TYPE_FIELD)
+    e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e2:SetCode(EFFECT_DRAW_COUNT)
+    e2:SetTargetRange(1,0)
+    e2:SetValue(function (e)
+		local tp=e:GetHandlerPlayer()
+		local val=6
+		if Duel.GetFlagEffect(tp,19403423)>0 then val=7 end
+		return val
+	end)
+end)
+
+standbyPhaseSkill(62487836,function (e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(tp,function (tc)
+		return (tc:IsAttribute(ATTRIBUTE_WATER) and tc:IsType(TYPE_MONSTER)) or tc:IsSetCard(0x2f) or tc:IsSetCard(0x77) or tc:IsSetCard(0x16c) or tc:IsSetCard(0x18a)
+	end,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
+	if g:GetCount()<2 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	g=g:Select(tp,2,2,nil)
+	if Duel.SendtoHand(g,nil,REASON_RULE)==2 then
+		Duel.BreakEffect()
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+		local sg=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,LOCATION_HAND,0,1,1,nil)
+		Duel.Remove(sg,POS_FACEUP,REASON_RULE)
+	end
+end,nil,true)
+
+endPhaseSkill(62487836,function (e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,function (c) return c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,false) and c:IsLevelBelow(10) and c:IsType(TYPE_SYNCHRO) and c:IsAttribute(ATTRIBUTE_WATER) end,tp,LOCATION_EXTRA,0,1,1,nil)
+	Duel.SpecialSummon(g,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)
+end,nil,true)
+
+addSkill(62487836, function (e2)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_CHAINING)
+	e2:SetOperation(function (e,tp,eg,ep,ev,re,r,rp)
+		if re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsAttribute(ATTRIBUTE_WATER) and ep==tp then
+			Duel.SetChainLimit(function ()
+				return tp==rp
+			end)
+		end
+	end)
+end)
+
 local function initialize()
   local skillCodes=getAllSkillCodes()
   local res=Duel.TossCoin(0,1)
