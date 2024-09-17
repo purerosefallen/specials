@@ -1286,14 +1286,15 @@ end)
 addSkill(21570001, function (e1)
 	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
     e1:SetCode(EFFECT_DESTROY_REPLACE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetTarget(function (e,tp,eg,ep,ev,re,r,rp,chk)
 		local g=Duel.GetDecktopGroup(tp,1)
 		if chk==0 then return eg:IsExists(function (c)
 			return c:IsControler(tp) and c:IsOnField()
 				and c:IsReason(REASON_EFFECT) and not c:IsReason(REASON_REPLACE)
-			end,1,nil,tp) and g:GetCount()>0
+			end,1,nil) and g:GetCount()>0
 		end
-		return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
+		return Duel.SelectYesNo(tp,1103)
 	end)
     e1:SetValue(function (e,c)
 		local tp=e:GetHandlerPlayer()
