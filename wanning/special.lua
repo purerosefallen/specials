@@ -46,10 +46,10 @@ local function wrapDeckSkill(code, effectFactory)
 end
 
 local function phaseSkill(code, phase, op, con, both)
-  wrapDeckSkill(code, function(e1)
+  	wrapDeckSkill(code, function(e1)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_PHASE+phase)
-		e1:SetCountLimit(1,0x7ffffff-code)
+		e1:SetCountLimit(1,0x7ffffff-phase)
 		e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
 			return (both or Duel.GetTurnPlayer()==tp) and (not con or con(e,tp,eg,ep,ev,re,r,rp))
 		end)
@@ -1178,7 +1178,7 @@ addSkill(92714517, function(e1)
 	e1:SetTargetRange(LOCATION_ONFIELD,0)
 	e1:SetCondition(function (e)
 		return Duel.IsExistingMatchingCard(function (tc)
-			return tc:IsLevelAbove(8) and c:IsSetCard(0x17e) and c:IsFaceup()
+			return tc:IsLevelAbove(8) and tc:IsSetCard(0x17e) and tc:IsFaceup()
 		end,tp,LOCATION_MZONE,0,1,nil)
 	end)
 	e1:SetTarget(function (e,c)
@@ -1285,7 +1285,6 @@ end)
 
 addSkill(21570001, function (e1)
 	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-    e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
     e1:SetCode(EFFECT_DESTROY_REPLACE)
 	e1:SetTarget(function (e,tp,eg,ep,ev,re,r,rp,chk)
 		local g=Duel.GetDecktopGroup(tp,1)
@@ -1294,7 +1293,7 @@ addSkill(21570001, function (e1)
 				and c:IsReason(REASON_EFFECT) and not c:IsReason(REASON_REPLACE)
 			end,1,nil,tp) and g:GetCount()>0
 		end
-		return Duel.SelectEffectYesNo(tp,c,96)
+		return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
 	end)
     e1:SetValue(function (e,c)
 		local tp=e:GetHandlerPlayer()
@@ -1335,7 +1334,7 @@ wrapDeckSkill(48356796, function (e2)
 end)
 
 standbyPhaseSkill(62487836,function (e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(tp,function (tc)
+	local g=Duel.GetMatchingGroup(function (tc)
 		return (tc:IsAttribute(ATTRIBUTE_WATER) and tc:IsType(TYPE_MONSTER)) or tc:IsSetCard(0x2f) or tc:IsSetCard(0x77) or tc:IsSetCard(0x16c) or tc:IsSetCard(0x18a)
 	end,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
 	if g:GetCount()<2 then return end
@@ -1360,12 +1359,14 @@ addSkill(62487836, function (e2)
 	e2:SetCode(EVENT_CHAINING)
 	e2:SetOperation(function (e,tp,eg,ep,ev,re,r,rp)
 		if re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsAttribute(ATTRIBUTE_WATER) and ep==tp then
-			Duel.SetChainLimit(function ()
-				return tp==rp
-			end)
+			Duel.SetChainLimit(c62487836_chainlm)
 		end
 	end)
 end)
+
+function c62487836_chainlm(e,ep,tp)
+	return tp==ep
+end
 
 local function initialize()
   local skillCodes=getAllSkillCodes()
