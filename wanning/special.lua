@@ -1294,7 +1294,7 @@ addSkill(21570001, function (e1)
 				and c:IsReason(REASON_EFFECT) and not c:IsReason(REASON_REPLACE)
 			end,1,nil) and g:GetCount()>0
 		end
-		return Duel.SelectYesNo(tp,1103)
+		return Duel.SelectYesNo(tp,aux.Stringid(897409,0))
 	end)
     e1:SetValue(function (e,c)
 		local tp=e:GetHandlerPlayer()
