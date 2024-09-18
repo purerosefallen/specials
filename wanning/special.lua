@@ -839,7 +839,7 @@ addSkill(35952884, function(e1)
 	end)
 end)
 
-wrapDeckSkill(35952884, function(e1)
+addSkill(35952884, function(e1)
 	e1:SetType(EFFECT_TYPE_FIELD)
     e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
     e1:SetCode(EFFECT_CANNOT_REMOVE)
@@ -935,7 +935,7 @@ function c72283691_chainop(e,tp,eg,ep,ev,re,r,rp)
 	destroyGold(tc)
 end
 
-wrapDeckSkill(37626500, function(e1)
+addSkill(37626500, function(e1)
     e1:SetType(EFFECT_TYPE_FIELD)
     e1:SetCode(EFFECT_CANNOT_REMOVE)
     e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
