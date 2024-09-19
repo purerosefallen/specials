@@ -1328,10 +1328,11 @@ wrapDeckSkill(48356796, function (e2)
     e2:SetCode(EFFECT_DRAW_COUNT)
     e2:SetTargetRange(1,0)
     e2:SetValue(function (e)
-		local tp=e:GetHandlerPlayer()
+		--[[local tp=e:GetHandlerPlayer()
 		local val=6
 		if Duel.GetFlagEffect(tp,19403423)>0 then val=7 end
-		return val
+		return val]]
+		return 6
 	end)
 end)
 
