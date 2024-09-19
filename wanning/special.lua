@@ -665,24 +665,22 @@ function c37313786_op(e,tp,eg,ep,ev,re,r,rp)
 	local dice=0
 	for i=1,4 do
 		local dc=Duel.TossDice(tp,1)
-		if dc==2 then ct=ct+1 end
-		if dc==2 or dc==6 then ct2=ct2+1 end
+		if dc==2 or dc==6 then ct=ct+1 end
+		if dc==2 then ct2=ct2+1 end
 		dice=dice+dc
 	end
 	if ct>0 then
 		if Duel.GetAttacker() then
 			Duel.NegateAttack()
 		end
-        if ct2>0 then
-			local g=Duel.GetDecktopGroup(1-tp,2*ct2)
-            Duel.DisableShuffleCheck()
-            Duel.Remove(g,POS_FACEUP,REASON_RULE)
-        end
-		if ct==4 then
-			local lp=Duel.GetLP(1-tp)-20220222
-			if lp<0 then lp=0 end
-			Duel.SetLP(1-tp,lp)
-		end
+		local g=Duel.GetDecktopGroup(1-tp,2*ct)
+		Duel.DisableShuffleCheck()
+		Duel.Remove(g,POS_FACEUP,REASON_RULE)
+	end
+	if ct2==4 then
+		local lp=Duel.GetLP(1-tp)-20220222
+		if lp<0 then lp=0 end
+		Duel.SetLP(1-tp,lp)
 	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
