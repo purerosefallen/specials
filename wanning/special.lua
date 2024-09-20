@@ -80,10 +80,6 @@ local function endPhaseSkill(code, op, con, both)
   phaseSkill(code, PHASE_END, op, con, both)
 end
 
-standbyPhaseSkill(48356796, function(e,tp,eg,ep,ev,re,r,rp)
-  Duel.Draw(tp,5,REASON_RULE)
-end)
-
 phaseSkill(22959079, PHASE_BATTLE_START, function(e,tp,eg,ep,ev,re,r,rp)
   local a1,a2,a3=Duel.TossCoin(tp,3)
   local result=(a1+a2+a3)*2
@@ -804,6 +800,7 @@ function c13513663_tg(e,tp,eg,ep,ev,re,r,rp,chk)
     Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 
+
 function c13513663_op(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
     if c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
@@ -1322,7 +1319,7 @@ addSkill(48356796, function (e1)
 	end)
 end)
 
-addSkill(48356796, function (e2)
+wrapDeckSkill(48356796, function (e2)
 	e2:SetType(EFFECT_TYPE_FIELD)
     e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
     e2:SetCode(EFFECT_DRAW_COUNT)
