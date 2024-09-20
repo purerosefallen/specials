@@ -781,8 +781,8 @@ oneTimeSkill(13513663, function(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetDescription(2)
 		e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 		e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-		e2:SetProperty(EFFECT_FLAG_DELAY)
 		e2:SetCode(EVENT_REMOVE)
+		e2:SetProperty(EFFECT_FLAG_DELAY)
 		e2:SetTarget(c13513663_tg)
 		e2:SetOperation(c13513663_op)
 		tc:RegisterEffect(e2)
@@ -806,7 +806,7 @@ end
 
 function c13513663_op(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
-    if c:IsRelateToEffect(e) then
+    if c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
         Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
     end
 end
