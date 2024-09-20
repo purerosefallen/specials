@@ -1319,7 +1319,7 @@ addSkill(48356796, function (e1)
 	end)
 end)
 
-wrapDeckSkill(48356796, function (e2)
+addSkill(48356796, function (e2)
 	e2:SetType(EFFECT_TYPE_FIELD)
     e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
     e2:SetCode(EFFECT_DRAW_COUNT)
