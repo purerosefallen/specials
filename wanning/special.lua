@@ -1034,12 +1034,20 @@ function c37626500_filter(c)
 	return c:IsType(TYPE_RITUAL) or c:IsRace(RACE_FAIRY) or c:IsSetCard(0x1a6)
 end
 
+oneTimeSkill(94820406,function (e,tp)
+	local g=Group.CreateGroup()
+	for i=1,5 do
+		local c=Duel.CreateToken(tp,94820406)
+		g:AddCard(c)
+	end
+	Duel.SendtoHand(g,tp,REASON_RULE)
+end)
+
 addSkill(94820406, function(e1)
     e1:SetType(EFFECT_TYPE_FIELD)
     e1:SetCode(EFFECT_CHAIN_MATERIAL)
     e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
     e1:SetTargetRange(1,0)
-    e1:SetReset(RESET_PHASE+PHASE_END)
     e1:SetTarget(function (e,te,tp)
 		if te:GetHandler():GetOriginalCode()~=94820406 then return Group.CreateGroup() end
 		return Duel.GetMatchingGroup(function (c)
@@ -1055,7 +1063,7 @@ addSkill(94820406, function(e1)
     e1:SetValue(aux.TRUE)
 end)
 
-addSkill(94820406, function(e1)
+wrapDeckSkill(94820406, function(e1)
     e1:SetType(EFFECT_TYPE_FIELD)
     e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e1:SetTargetRange(LOCATION_MZONE,0)
@@ -1078,7 +1086,7 @@ wrapDeckSkill(94820406, function(e1)
 	end)
 end)
 
-addSkill(94820406, function(e1)
+wrapDeckSkill(94820406, function(e1)
     e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
     e1:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e1:SetOperation(function (e,tp)
