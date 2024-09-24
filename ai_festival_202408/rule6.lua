@@ -26,7 +26,7 @@ function SP_RULE.InitRuleCard(c)
 	e2:SetOperation(SP_RULE.operation)
 	c:RegisterEffect(e2)
 end
-function SP_RULE.target(e,tp,eg,ep,ev,re,r,rp)
+function SP_RULE.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummon(tp) and not Duel.IsPlayerAffectedByEffect(tp,63060238) and not Duel.IsPlayerAffectedByEffect(tp,97148796)
 		and Duel.IsExistingMatchingCard(Card.IsSummonableCard,tp,LOCATION_DECK,0,1,nil) and Duel.IsPlayerCanDiscardDeck(tp,1) end
