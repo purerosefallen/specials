@@ -1202,10 +1202,25 @@ addSkill(92714517, function(e1)
 end)
 
 standbyPhaseSkill(55795155, function (e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(24094258,3))
 	local g=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_DECK+LOCATION_GRAVE,0,0,2,nil,TYPE_PENDULUM)
 	if g:GetCount()>0 then
-        Duel.SendtoExtraP(g,nil,REASON_EFFECT)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
+		local ct=0
+		if Duel.CheckLocation(tp,LOCATION_PZONE,0) then ct=ct+1 end
+		if Duel.CheckLocation(tp,LOCATION_PZONE,1) then ct=ct+1 end
+		local sg=g:FilterSelect(tp,function (c)
+			return not c:IsForbidden() and c:CheckUniqueOnField(tp,LOCATION_SZONE)
+		end,0,ct,nil)
+        if sg:GetCount()>0 then
+			for tc in aux.Next(sg) do
+				if Duel.MoveToField(tc,tp,tp,LOCATION_PZONE,POS_FACEUP,true) then
+					g:RemoveCard(tc)
+				end
+			end
+		end
+    end
+	if g:GetCount()>0 then
+		Duel.SendtoExtraP(g,nil,REASON_EFFECT)
     end
 end)
 
