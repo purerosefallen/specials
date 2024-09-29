@@ -22,9 +22,13 @@ function SP_RULE.InitRuleCard(c)
 	e2:SetRange(LOCATION_REMOVED)
     e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e2:SetCountLimit(1,98765432)
+	e2:SetCondition(SP_RULE.condition)
 	e2:SetTarget(SP_RULE.target)
 	e2:SetOperation(SP_RULE.operation)
 	c:RegisterEffect(e2)
+end
+function SP_RULE.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer() == tp
 end
 function SP_RULE.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
