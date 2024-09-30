@@ -80,8 +80,8 @@ function CUNGUI.CreateChest(tp)
 end
 
 CUNGUI.Chests={}
-CUNGUI.Chests[0]=Group.CreateGroup()
-CUNGUI.Chests[1]=Group.CreateGroup()
+CUNGUI.Chests[0]={}
+CUNGUI.Chests[1]={}
 function CUNGUI.CreateChestStep(tp)
 	local c=Duel.CreateToken(tp,1102515)
 	if not Duel.SpecialSummonStep(c,0,tp,tp,true,true,POS_FACEUP_ATTACK) then return nil end
@@ -96,7 +96,7 @@ function CUNGUI.CreateChestStep(tp)
 	e1:SetOperation(CUNGUI.chestop)
 	c:RegisterEffect(e1)
 
-	e2=Effect.CreateEffect(c)
+	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_BATTLED)
 	e2:SetReset(RESET_EVENT+RESET_TOFIELD+RESET_MSCHANGE+RESET_TEMP_REMOVE)
@@ -105,7 +105,7 @@ function CUNGUI.CreateChestStep(tp)
 	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
 
-	CUNGUI.Chests[tp]:AddCard(c)
+	table.insert(CUNGUI.Chests[tp],c)
 	return c
 end
 
@@ -114,7 +114,7 @@ function CUNGUI.chestreg(e,tp)
 	if Duel.GetAttacker()==e:GetHandler() then
 		i=1
 	end
-	e2:GetLabelObject():SetLabel(i)
+	e:GetLabelObject():SetLabel(i)
 end
 
 function CUNGUI.chestcond(e,tp,eg,ep,ev,re,r,rp)
