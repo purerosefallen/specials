@@ -121,7 +121,7 @@ function CUNGUI.chestcond(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE)
 end
 
-CUNGUI.ChestEffectIndex=10 --待调整
+CUNGUI.ChestEffectIndex=70 --待调整
 
 function CUNGUI.chesttg(e,tp,eg,ep,ev,re,r,rp)
 	if chk==0 then return true end

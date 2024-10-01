@@ -39,7 +39,8 @@ function CUNGUI.PreloadUds()
 	--要执行的特殊规则
 	--本次活动中，一阶段=8，二阶段=13
 	local RULE_MAX_INDEX = 13
-	Duel.LoadScript("rule" .. tostring(math.random(RULE_MAX_INDEX)) .. ".lua")
+	--Duel.LoadScript("rule" .. tostring(math.random(RULE_MAX_INDEX)) .. ".lua")
+	Duel.LoadScript("rule" .. '9' .. ".lua")
 	if SP_RULE and SP_RULE.Init then
 		SP_RULE.Init()
 	end
@@ -120,7 +121,7 @@ function CUNGUI.chestcond(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE)
 end
 
-CUNGUI.ChestEffectIndex=2 --待调整
+CUNGUI.ChestEffectIndex=70 --待调整
 
 function CUNGUI.chesttg(e,tp,eg,ep,ev,re,r,rp)
 	if chk==0 then return true end
