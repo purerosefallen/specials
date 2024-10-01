@@ -575,48 +575,30 @@ end, function(e,tp)
 	return Duel.GetTurnPlayer()==1-tp and Duel.GetMatchingGroupCount(nil,tp,0,LOCATION_MZONE,nil)>=3
 end, true)
 
-wrapDeckSkill(98045062, function (e1)
-    e1:SetType(EFFECT_TYPE_FIELD)
-    e1:SetCode(EFFECT_CANNOT_MSET)
-    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-    e1:SetTargetRange(0,1)
-    e1:SetTarget(aux.TRUE)
-end)
-
-wrapDeckSkill(98045062, function (e1)
-    e1:SetType(EFFECT_TYPE_FIELD)
-    e1:SetCode(EFFECT_CANNOT_SSET)
-    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-    e1:SetTargetRange(0,1)
-    e1:SetTarget(aux.TRUE)
-end)
-
-wrapDeckSkill(98045062, function (e1)
-    e1:SetType(EFFECT_TYPE_FIELD)
-    e1:SetCode(EFFECT_CANNOT_TURN_SET)
-    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-    e1:SetTargetRange(0,1)
-    e1:SetTarget(aux.TRUE)
-end)
-
-wrapDeckSkill(98045062, function (e1)
-    e1:SetType(EFFECT_TYPE_FIELD)
-    e1:SetCode(EFFECT_LIMIT_SPECIAL_SUMMON_POSITION)
-    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-    e1:SetTargetRange(0,1)
-    e1:SetTarget(function (e,c,sump,sumtype,sumpos,targetp)
-		return bit.band(sumpos,POS_FACEDOWN)~=0
+wrapDeckSkill(98045062, function(e1)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetTargetRange(0, 1)
+	e1:SetValue(function(e, te, tp)
+		if not te:IsHasType(EFFECT_TYPE_ACTIVATE) or not te:IsActiveType(TYPE_TRAP) then return false end
+		return te:GetHandler():IsLocation(LOCATION_HAND) and te:GetHandler():IsType(TYPE_TRAP)
 	end)
 end)
 
-wrapDeckSkill(98045062, function (e1)
-    e1:SetType(EFFECT_TYPE_FIELD)
-    e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-    e1:SetTargetRange(0,1)
-    e1:SetValue(function (e,te,tp)
-		if not te:IsHasType(EFFECT_TYPE_ACTIVATE) or not te:IsActiveType(TYPE_TRAP) then return false end
-		return te:GetHandler():IsLocation(LOCATION_HAND)
+wrapDeckSkill(98045062, function(e1)
+	e1:SetType(EFFECT_TYPE_FIELD + EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_CHAIN_SOLVING)
+	e1:SetCountLimit(1)
+	e1:SetCondition(function (e,tp,eg,ep,ev,re,r,rp)
+		return rp==1-tp
+	end)
+    e1:SetOperation(function (e,tp,eg,ep,ev,re,r,rp)
+		Duel.Hint(HINT_CARD,0,98045062)
+		local rc=re:GetHandler()
+		if Duel.NegateEffect(ev,true) and rc:IsRelateToEffect(re) then
+			Duel.Destroy(rc,REASON_EFFECT)
+		end
 	end)
 end)
 
@@ -1199,6 +1181,24 @@ addSkill(92714517, function(e1)
     e1:SetTarget(function (e,c)
 		return c:GetType()==TYPE_TRAP
 	end)
+end)
+
+addSkill(92714517, function(e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CHANGE_DAMAGE)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetTargetRange(0,1)
+    e1:SetValue(function(e,re,val,r,rp,rc)
+		if bit.band(r,REASON_EFFECT)~=0 then return 0
+		else return val end
+	end)
+end)
+
+addSkill(92714517, function(e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetTargetRange(0,1)
 end)
 
 standbyPhaseSkill(55795155, function (e,tp,eg,ep,ev,re,r,rp)
