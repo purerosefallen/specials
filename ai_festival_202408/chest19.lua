@@ -13,7 +13,7 @@ function CHEST.EffectMessageAbsolute(e,rp)
     local name=CUNGUI.GetPlayerName()
     local name2=CUNGUI.GetAIName()
     if rp == CUNGUI.AI then name2,name = name,name2 end
-    if Duel.GetFieldGroupCount(rp,LOCATION_MZONE)<1 then
+    if Duel.GetFieldGroupCount(rp,LOCATION_MZONE,0)<1 then
         return name .. "觉得自己的肚子已经足够大了，没必要膨胀成十倍……"
     end
     return name .. "对着自己场上的怪兽使用了放大器！"
