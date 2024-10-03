@@ -88,6 +88,7 @@ function CUNGUI.CreateChestStep(tp)
 	
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetCategory(CATEGORY_DRAW)
 	e1:SetCode(EVENT_BATTLE_DESTROYED)
 	e1:SetReset(RESET_EVENT+RESET_TOFIELD+RESET_MSCHANGE+RESET_TEMP_REMOVE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CAN_FORBIDDEN+EFFECT_FLAG_CANNOT_INACTIVATE+EFFECT_FLAG_UNCOPYABLE)
@@ -95,6 +96,7 @@ function CUNGUI.CreateChestStep(tp)
 	e1:SetTarget(CUNGUI.chesttg)
 	e1:SetOperation(CUNGUI.chestop)
 	c:RegisterEffect(e1)
+	c:RegisterFlagEffect(1102515,RESET_EVENT+RESET_TOFIELD+RESET_MSCHANGE+RESET_TEMP_REMOVE,0,1)
 
 	table.insert(CUNGUI.Chests[tp],c)
 	return c
@@ -154,7 +156,9 @@ function CUNGUI.chestop(e,tp,eg,ep,ev,re,r,rp)
 		end
 		CHEST.BattleDestroyedEffect(e,p)
 	end
+	Duel.Draw(e:GetHandler():GetControler(),1,REASON_EFFECT)
 	e:Reset()
+	e:GetHandler():ResetFlagEffect(1102515)
 end
 
 function CUNGUI.CheckAI(e)

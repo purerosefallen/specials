@@ -18,16 +18,18 @@ end
 --第一个抽卡阶段执行，tp是AI。
 function SP_RULE.InitAdjust(tp)
 	local c=CUNGUI.CreateChestStep(tp)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-	e1:SetValue(10000)
-	c:RegisterEffect(e1)
-	e1=e1:Clone()
-	e1:SetCode(EFFECT_SET_DEFENSE_FINAL)
-	c:RegisterEffect(e1)
-	Duel.SpecialSummonComplete()
+	if c then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetValue(10000)
+		c:RegisterEffect(e1)
+		e1=e1:Clone()
+		e1:SetCode(EFFECT_SET_DEFENSE_FINAL)
+		c:RegisterEffect(e1)
+		Duel.SpecialSummonComplete()
+	end
 end
 
 --给规则卡添加效果。只会执行一次。

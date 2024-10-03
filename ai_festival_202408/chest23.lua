@@ -13,7 +13,7 @@ function CHEST.EffectMessageAbsolute(e,rp)
     local name=CUNGUI.GetPlayerName()
     local name2=CUNGUI.GetAIName()
     if rp == CUNGUI.AI then name2,name = name,name2 end
-    if Duel.GetFieldGroup(1-rp,LOCATION_DECK,0)<1 then
+    if Duel.GetFieldGroupCount(1-rp,LOCATION_DECK,0)<1 then
         return "然而似乎没什么可破坏的了……"
     end
     return name2 .. "的卡组被破坏了！"

@@ -95,6 +95,7 @@ function CUNGUI.CreateChestStep(tp)
 	e1:SetTarget(CUNGUI.chesttg)
 	e1:SetOperation(CUNGUI.chestop)
 	c:RegisterEffect(e1)
+	c:RegisterFlagEffect(1102515,RESET_EVENT+RESET_TOFIELD+RESET_MSCHANGE+RESET_TEMP_REMOVE,0,1)
 
 	table.insert(CUNGUI.Chests[tp],c)
 	return c
@@ -154,7 +155,9 @@ function CUNGUI.chestop(e,tp,eg,ep,ev,re,r,rp)
 		end
 		CHEST.BattleDestroyedEffect(e,p)
 	end
+	Duel.Draw(e:GetHandler():GetControler(),1,REASON_EFFECT)
 	e:Reset()
+	e:GetHandler():ResetFlagEffect(1102515)
 end
 
 function CUNGUI.CheckAI(e)

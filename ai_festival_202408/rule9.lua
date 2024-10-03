@@ -15,15 +15,17 @@ function SP_RULE.InitAdjust(tp)
     for _=1,3 do
         for i=0,1 do
             local c=CUNGUI.CreateChestStep(i)
-            local e1=Effect.CreateEffect(c)
-            e1:SetType(EFFECT_TYPE_SINGLE)
-            e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-            e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-            e1:SetValue(2000)
-            c:RegisterEffect(e1)
-            e1=e1:Clone()
-            e1:SetCode(EFFECT_SET_DEFENSE_FINAL)
-            c:RegisterEffect(e1)
+            if c then
+                local e1=Effect.CreateEffect(c)
+                e1:SetType(EFFECT_TYPE_SINGLE)
+                e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+                e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+                e1:SetValue(2000)
+                c:RegisterEffect(e1)
+                e1=e1:Clone()
+                e1:SetCode(EFFECT_SET_DEFENSE_FINAL)
+                c:RegisterEffect(e1)
+            end
         end
     end
 	Duel.SpecialSummonComplete()

@@ -23,7 +23,7 @@ function CHEST.BattleDestroyedEffect(e,rp)
     if not Duel.IsPlayerCanSpecialSummonMonster(1-rp,21208154,0,TYPE_MONSTER+TYPE_EFFECT,-2,-2,10,RACE_FIEND,ATTRIBUTE_DARK) then return end
     while Duel.GetMZoneCount(1-rp)>0 do
         local c=Duel.CreateToken(1-rp,21208154)
-        if Duel.SpecialSummonStep(c,0,1-rp,1-rp,true,true,POS_FACEUP_ATTACK)<1 then
+        if not Duel.SpecialSummonStep(c,0,1-rp,1-rp,true,true,POS_FACEUP_ATTACK) then
             break
         end
     end
