@@ -13,7 +13,7 @@ function CHEST.EffectMessageAbsolute(e,rp)
     local name=CUNGUI.GetPlayerName()
     local name2=CUNGUI.GetAIName()
     if rp == CUNGUI.AI then name2,name = name,name2 end
-    if Duel.GetFieldGroup(rp,LOCATION_DECK,0)<1 then
+    if Duel.GetFieldGroupCount(rp,LOCATION_DECK,0)<1 then
         return "然而似乎耗材不够了……"
     end
     return name .. "努力建设着墓地！"
