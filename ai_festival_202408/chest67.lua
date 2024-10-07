@@ -26,7 +26,7 @@ function CHEST.filter(c)
 end
 
 --战斗破坏时发动的效果。
-function CHEST.BattleDestroyedEffect(e,rp)
+function CHEST.BattleDestroyedEffect(e,tp)
 	local c=e:GetHandler()
 	if not Duel.IsExistingMatchingCard(CHEST.filter,tp,LOCATION_MZONE,0,1,nil)
 		or not Duel.IsExistingMatchingCard(CHEST.filter,tp,0,LOCATION_MZONE,1,nil)

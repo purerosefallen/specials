@@ -23,7 +23,7 @@ end
 function CHEST.BattleDestroyedEffect(e,rp)
     if not Duel.IsPlayerCanSpecialSummonMonster(1-rp,99267150,0,TYPE_MONSTER+TYPE_EFFECT+TYPE_FUSION,5000,5000,12,RACE_DRAGON,ATTRIBUTE_DARK) then return end
     local c=Duel.CreateToken(rp,99267150)
-    while Duel.SpecialSummonStep(c,0,1-rp,1-rp,true,true,POS_FACEUP_ATTACK)>0 do
+    while Duel.SpecialSummonStep(c,0,1-rp,1-rp,true,true,POS_FACEUP_ATTACK) do
         c=Duel.CreateToken(rp,99267150)
     end
     Duel.SpecialSummonComplete()

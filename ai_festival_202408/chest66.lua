@@ -21,8 +21,8 @@ end
 
 --战斗破坏时发动的效果。
 function CHEST.BattleDestroyedEffect(e,rp)
-    local d1=6-#Duel.GetFieldGroupCount(rp,LOCATION_HAND,0)
-    local d2=6-#Duel.GetFieldGroupCount(1-rp,LOCATION_HAND,0)
+    local d1=6-Duel.GetFieldGroupCount(rp,LOCATION_HAND,0)
+    local d2=6-Duel.GetFieldGroupCount(1-rp,LOCATION_HAND,0)
     if d1>0 then
         Duel.Draw(rp,d1,REASON_RULE)
     end
