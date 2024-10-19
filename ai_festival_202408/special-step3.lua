@@ -276,7 +276,6 @@ function CUNGUI.Step3DiceDuel(e,tp)
 		else
 			e:Reset()
 		end
-		return
 	end
 	if Duel.GetTurnCount() < 2 then
 
@@ -406,7 +405,7 @@ end
 function CUNGUI.RandomSummonStep(tp)
 	local id=CUNGUI.SPList[math.random(#CUNGUI.SPList)]
 	local c=Duel.CreateToken(tp,id)
-	if Duel.SpecialSummonStep(c,0,tp,tp,true,true,POS_FACEUP_ATTACK)>0 then
+	if Duel.SpecialSummonStep(c,0,tp,tp,true,true,POS_FACEUP_ATTACK) then
 		c:CompleteProcedure()
 		return true
 	end
