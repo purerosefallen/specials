@@ -39,8 +39,7 @@ function CUNGUI.PreloadUds()
 	--要执行的特殊规则
 	--本次活动中，一阶段=8，二阶段=13
 	local RULE_MAX_INDEX = 13
-	--Duel.LoadScript("rule" .. tostring(math.random(RULE_MAX_INDEX)) .. ".lua")
-	Duel.LoadScript("rule" .. '9' .. ".lua")
+	Duel.LoadScript("rule" .. tostring(math.random(RULE_MAX_INDEX)) .. ".lua")
 	if SP_RULE and SP_RULE.Init then
 		SP_RULE.Init()
 	end
