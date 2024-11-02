@@ -295,7 +295,7 @@ function CUNGUI.Step3DiceDuel(e,tp)
 			CUNGUI.RandomSummonStep(tp)
 			CUNGUI.RandomSummonStep(tp)
 			CUNGUI.RandomSummonStep(tp)
-
+			Duel.SpecialSummonComplete()
 			local m = math.random(7)
 			local str = ""
 
@@ -315,6 +315,7 @@ function CUNGUI.Step3DiceDuel(e,tp)
 			elseif m == 3 then
 				str = "？？？：不击灭入侵者，有辱黄金卿之名！"
 				CUNGUI.CreateAndSpecialSummon(1-tp,95440946,POS_FACEUP_DEFENSE)
+				Duel.SpecialSummonComplete()
 				local c=Duel.CreateToken(1-tp,20590515)
 				Duel.SSet(1-tp,c)
 				local c=Duel.CreateToken(1-tp,56984514)
@@ -323,6 +324,7 @@ function CUNGUI.Step3DiceDuel(e,tp)
 				str = "？？？：够格的对手，久违的实战。"
 				CUNGUI.CreateAndSpecialSummon(1-tp,42632209)
 				local c=CUNGUI.CreateAndSpecialSummon(1-tp,69488544)
+				Duel.SpecialSummonComplete()
 				local tc=Duel.CreateToken(1-tp,31423101)
 				Duel.Equip(1-tp,tc,c)
 			elseif m == 5 then
@@ -338,6 +340,7 @@ function CUNGUI.Step3DiceDuel(e,tp)
 			else
 				str = "天上划出一道口子，有个意义不明戴着假面并且你不认识的怪兽前来助阵。"
 				local c=CUNGUI.CreateAndSpecialSummonStep(1-tp,26973555)
+				Duel.SpecialSummonComplete()
 				local oc=CUNGUI.CreateAndSendtoHand(1-tp,13171876)
 				Duel.Overlay(c,oc)
 			end
