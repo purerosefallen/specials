@@ -9,7 +9,6 @@ function c64631466.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
-	e1:SetCondition(c64631466.eqcon)
 	e1:SetTarget(c64631466.eqtg)
 	e1:SetOperation(c64631466.eqop)
 	c:RegisterEffect(e1)
@@ -38,6 +37,11 @@ function c64631466.initial_effect(c)
 	e4:SetCondition(c64631466.damcon)
 	e4:SetOperation(c64631466.damop)
 	c:RegisterEffect(e4)
+	local e5=aux.AddRitualProcGreater2(c,c64631466.filter,LOCATION_HAND,nil,nil,true)
+	e5:SetType(EFFECT_TYPE_IGNITION)
+	e5:SetRange(LOCATION_HAND)
+	e5:SetCost(c64631466.spcost)
+	c:RegisterEffect(e5)
 end
 function c64631466.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	return c64631466.can_equip_monster(e:GetHandler())
@@ -61,7 +65,7 @@ function c64631466.eqlimit(e,c)
 	return e:GetOwner()==c
 end
 function c64631466.equip_monster(c,tp,tc)
-	if c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and not c64631466.can_equip_monster(c) then
+	if c:IsLocation(LOCATION_MZONE) and c:IsFaceup() then
 		Duel.SendtoGrave(tc,REASON_RULE)
 		return
 	end
@@ -127,4 +131,16 @@ function c64631466.defval(e,c)
 	else
 		return def
 	end
+end
+function c64631466.filter(c,e,tp,chk)
+	return c==e:GetHandler() and c:IsType(TYPE_RITUAL)
+end
+function c64631466.costfilter(c)
+	return c:IsCode(41426869) and c:IsAbleToGraveAsCost()
+end
+function c64631466.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c64631466.costfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,c64631466.costfilter,tp,LOCATION_DECK,0,1,1,nil)
+	Duel.SendtoGrave(g,REASON_COST)
 end

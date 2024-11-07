@@ -6,7 +6,7 @@ function c69831560.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetRange(LOCATION_HAND)
+	e1:SetRange(LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE)
 	e1:SetCondition(c69831560.spcon)
 	e1:SetTarget(c69831560.sptg)
 	e1:SetOperation(c69831560.spop)
@@ -26,6 +26,16 @@ function c69831560.initial_effect(c)
 	e3:SetTarget(c69831560.cointg)
 	e3:SetOperation(c69831560.coinop)
 	c:RegisterEffect(e3)
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(69831560,1))
+	e3:SetCategory(CATEGORY_DESTROY)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_TO_HAND)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCondition(c69831560.ddcon)
+	e3:SetTarget(c69831560.ddtg)
+	e3:SetOperation(c69831560.ddop)
+	c:RegisterEffect(e3)
 end
 c69831560.toss_coin=true
 function c69831560.spfilter(c)
@@ -34,11 +44,11 @@ end
 function c69831560.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local mg=Duel.GetMatchingGroup(c69831560.spfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local mg=Duel.GetMatchingGroup(c69831560.spfilter,tp,LOCATION_MZONE,0,nil)
 	return mg:CheckSubGroup(aux.mzctcheck,3,3,tp)
 end
 function c69831560.sptg(e,tp,eg,ep,ev,re,r,rp,chk,c)
-	local mg=Duel.GetMatchingGroup(c69831560.spfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local mg=Duel.GetMatchingGroup(c69831560.spfilter,tp,LOCATION_MZONE,0,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local sg=mg:SelectSubGroup(tp,aux.mzctcheck,true,3,3,tp)
 	if sg then
@@ -131,4 +141,20 @@ function c69831560.desop2(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(g,REASON_EFFECT)
 	end
 	e:Reset()
+end
+function c69831560.ddcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
+function c69831560.ddfilter(c,tp)
+	return c:IsControler(1-tp) and not c:IsReason(REASON_DRAW)
+end
+function c69831560.ddtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local g=eg:Filter(c69831560.ddfilter,nil,tp)
+	if chk==0 then return g:GetCount()>0 end
+end
+function c69831560.ddop(e,tp,eg,ep,ev,re,r,rp)
+	local g=eg:Filter(c69831560.ddfilter,nil,tp)
+	if g:GetCount()>0 then
+		Duel.SendtoHand(g,tp,REASON_EFFECT)
+	end
 end

@@ -26,6 +26,13 @@ function c5861892.initial_effect(c)
 	e3:SetTarget(c5861892.cointg)
 	e3:SetOperation(c5861892.coinop)
 	c:RegisterEffect(e3)
+	local e10=Effect.CreateEffect(c)
+	e10:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e10:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e10:SetCode(EVENT_TOSS_COIN_NEGATE)
+	e10:SetRange(LOCATION_MZONE)
+	e10:SetOperation(c5861892.coinop)
+	c:RegisterEffect(e10)
 end
 c5861892.toss_coin=true
 function c5861892.spfilter(c)
@@ -147,4 +154,9 @@ function c5861892.negop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(-1000)
 		c:RegisterEffect(e1)
 	end
+end
+function c5861892.coinop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_CARD,0,5861892)
+	local val=1-Duel.AnnounceCoin(e:GetHandlerPlayer())
+	Duel.SetCoinResult(val)
 end

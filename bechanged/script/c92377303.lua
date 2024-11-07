@@ -1,19 +1,24 @@
 --黒衣の大賢者
 function c92377303.initial_effect(c)
 	aux.AddCodeList(c,46986414)
+	c:SetSPSummonOnce(92377303)
+	aux.EnableChangeCode(c,46986414,LOCATION_MZONE+LOCATION_GRAVE)
 	c:EnableReviveLimit()
-	--special summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetRange(LOCATION_HAND+LOCATION_DECK)
-	e1:SetCountLimit(1,92377303+EFFECT_COUNT_CODE_OATH)
-	e1:SetCondition(c92377303.spcon)
-	e1:SetTarget(c92377303.sptg)
-	e1:SetOperation(c92377303.spop)
-	e1:SetValue(SUMMON_VALUE_SELF)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	c:RegisterEffect(e1)
+	--special summon
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_SPSUMMON_PROC)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e2:SetRange(LOCATION_HAND+LOCATION_DECK)
+	e2:SetCondition(c92377303.spcon)
+	e2:SetTarget(c92377303.sptg)
+	e2:SetOperation(c92377303.spop)
+	c:RegisterEffect(e2)
 	--to hand
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(92377303,1))
@@ -24,32 +29,33 @@ function c92377303.initial_effect(c)
 	e3:SetTarget(c92377303.thtg)
 	e3:SetOperation(c92377303.thop)
 	c:RegisterEffect(e3)
-	--code
-	aux.EnableChangeCode(c,46986414,LOCATION_MZONE+LOCATION_GRAVE)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+	e4:SetValue(LOCATION_DECK)
+	c:RegisterEffect(e4)
 end
-function c92377303.spfilter(c)
-	return c:IsFaceup() and c:IsReleasable() and c:IsCode(46986414)
+function c92377303.spfilter(c,tp)
+	return c:IsCode(46986414)
+		and Duel.GetMZoneCount(tp,c)>0 and (c:IsControler(tp) or c:IsFaceup())
 end
 function c92377303.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local g=Duel.GetMatchingGroup(c92377303.spfilter,tp,LOCATION_MZONE,0,nil)
-	return g:GetCount()>0
+	return Duel.CheckReleaseGroupEx(tp,c92377303.spfilter,1,REASON_SPSUMMON,false,nil,tp) and Duel.GetCurrentPhase()==PHASE_MAIN2
 end
 function c92377303.sptg(e,tp,eg,ep,ev,re,r,rp,chk,c)
-	local g=Duel.GetMatchingGroup(c92377303.spfilter,tp,LOCATION_MZONE,0,nil)
+	local g=Duel.GetReleaseGroup(tp,false,REASON_SPSUMMON):Filter(c92377303.spfilter,nil,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:Select(tp,1,1,nil)
-	if sg then
-		sg:KeepAlive()
-		e:SetLabelObject(sg)
+	local tc=g:SelectUnselect(nil,tp,false,true,1,1)
+	if tc then
+		e:SetLabelObject(tc)
 		return true
 	else return false end
 end
 function c92377303.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=e:GetLabelObject()
-	Duel.Release(g,REASON_SPSUMMON+REASON_COST)
-	g:DeleteGroup()
+	Duel.Release(g,REASON_SPSUMMON)
 end
 function c92377303.thfilter(c)
 	return c:IsType(TYPE_SPELL) and c:IsAbleToHand()

@@ -4,10 +4,6 @@ function c21723081.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCondition(function (e)
-		local tp=e:GetHandlerPlayer()
-		return (not Duel.IsExistingMatchingCard(function (tc) return not (tc:IsRace(RACE_MACHINE) or tc:IsAttribute(ATTRIBUTE_LIGHT)) end,tp,LOCATION_GRAVE,0,1,nil) and e:GetHandler():IsLocation(LOCATION_HAND)) or not e:GetHandler():IsLocation(LOCATION_HAND)
-	end)
 	c:RegisterEffect(e1)
 	--turn
 	local e2=Effect.CreateEffect(c)
@@ -18,22 +14,18 @@ function c21723081.initial_effect(c)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetHintTiming(0,TIMING_END_PHASE)
 	e2:SetCountLimit(1,21723081)
-	e2:SetCondition(c21723081.condition)
 	e2:SetTarget(c21723081.target)
 	e2:SetOperation(c21723081.operation)
 	c:RegisterEffect(e2)
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	c:RegisterEffect(e0)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e3:SetCost(c21723081.cost)
+	c:RegisterEffect(e3)
 end
 c21723081.has_text_type=TYPE_UNION
-function c21723081.cfilter(c)
-	return c:IsFaceup() and (c:IsCode(91998119) or c:IsType(TYPE_FUSION) and aux.IsMaterialListCode(c,91998119))
-end
-function c21723081.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c21723081.cfilter,tp,LOCATION_MZONE,0,1,nil)
-end
 function c21723081.tdfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_UNION) and c:IsAbleToDeck()
 end
@@ -72,4 +64,11 @@ function c21723081.operation(e,tp,eg,ep,ev,re,r,rp)
 			Duel.Destroy(rg,REASON_EFFECT)
 		end
 	end
+end
+function c21723081.cfilter(c)
+	return (c:IsType(TYPE_UNION) or c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_LIGHT)) and c:IsDiscardable()
+end
+function c21723081.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c21723081.cfilter,tp,LOCATION_HAND,0,1,nil) end
+	Duel.DiscardHand(tp,c21723081.cfilter,1,1,REASON_DISCARD+REASON_COST,nil)
 end
