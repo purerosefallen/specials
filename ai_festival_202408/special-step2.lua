@@ -234,19 +234,57 @@ end
 function CUNGUI.RuleCardMove(e,tp)
 	local c=e:GetLabelObject()
 	if not c then
-		c=Duel.CreateToken(tp,e:GetLabel())
+		c=CUNGUI.CreateRuleCard(tp,e:GetLabel())
 		if SP_RULE and SP_RULE.InitRuleCard then
 			SP_RULE.InitRuleCard(c)
 		end
 		e:SetLabelObject(c)
 		CUNGUI.RuleCardGroup[tp]=c
 	end
-	if c:IsLocation(LOCATION_REMOVED) and c:IsFacedown() then
-		Duel.SendtoGrave(c,REASON_RULE)
+	if not c:IsLocation(LOCATION_EXTRA) or c:IsFacedown() then
+		Duel.SendtoExtraP(c,tp,REASON_RULE)
 	end
-	if not c:IsLocation(LOCATION_REMOVED) then
-		Duel.Remove(c,POS_FACEUP,REASON_RULE)
+end
+
+function CUNGUI.CreateRuleCard(tp,code)
+	local c=Duel.CreateToken(tp,code)
+	if tp~=CUNGUI.AI then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetCode(EFFECT_SPSUMMON_PROC_G)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+		e1:SetRange(LOCATION_EXTRA)
+		e1:SetCondition(function (e)
+			return e:GetHandler():IsFaceup()
+		end)
+		e1:SetOperation(function ()
+			CUNGUI.HintRule()
+		end)
+		c:RegisterEffect(e1)
 	end
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetRange(LOCATION_EXTRA)
+	e2:SetCode(EFFECT_CANNOT_USE_AS_COST)
+	e2:SetValue(1)
+	c:RegisterEffect(e2)
+	local e3=e2:Clone(c)
+	e3:SetCode(EFFECT_CANNOT_TO_GRAVE)
+	c:RegisterEffect(e3)
+	local e4=e2:Clone(c)
+	e4:SetCode(EFFECT_CANNOT_TO_HAND)
+	c:RegisterEffect(e4)
+	local e5=e2:Clone(c)
+	e5:SetCode(EFFECT_CANNOT_TO_DECK)
+	c:RegisterEffect(e5)
+	local e6=Effect.CreateEffect(c)
+	e6:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e6:SetType(EFFECT_TYPE_SINGLE)
+	e6:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e6:SetValue(aux.FALSE)
+	c:RegisterEffect(e6)
+	return c
 end
 
 function CUNGUI.GetRandomGambleCard(tp)
