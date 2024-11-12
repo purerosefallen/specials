@@ -191,16 +191,7 @@ function CUNGUI.CheckAI(e)
 			e1=e1:Clone()
 			Duel.RegisterEffect(e1,1)
 		end
-		if SP_RULE.RuleName then
-			Debug.Message("已启动规则：【" .. SP_RULE.RuleName .. "】，以下为规则详情。")
-		end
-		if SP_RULE.Message then
-			for _,v in pairs(SP_RULE.Message) do
-				Debug.Message(v)
-			end
-		else
-			Debug.Message("（详情不明）")
-		end
+		CUNGUI.HintRule()
 	end
 	e:Reset()
 end
@@ -222,6 +213,22 @@ function CUNGUI.HumanDraw(e,tp)
 	local c=Duel.CreateToken(tp,id)
     Duel.SendtoDeck(c,tp,SEQ_DECKTOP,REASON_RULE)
 	Duel.Draw(tp,1,REASON_RULE)
+	if tp ~= 0 or Duel.GetTurnCount(tp) > 1  then
+		CUNGUI.HintRule()
+	end
+end
+
+function CUNGUI.HintRule()
+	if SP_RULE.RuleName then
+		Debug.Message("已启动规则：【" .. SP_RULE.RuleName .. "】，以下为规则详情。")
+	end
+	if SP_RULE.Message then
+		for _,v in pairs(SP_RULE.Message) do
+			Debug.Message(v)
+		end
+	else
+		Debug.Message("（详情不明）")
+	end
 end
 
 function CUNGUI.RuleCardMove(e,tp)
@@ -241,6 +248,20 @@ end
 
 function CUNGUI.CreateRuleCard(tp,code)
 	local c=Duel.CreateToken(tp,code)
+	if tp~=CUNGUI.AI then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetCode(EFFECT_SPSUMMON_PROC_G)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+		e1:SetRange(LOCATION_EXTRA)
+		e1:SetCondition(function (e)
+			return e:GetHandler():IsFaceup()
+		end)
+		e1:SetOperation(function ()
+			CUNGUI.HintRule()
+		end)
+		c:RegisterEffect(e1)
+	end
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
