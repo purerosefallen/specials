@@ -2,7 +2,7 @@
 function c41578483.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcCodeFunRep(c,64631466,aux.FilterBoolFunction(Card.IsRace,RACE_ILLUSION),1,1,true,true)
+	aux.AddFusionProcCodeFun(c,64631466,aux.FilterBoolFunction(Card.IsFusionType,TYPE_EFFECT),1,true,true)
 	--Equip
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(41578483,0))

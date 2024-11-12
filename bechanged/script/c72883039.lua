@@ -4,12 +4,6 @@ function c72883039.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCondition(function (e,tp,eg,ep,ev,re,r,rp)
-		return (Duel.GetMatchingGroupCount(function(c)
-				return c:IsCode(72883039) and c:IsFaceup()
-			end,tp,LOCATION_ONFIELD,0,nil)==0
-		end) and e:GetHandler():IsLocation(LOCATION_HAND)) or not e:GetHandler():IsLocation(LOCATION_HAND)
-	e1:SetTarget(c72883039.acttg)
 	c:RegisterEffect(e1)
 	--indes
 	local e2=Effect.CreateEffect(c)
@@ -45,16 +39,37 @@ function c72883039.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_QUICK_O)
 	e5:SetCode(EVENT_FREE_CHAIN)
 	e5:SetRange(LOCATION_SZONE)
+	e5:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e5:SetCondition(c72883039.spcon)
 	e5:SetCost(c72883039.spcost)
 	e5:SetTarget(c72883039.sptg)
 	e5:SetOperation(c72883039.spop)
 	c:RegisterEffect(e5)
-	--act in hand
 	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_SINGLE)
-	e6:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	e6:SetDescription(aux.Stringid(72883039,5))
+	e6:SetType(EFFECT_TYPE_QUICK_O)
+	e6:SetCode(EVENT_FREE_CHAIN)
+	e6:SetRange(LOCATION_SZONE)
+	e6:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
+	e6:SetTarget(c72883039.tdtg2)
+	e6:SetOperation(c72883039.tdop2)
 	c:RegisterEffect(e6)
+	local e7=Effect.CreateEffect(c)
+	e7:SetDescription(aux.Stringid(72883039,4))
+	e7:SetType(EFFECT_TYPE_SINGLE)
+	e7:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+	e7:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e7:SetCondition(c72883039.handcon)
+	c:RegisterEffect(e7)
+end
+function c72883039.acfilter(c)
+	return c:IsFaceup() and c:IsCode(36894320) and c:IsAbleToGraveAsCost()
+end
+function c72883039.actcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c72883039.acfilter,tp,LOCATION_SZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,c72883039.acfilter,tp,LOCATION_SZONE,0,1,1,nil)
+	Duel.SendtoGrave(g,REASON_COST)
 end
 function c72883039.acttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -100,4 +115,21 @@ function c72883039.spop(e,tp,eg,ep,ev,re,r,rp)
 	if sg then
 		Duel.SpecialSummon(sg,0,tp,tp,true,false,POS_FACEUP)
 	end
+end
+function c72883039.tdtg2(e,tp,eg,ep,ev,re,r,rp,chk)
+	local g=Duel.GetMatchingGroup(c72883039.setfilter,tp,LOCATION_GRAVE+LOCATION_DECK,0,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_ONFIELD,0,1,nil,36894320,9409625) and g:GetCount()>0 end
+end
+function c72883039.setfilter(c)
+	return c:IsCode(36894320,9409625) and c:IsSSetable()
+end
+function c72883039.tdop2(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(c72883039.setfilter),tp,LOCATION_GRAVE+LOCATION_DECK,0,nil)
+	if g:GetCount()>0 then
+		local sc=g:Select(tp,1,1,nil):GetFirst()
+		Duel.SSet(tp,sc)
+	end
+end
+function c72883039.handcon(e)
+	return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_ONFIELD,0,1,nil,36894320,9409625)
 end
