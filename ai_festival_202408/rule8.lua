@@ -25,7 +25,7 @@ function SP_RULE.InitRuleCard(c)
     e1:SetType(EFFECT_TYPE_FIELD)
     e1:SetCode(EFFECT_CHANGE_DAMAGE)
     e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetRange(LOCATION_REMOVED)
+	e1:SetRange(LOCATION_EXTRA)
     e1:SetTargetRange(1,0)
     e1:SetValue(function (e,re,val,r,rp,rc)
 		return val*2
