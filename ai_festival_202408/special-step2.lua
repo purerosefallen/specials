@@ -248,14 +248,14 @@ end
 
 function CUNGUI.CreateRuleCard(tp,code)
 	local c=Duel.CreateToken(tp,code)
-	if tp~=CUNGUI.AI then
+	if tp==CUNGUI.AI then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_SPSUMMON_PROC_G)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_BOTH_SIDE)
 		e1:SetRange(LOCATION_EXTRA)
 		e1:SetCondition(function (e)
-			return e:GetHandler():IsFaceup()
+			return e:GetHandler():IsFaceup() and Duel.GetTurnPlayer()==1-e:GetHandlerPlayer()
 		end)
 		e1:SetOperation(function ()
 			CUNGUI.HintRule()
