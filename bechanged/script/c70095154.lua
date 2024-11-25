@@ -22,10 +22,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.cfilter(c)
-	return (c:IsAttack(2100) or c:IsDefense(2100)) and c:IsFaceup() and c:IsRace(RACE_MACHINE)
+	return not((c:IsAttack(2100) or c:IsDefense(2100)) and c:IsRace(RACE_MACHINE)) and c:IsFaceup()
 end
 function s.spcon(e,c)
 	if c==nil then return true end
+	local tp=c:GetControler()
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 		and (Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0)==0
 		or not Duel.IsExistingMatchingCard(s.cfilter,c:GetControler(),LOCATION_MZONE,0,1,nil))

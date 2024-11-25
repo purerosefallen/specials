@@ -1,4 +1,5 @@
 --クリスタルP
+local s,id,o=GetID()
 function c3576031.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -48,6 +49,7 @@ function c3576031.initial_effect(c)
 	e6:SetType(EFFECT_TYPE_QUICK_O)
 	e6:SetCode(EVENT_FREE_CHAIN)
 	e6:SetRange(LOCATION_MZONE)
+	e6:SetCost(s.cost)
 	e6:SetCondition(c3576031.spcon)
 	e6:SetTarget(c3576031.sptg)
 	e6:SetOperation(c3576031.spop)
@@ -127,19 +129,24 @@ function c3576031.scop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummonComplete()
 end
 function c3576031.eftg(e,c)
-	local seq=c:GetSequence()
 	return c:IsType(TYPE_EFFECT) and c:IsType(TYPE_SYNCHRO) and c:IsSetCard(0xea)
+end
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	local code=c:GetCode()
+	if chk==0 then return Duel.GetFlagEffect(tp,code)==0 end
+	Duel.RegisterFlagEffect(tp,code,RESET_PHASE+PHASE_END,0,1)
 end
 function c3576031.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==1-tp
 end
 function c3576031.spfilter(c,e,tp,ec)
 	return c:IsType(TYPE_SYNCHRO) and c:IsType(TYPE_TUNER)
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,false)
 		and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
 end
 function c3576031.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c3715284.spfilter,tp,LOCATION_DECK,0,2,nil,e,tp,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c3576031.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,e:GetHandler()) end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
@@ -149,7 +156,7 @@ function c3576031.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,c3576031.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 		if g:GetCount()>0 then
-			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+			Duel.SpecialSummon(g,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)
 		end
 	end
 end

@@ -76,7 +76,7 @@ function c76359406.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c76359406.spcon2(e,tp,eg,ep,ev,re,r,rp)
 	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-	return rp==tp and re:GetHandler():IsSetCard(0xea)
+	return rp==tp and re:GetHandler():IsSetCard(0xea) and re:GetHandler():IsType(TYPE_TUNER)
 		and bit.band(loc,LOCATION_ONFIELD)~=0
 end
 function c76359406.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)

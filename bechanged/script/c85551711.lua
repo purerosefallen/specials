@@ -1,7 +1,7 @@
 --虚空の黒魔導師
 function c85551711.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),7,2,c85551711.ovfilter,aux.Stringid(85551711,1))
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),7,2,c85551711.ovfilter,aux.Stringid(85551711,1),2,c85551711.xyzop)
 	c:EnableReviveLimit()
 	--act qp/trap in hand
 	local e1=Effect.CreateEffect(c)
@@ -37,6 +37,10 @@ function c85551711.initial_effect(c)
 end
 function c85551711.ovfilter(c)
 	return c:IsFaceup() and c:GetOriginalCodeRule()==46986414
+end
+function c85551711.xyzop(e,tp,chk)
+	if chk==0 then return Duel.GetFlagEffect(tp,85551711)==0 end
+	Duel.RegisterFlagEffect(tp,85551711,RESET_PHASE+PHASE_END,0,1)
 end
 function c85551711.handcon(e)
 	return Duel.GetTurnPlayer()~=e:GetHandlerPlayer()

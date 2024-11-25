@@ -106,8 +106,11 @@ function c9409625.tdop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SSet(tp,sc)
 	end
 end
-function c9409625.handcon(e)
-	return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),e:GetOwner(),LOCATION_ONFIELD,0,1,nil,36894320,72883039)
+function c9409625.acop(c)
+	return c:IsFaceup() and c:IsCode(36894320,72883039)
+end
+function c9409625.handcon(e,c)
+	return Duel.IsExistingMatchingCard(c9409625.acop,e:GetHandler(),LOCATION_ONFIELD,0,1,nil)
 end
 function c9409625.filter(c,sp)
 	return c:IsSummonPlayer(sp) and c:IsSummonType(SUMMON_TYPE_SYNCHRO)

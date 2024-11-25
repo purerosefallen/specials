@@ -15,8 +15,9 @@ function c93665266.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(93665266,1))
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_ACTIVATE_CONDITION)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetCondition(c93665266.con)
 	e2:SetTarget(c93665266.tg)
 	e2:SetOperation(c93665266.op)
 	c:RegisterEffect(e2)
@@ -77,6 +78,9 @@ function c93665266.scop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c93665266.pfilter(c,tp)
 	return c:IsCode(3576031) and not c:IsForbidden() and c:IsType(TYPE_FIELD) and c:CheckUniqueOnField(tp)
+end
+function c93665266.con(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetFieldGroupCount(tp,LOCATION_FZONE,0)==0
 end
 function c93665266.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c93665266.pfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,tp) end

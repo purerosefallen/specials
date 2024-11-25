@@ -112,7 +112,7 @@ function c29884951.remop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c29884951.matval(e,c)
-	return c:IsType(TYPE_SYNCHRO) and c:IsSetCard(0x16b)
+	return c:IsType(TYPE_SYNCHRO) and (c:IsSetCard(0x16b) or c:IsRace(RACE_WYRM))
 end
 function c29884951.tnval(e,c)
 	return e:GetHandler():IsControler(c:GetControler())

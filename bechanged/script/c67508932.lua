@@ -62,7 +62,7 @@ function c67508932.hspfilter(c,tp,sc)
 		and c:IsControler(tp) and Duel.GetLocationCountFromEx(tp,tp,c,sc)>0
 end
 function c67508932.hspcon(e,c)
-	if c==nil then return true end
+	if c==nil then return Duel.GetFlagEffect(tp,67508932)==0 end
 	return Duel.CheckReleaseGroupEx(c:GetControler(),c67508932.hspfilter,1,REASON_SPSUMMON,false,nil,c:GetControler(),c)
 end
 function c67508932.hsptg(e,tp,eg,ep,ev,re,r,rp,chk,c)
@@ -78,6 +78,8 @@ function c67508932.hspop(e,tp,eg,ep,ev,re,r,rp,c)
 	local tc=e:GetLabelObject()
 	c:SetMaterial(Group.FromCards(tc))
 	Duel.Release(tc,REASON_SPSUMMON)
+	Duel.RegisterFlagEffect(tp,67508932,RESET_PHASE+PHASE_END,0,1)
+
 end
 function c67508932.rmcond(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

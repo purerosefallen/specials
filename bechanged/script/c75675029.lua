@@ -86,7 +86,7 @@ function c75675029.disop(e,tp,eg,ep,ev,re,r,rp)
 			e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 			tc:RegisterEffect(e3)
 		end
-		if Duel.IsExistingMatchingCard(aux.NecroValleyFilter(aux.AND(Card.IsAbleToHand,Card.IsType)),tp,0,LOCATION_DECK+LOCATION_GRAVE,1,nil,tc:GetType()) and Duel.SelectYesNo(1-tp,aux.Stringid(id,2)) then
+		if Duel.IsExistingMatchingCard(aux.NecroValleyFilter(aux.AND(Card.IsAbleToHand,Card.IsType)),tp,0,LOCATION_DECK+LOCATION_GRAVE,1,nil,tc:GetType()) and Duel.SelectYesNo(1-tp,aux.Stringid(75675029,2)) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 			local g=Duel.SelectMatchingCard(1-tp,aux.NecroValleyFilter(aux.AND(Card.IsAbleToHand,Card.IsType)),tp,0,LOCATION_DECK+LOCATION_GRAVE,1,1,nil,tc:GetType())

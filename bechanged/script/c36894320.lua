@@ -138,8 +138,11 @@ function c36894320.tdop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SSet(tp,sc)
 	end
 end
-function c36894320.handcon(e)
-	return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),e:GetOwner(),LOCATION_ONFIELD,0,1,nil,9409625,72883039)
+function c36894320.acop(c)
+	return c:IsFaceup() and c:IsCode(9409625,72883039)
+end
+function c36894320.handcon(e,c)
+	return Duel.IsExistingMatchingCard(c36894320.acop,e:GetHandler(),LOCATION_ONFIELD,0,1,nil)
 end
 function c36894320.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():IsControler(1-tp) and Duel.GetAttackTarget()==nil

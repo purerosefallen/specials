@@ -9,17 +9,7 @@ function c76792184.initial_effect(c)
 	e1:SetTarget(c76792184.target)
 	e1:SetOperation(c76792184.activate)
 	c:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(128454,0))
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_GRAVE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCountLimit(1,76792185)
-	e2:SetCost(aux.bfgcost)
-	e2:SetTarget(c76792184.thtg)
-	e2:SetOperation(c76792184.thop)
-	c:RegisterEffect(e2)
+
 end
 function c76792184.filter(c,e,tp)
 	return c:IsCode(12266229,30208479,47963370) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false)
@@ -49,27 +39,6 @@ function c76792184.activate(e,tp,eg,ep,ev,re,r,rp)
 		local sg=g:SelectSubGroup(tp,c76792184.gcheck,false,1,g:GetCount(),tp,lv)
 		if sg and sg:GetCount()>0 then
 			Duel.Release(sg,REASON_EFFECT)
-		end
-	end
-end
-function c76792184.thfilter(c,e,tp)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	return aux.IsCodeListed(c,46986414,30208479,47963370) and (c:IsAbleToHand() or (ft>0 and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)))
-end
-function c76792184.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c76792184.thfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
-end
-function c76792184.thop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
-	local g=Duel.SelectMatchingCard(tp,c76792184.thfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local tc=g:GetFirst()
-	if tc then
-		if tc:IsAbleToHand() and (not tc:IsCanBeSpecialSummoned(e,0,tp,false,false) or ft<=0 or Duel.SelectOption(tp,1190,1152)==0) then
-			Duel.SendtoHand(tc,nil,REASON_EFFECT)
-			Duel.ConfirmCards(1-tp,tc)
-		else
-			Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
 end
