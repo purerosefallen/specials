@@ -1166,10 +1166,19 @@ standbyPhaseSkill(92714517, function (e,tp,eg,ep,ev,re,r,rp)
 	if ft>5 then ft=5 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 	local g=Duel.SelectMatchingCard(tp,function (tc)
-		return tc:GetType()==TYPE_TRAP
+		return tc:GetType()==TYPE_TRAP and tc:IsSetCard(0x17e)
 	end,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,ft,nil)
 	if g:GetCount()>0 then
 		Duel.SSet(tp,g)
+	end
+	local ct=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if ct>2 then ft=2 end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local sg=Duel.SelectMatchingCard(tp,function (tc)
+		return tc:IsCanBeSpecialSummoned(e,0,tp,false,false) and tc:IsSetCard(0x17e)
+	end,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,ct,nil)
+	if sg:GetCount()>0 then
+		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 	end
 end, nil, true)
 
@@ -1179,26 +1188,23 @@ addSkill(92714517, function(e1)
     e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
     e1:SetTargetRange(LOCATION_SZONE,0)
     e1:SetTarget(function (e,c)
-		return c:GetType()==TYPE_TRAP
+		return c:GetType()==TYPE_TRAP and c:IsSetCard(0x17e)
 	end)
 end)
 
 addSkill(92714517, function(e1)
-    e1:SetType(EFFECT_TYPE_FIELD)
-    e1:SetCode(EFFECT_CHANGE_DAMAGE)
-    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-    e1:SetTargetRange(0,1)
-    e1:SetValue(function(e,re,val,r,rp,rc)
-		if bit.band(r,REASON_EFFECT)~=0 then return 0
-		else return val end
+    e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+    e1:SetCode(EVENT_CHAIN_SOLVED)
+	e1:SetOperation(function (e,tp,eg,ep,ev,re,r,rp)
+		if re:GetHandler():GetType()~=TYPE_TRAP then return end
+		local rg=Group.CreateGroup()
+		local g=Duel.GetDecktopGroup(1-tp,1)
+		if #g>0 then rg:Merge(g) end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+		local sg=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,1,nil)
+		if #sg>0 then rg:Merge(sg) end
+		if #g>0 then Duel.Remove(rg,POS_FACEUP,REASON_RULE) end
 	end)
-end)
-
-addSkill(92714517, function(e1)
-    e1:SetType(EFFECT_TYPE_FIELD)
-    e1:SetCode(EFFECT_NO_EFFECT_DAMAGE)
-    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-    e1:SetTargetRange(0,1)
 end)
 
 standbyPhaseSkill(55795155, function (e,tp,eg,ep,ev,re,r,rp)
