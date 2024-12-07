@@ -55,7 +55,7 @@ function c63519819.initial_effect(c)
 end
 function c63519819.hspfilter(c,tp,sc)
 	return c:GetOriginalCode()==27125110
-		and c:IsControler(tp) nil) and Duel.GetLocationCountFromEx(tp,tp,c,sc)>0
+		and c:IsControler(tp) and Duel.GetLocationCountFromEx(tp,tp,c,sc)>0
 		and c:IsCanBeFusionMaterial(sc,SUMMON_TYPE_SPECIAL)
 end
 function c63519819.hspcon(e,c)

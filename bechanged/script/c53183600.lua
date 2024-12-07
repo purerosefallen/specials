@@ -51,6 +51,17 @@ function c53183600.initial_effect(c)
 	e7:SetTarget(c53183600.destg)
 	e7:SetOperation(c53183600.desop)
 	c:RegisterEffect(e7)
+	local e8=Effect.CreateEffect(c)
+	e8:SetDescription(aux.Stringid(53183600,0))
+	e8:SetCategory(CATEGORY_DRAW)
+	e8:SetType(EFFECT_TYPE_IGNITION)
+	e8:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e8:SetRange(LOCATION_HAND)
+	e8:SetCountLimit(1,53183600)
+	e8:SetCost(c53183600.drcost)
+	e8:SetTarget(c53183600.drtg)
+	e8:SetOperation(c53183600.drop)
+	c:RegisterEffect(e8)
 end
 function c53183600.cfilter(c)
 	return c:IsFaceup() and c:IsCode(15259703)
@@ -139,4 +150,25 @@ function c53183600.desop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1,true)
 	end
+end
+function c53183600.cdrfilter(c)
+	return c:IsSetCard(0x62) and c:IsDiscardable()
+end
+function c53183600.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsDiscardable()
+		and Duel.IsExistingMatchingCard(c53183600.cdrfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
+	local g=Duel.SelectMatchingCard(tp,c53183600.cdrfilter,tp,LOCATION_HAND,0,1,1,e:GetHandler())
+	g:AddCard(e:GetHandler())
+	Duel.SendtoGrave(g,REASON_DISCARD+REASON_COST)
+end
+function c53183600.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(2)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
+end
+function c53183600.drop(e,tp,eg,ep,ev,re,r,rp)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Draw(p,d,REASON_EFFECT)
 end

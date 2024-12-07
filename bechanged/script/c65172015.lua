@@ -46,10 +46,10 @@ function c65172015.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c65172015.matfilter(c,sc)
-	return c:IsFusionCode(1561110,91998119) and c:IsAbleToRemoveAsCost() and c:IsCanBeFusionMaterial(sc,SUMMON_TYPE_SPECIAL)
+	return c:IsFusionCode(1561110,75748977) and c:IsAbleToRemoveAsCost() and c:IsCanBeFusionMaterial(sc,SUMMON_TYPE_SPECIAL)
 end
 function c65172015.fselect(g,tp,sc)
-	return aux.gfcheck(g,Card.IsOriginalCodeRule,1561110,91998119)
+	return aux.gfcheck(g,Card.IsOriginalCodeRule,1561110,75748977)
 		and Duel.GetLocationCountFromEx(tp,tp,g,sc)>0
 end
 function c65172015.spcon(e,c)

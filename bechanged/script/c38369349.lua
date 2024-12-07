@@ -133,7 +133,7 @@ function c38369349.spcost3(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c38369349.spfilter3(c,e,tp,mc)
-	return c:IsRace(RACE_DRAGON)
+	return c:IsRace(RACE_DRAGON) and not c:IsType(TYPE_EFFECT)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
 		and (Duel.GetLocationCountFromEx(tp,tp,mc,c)>0 and c:IsLocation(LOCATION_EXTRA)
 		or Duel.GetMZoneCount(tp,mc,tp)>0 and c:IsLocation(LOCATION_DECK))

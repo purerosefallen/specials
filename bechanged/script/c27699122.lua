@@ -50,19 +50,41 @@ function c27699122.op(e,tp,eg,ep,ev,re,r,rp)
 end
 function c27699122.spfilter(c,e,tp)
 	return c:IsSetCard(0x110) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and (c:IsLocation(LOCATION_DECK) and Duel.GetMZoneCount(tp)>0
+			or c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0)
+end
+function c27699122.setfilter(c,tp)
+	return c:IsCode(15259703) and c:IsType(TYPE_FIELD) and not c:IsForbidden() and c:CheckUniqueOnField(tp)
 end
 function c27699122.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c27699122.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+	if chk==0 then
+		if Duel.IsEnvironment(15259703) then
+			return Duel.IsExistingMatchingCard(c27699122.spfilter,tp,LOCATION_DECK+LOCATION_EXTRA,0,1,nil,e,tp)
+		else
+			return Duel.IsExistingMatchingCard(c27699122.setfilter,tp,LOCATION_DECK,0,1,nil,tp)
+		end
+	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c27699122.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c27699122.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	local tc=g:GetFirst()
-	if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
-		Duel.BreakEffect()
-		Duel.Damage(tp,tc:GetAttack(),REASON_EFFECT)
+	if Duel.IsEnvironment(15259703) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local g=Duel.SelectMatchingCard(tp,c27699122.spfilter,tp,LOCATION_DECK+LOCATION_EXTRA,0,1,1,nil,e,tp)
+		local tc=g:GetFirst()
+		if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
+			Duel.BreakEffect()
+			Duel.Damage(tp,tc:GetAttack(),REASON_EFFECT)
+		end
+	else
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
+		local tc=Duel.SelectMatchingCard(tp,c27699122.setfilter,tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
+		if tc then
+			local fc=Duel.GetFieldCard(tp,LOCATION_SZONE,5)
+			if fc then
+				Duel.SendtoGrave(fc,REASON_RULE)
+				Duel.BreakEffect()
+			end
+			Duel.MoveToField(tc,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
+		end
 	end
 end

@@ -28,7 +28,7 @@ function c75779210.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c75779210.matfilter(c,syncard)
-	return c:IsAttribute(ATTRIBUTE_LIGHT)
+	return c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsTuner(syncard)
 end
 function c75779210.uttg(e,c)
 	return e:GetHandler():GetEquipGroup():IsContains(c)

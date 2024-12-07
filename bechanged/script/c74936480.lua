@@ -10,7 +10,7 @@ function c74936480.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(0,LOCATION_MZONE)
 	e1:SetCondition(s.con)
-	e1:SetTarget(s.atktarget)
+	e1:SetTarget(s.target)
 	c:RegisterEffect(e1)
 	--damage
 	local e2=Effect.CreateEffect(c)

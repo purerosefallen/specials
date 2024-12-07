@@ -1,7 +1,5 @@
 --PSY骨架超载
-function c36970611.initial_effect(c)
---PSYフレーム・オーバーロード
----@param c Card
+local s,id,o=GetID()
 function c36970611.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -36,7 +34,7 @@ function c36970611.initial_effect(c)
 	c:RegisterEffect(e3)
 	--act in set turn
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,5))
+	e4:SetDescription(aux.Stringid(36970611,5))
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
 	e4:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
@@ -88,8 +86,6 @@ function c36970611.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
-end
-	
 end
 function s.cfilter(c)
 	return c:IsSetCard(0xc1) and c:IsFaceupEx() and c:IsAbleToGraveAsCost() and c:IsType(TYPE_MONSTER) and not c:IsType(TYPE_TUNER)

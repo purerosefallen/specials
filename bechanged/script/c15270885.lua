@@ -18,13 +18,14 @@ function c15270885.initial_effect(c)
 	e2:SetCondition(c15270885.indcon)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(15270885,0))
+	e3:SetDescription(aux.Stringid(15270885,3))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_CHANGE_POS)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1)
-	e3:SetTarget(c15270885.sptg3)
-	e3:SetOperation(c15270885.spop3)
+	e3:SetTarget(c15270885.sptg)
+	e3:SetOperation(c15270885.spop)
 	c:RegisterEffect(e3)
 	--direct attack
 	local e5=Effect.CreateEffect(c)
@@ -82,31 +83,21 @@ function c15270885.posop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ChangePosition(c,POS_FACEUP_DEFENSE)
 	end
 end
-function c15270885.sptg3(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+function c15270885.spfilter(c,e,tp)
+	return c:IsSetCard(0xac) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function c15270885.spop3(e,tp,eg,ep,ev,re,r,rp)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_CANNOT_ATTACK)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e2:SetTarget(c15270885.atktarget)
-	e2:SetReset(RESET_PHASE+PHASE_END,2)
-	c:RegisterEffect(e2)
-	if e:GetHandler():IsRelateToEffect(e) then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_OATH)
-		e1:SetCode(EFFECT_CANNOT_ATTACK)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		e:GetHandler():RegisterEffect(e1,true)
-	end
+function c15270885.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,59822133)
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>1
+		and Duel.IsExistingMatchingCard(c15270885.spfilter,tp,LOCATION_DECK,0,2,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_DECK)
 end
-function c15270885.atktarget(e,c)
-	if e:GetHandler():GetAttack()==0 then
-		return false
-	else
-		return c:IsAttackBelow(e:GetHandler():GetAttack()-1)
-	end
+function c15270885.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.IsPlayerAffectedByEffect(tp,59822133) then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=1 then return end
+	local g=Duel.GetMatchingGroup(c15270885.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
+	if g:GetCount()<2 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local sg=g:Select(tp,2,2,nil)
+	Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 end
