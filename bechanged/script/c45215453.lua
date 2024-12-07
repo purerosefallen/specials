@@ -2,7 +2,7 @@
 ---@param c Card
 function c45215453.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroMixProcedure(c,c45215453.matfilter,nil,nil,aux.NonTuner(Card.IsAttribute,ATTRIBUTE_LIGHT),1,99)
+	aux.AddSynchroMixProcedure(c,c45215453.matfilter,nil,nil,aux.NonTuner(nil),1,99)
 	c:EnableReviveLimit()
 	--search
 	local e1=Effect.CreateEffect(c)

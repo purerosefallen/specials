@@ -2,10 +2,23 @@
 local s,id,o=GetID()
 function c34365442.initial_effect(c)
 	--activate
+	local e9=Effect.CreateEffect(c)
+	e9:SetType(EFFECT_TYPE_ACTIVATE)
+	e9:SetCode(EVENT_FREE_CHAIN)
+	e9:SetTarget(s.tg)
+	e9:SetHintTiming(0,TIMING_END_PHASE)
+	c:RegisterEffect(e9)
+	--act in set turn
 	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_ACTIVATE)
-	e0:SetCode(EVENT_FREE_CHAIN)
+	e0:SetDescription(aux.Stringid(id,4))
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetValue(id)
+	e0:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+	e0:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e0:SetCondition(s.condition)
+	e0:SetCost(s.cost)
 	c:RegisterEffect(e0)
+
 	--attack
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(34365442,1))
@@ -46,16 +59,13 @@ function c34365442.initial_effect(c)
 	e4:SetTarget(s.target)
 	e4:SetOperation(s.activate2)
 	c:RegisterEffect(e4)
-	--act in set turn
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,4))
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetValue(id)
-	e5:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
-	e5:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e5:SetCondition(s.condition)
-	e5:SetCost(s.cost)
-	c:RegisterEffect(e5)
+end
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	local res=e:GetHandler():IsHasEffect(EFFECT_TRAP_ACT_IN_SET_TURN,tp)
+	if chk==0 then return res and res:GetOwner()==c and res:GetValue()==id
+		or not c:IsStatus(STATUS_SET_TURN)
+	 end
 end
 function s.cfilter(c)
 	return c:IsSetCard(0x152,0x153)  and c:IsAbleToGraveAsCost()
@@ -138,7 +148,7 @@ end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 end
-function s.filte(c)
+function s.filter(c)
     return c:IsSetCard(0x2151) and c:IsLink(2) and c:IsAttackable()
 end
 function s.activate2(e,tp,eg,ep,ev,re,r,rp)

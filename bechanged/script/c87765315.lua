@@ -46,6 +46,7 @@ function c87765315.activate(e,tp,eg,ep,ev,re,r,rp)
 			local ssg=sg:SelectSubGroup(tp,c87765315.gcheck,false,3,3)
 			if ssg then
 				Duel.SendtoHand(ssg,nil,REASON_EFFECT)
+				Duel.ConfirmCards(1-tp,ssg)
 			end
 		end
 	end

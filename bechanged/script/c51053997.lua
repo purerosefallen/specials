@@ -8,7 +8,7 @@ function c51053997.initial_effect(c)
 	c:RegisterEffect(e1)
 	--act in set turn
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,5))
+	e2:SetDescription(aux.Stringid(51053997,5))
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
 	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
@@ -68,7 +68,7 @@ end
 function c51053997.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-    local atk=tc:GetAttack()
+	local atk=tc:GetAttack()
 	if tc:IsRelateToEffect(e) and Duel.Remove(tc,0,REASON_EFFECT+REASON_TEMPORARY)~=0 then
 		local ct=1
 		if Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_STANDBY then ct=2 end
@@ -90,8 +90,8 @@ function c51053997.operation(e,tp,eg,ep,ev,re,r,rp)
 		end
 		Duel.RegisterEffect(e1,tp)
 		tc:RegisterFlagEffect(51053998,RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,0,ct)
-        Duel.Damage(1-tp,atk,REASON_EFFECT)
-        local e2=Effect.CreateEffect(c)
+		Duel.Damage(1-tp,atk,REASON_EFFECT)
+		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_FIELD)
 		e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e2:SetCode(EFFECT_REFLECT_BATTLE_DAMAGE)

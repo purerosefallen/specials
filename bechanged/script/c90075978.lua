@@ -1,4 +1,5 @@
 --W星云陨石
+local s,id,o=GetID()
 function c90075978.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -10,9 +11,9 @@ function c90075978.initial_effect(c)
 	e1:SetOperation(c90075978.activate)
 	c:RegisterEffect(e1)
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetDescription(aux.Stringid(90075978,2))
 	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetValue(id)
+	e3:SetValue(90075978)
 	e3:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
 	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e3:SetCondition(c90075978.condition)

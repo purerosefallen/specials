@@ -2,7 +2,7 @@
 ---@param c Card
 function c56768355.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroMixProcedure(c,c56768355.matfilter,nil,nil,aux.NonTuner(Card.IsAttribute,ATTRIBUTE_LIGHT),1,99)
+	aux.AddSynchroMixProcedure(c,c56768355.matfilter,nil,nil,aux.NonTuner(nil),1,99)
 	c:EnableReviveLimit()
 	--equip
 	local e1=Effect.CreateEffect(c)
@@ -26,7 +26,7 @@ function c56768355.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c56768355.matfilter(c,syncard)
-	return c:IsSetCard(0x30) and (c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsTuner(syncard))
+	return c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsTuner(syncard)
 end
 function c56768355.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO)

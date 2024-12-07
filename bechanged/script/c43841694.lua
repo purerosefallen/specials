@@ -21,7 +21,7 @@ end
 function c43841694.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	if chk==0 then return 
-		and Duel.IsExistingMatchingCard(c43841694.filter,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,nil,e,tp)
+		Duel.IsExistingMatchingCard(c43841694.filter,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,nil,e,tp)
 		and Duel.IsExistingTarget(c43841694.filter2,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g2=Duel.SelectTarget(tp,c43841694.filter2,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,99,nil)
