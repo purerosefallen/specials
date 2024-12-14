@@ -50,7 +50,7 @@ function c96891787.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local sg=Duel.SelectMatchingCard(tp,c96891787.cfilter,tp,0,LOCATION_MZONE,1,1,nil)
 		if #sg>0 then
-			Duel.Destroy(tp,REASON_EFFECT)
+			Duel.Destroy(sg,REASON_EFFECT)
 		end
 	end
 	local e1=Effect.CreateEffect(e:GetHandler())

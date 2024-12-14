@@ -21,8 +21,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
 	e2:SetCountLimit(1,id+o)
-	e2:SetCondition(s.rmcon)
-	e2:SetCost(aux.bfgcost)
+	e2:SetCost(s.cost)
 	e2:SetTarget(s.rmtg)
 	e2:SetOperation(s.rmop)
 	c:RegisterEffect(e2)
@@ -70,25 +69,33 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function s.cfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_XYZ)
-		and c:GetOverlayGroup():IsExists(Card.IsType,1,nil,TYPE_SPELL)
-		and c:GetOverlayGroup():IsExists(Card.IsType,1,nil,TYPE_TRAP)
+function s.cfilter(c,tp)
+	return c:IsFaceup() and c:IsSetCard(0x126) and c:IsType(TYPE_XYZ)
+		and c:CheckRemoveOverlayCard(tp,1,REASON_COST)
 end
-function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DEATTACHFROM)
+	local c=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_MZONE,0,1,1,nil,tp):GetFirst()
+	c:RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
-	if chk==0 then return #g>0 end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
+	if chk==0 then return e:GetHandler():IsSSetable() end
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,e:GetHandler(),1,0,0)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
-	if #g>0 then
-		Duel.HintSelection(g)
-		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) and Duel.SSet(tp,c)~=0 then
+		local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,4)) then
+			Duel.BreakEffect()
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+			local sg=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+			if #sg>0 then
+				Duel.HintSelection(sg)
+				Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)
+			end
+		end
 	end
 end
 function s.actcon(e)

@@ -43,11 +43,11 @@ function c67007102.initial_effect(c)
 	end
 end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if not re or re:GetHandler():IsPreviousLocation(LOCATION_HAND) then return end
-	local tc=eg:GetFirst()
-	while tc do
-		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
-		tc=eg:GetNext()
+	if not re then return end
+	for tc in aux.Next(eg) do
+		if not tc:IsPreviousLocation(LOCATION_HAND) then
+			tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+		end
 	end
 end
 function s.actcon(e)
