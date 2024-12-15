@@ -13,9 +13,14 @@ function aux.PreloadUds()
     end
   end
   local params={aux.FALSE,13,2,2,alterf,aux.Stringid(58600555,2),nil}
-	e1:SetCondition(Auxiliary.XyzConditionAlter(table.unpack(params)))
+	e1:SetCondition(function(e,tp,...)
+    return Duel.GetFlagEffect(tp,e:GetHandler():GetOriginalCode()+10)==0 and Auxiliary.XyzConditionAlter(table.unpack(params))(e,tp,...)
+  end)
 	e1:SetTarget(Auxiliary.XyzTargetAlter(table.unpack(params)))
-	e1:SetOperation(Auxiliary.XyzOperationAlter(table.unpack(params)))
+	e1:SetOperation(function(e,tp,...)
+    Duel.RegisterFlagEffect(tp,e:GetHandler():GetOriginalCode()+10,RESET_PHASE+PHASE_END,0,1)
+    return Auxiliary.XyzOperationAlter(table.unpack(params))(e,tp,...)
+  end)
   e1:SetValue(SUMMON_TYPE_XYZ)
 
   local e2=Effect.GlobalEffect()

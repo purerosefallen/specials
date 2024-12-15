@@ -85,7 +85,7 @@ end
 function c74689476.actlimit(e,re,rp)
 	local rc=re:GetHandler()
 	return re:IsActiveType(TYPE_MONSTER) and rc:IsOnField()
-		and rc:IsSummonLocation(LOCATION_EXTRA) and not rc:IsSetCard(0x150)
+		and rc:IsSummonLocation(LOCATION_EXTRA) and not rc:IsSetCard(0x150,0x128)
 end
 function c74689476.discon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetEquipTarget()

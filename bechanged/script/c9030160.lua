@@ -50,7 +50,7 @@ function c9030160.sumlimit(e,c)
 	if not c then return false end
 	if Duel.IsExistingMatchingCard(Card.IsSetCard,e:GetHandlerPlayer(),LOCATION_PZONE,0,2,nil,0xaf) then
 		return not c:IsControler(e:GetHandlerPlayer())
-	not
+	else
 		return true
 	end
 end
@@ -63,7 +63,7 @@ function c9030160.fuslimit(e,c,sumtype)
 	end
 end
 function c9030160.evalue(e,re,rp)
-	if not re:IsActiveType(TYPE_SPELL+TYPE_TRAP) then return false
+	if not re:IsActiveType(TYPE_SPELL+TYPE_TRAP) then return false end
 	if Duel.IsExistingMatchingCard(Card.IsSetCard,e:GetHandlerPlayer(),LOCATION_PZONE,0,2,nil,0xaf) then
 		return rp==1-e:GetHandlerPlayer()
 	else

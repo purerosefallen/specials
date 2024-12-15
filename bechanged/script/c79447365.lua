@@ -59,7 +59,7 @@ function c79447365.activate(e,tp,eg,ep,ev,re,r,rp)
 	else
 		lv=tc:GetLevel()
 	end
-	if Duel.IsExistingMatchingCard(c79447365.spfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp,lv) and (not tc:IsControlerCanBeChanged() or Duel.SelectYesNo(tp,aux.Stringid(id,1))) then
+	if Duel.IsExistingMatchingCard(c79447365.spfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp,lv) and (not tc:IsControlerCanBeChanged() or Duel.SelectYesNo(tp,aux.Stringid(79447365,1))) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,c79447365.spfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp,lv)
 		if g:GetCount()>0 then

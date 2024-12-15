@@ -57,10 +57,23 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
 	if g:GetCount()>0 then
+		local code=g:GetFirst():GetCode()
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
+		local e0=Effect.CreateEffect(c)
+		e0:SetType(EFFECT_TYPE_FIELD)
+		e0:SetCode(EFFECT_CANNOT_TO_HAND)
+		e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e0:SetTargetRange(1,0)
+		e0:SetTarget(s.thlimit)
+		e0:SetLabel(code)
+		e0:SetReset(RESET_PHASE+PHASE_END)
+		Duel.RegisterEffect(e0,tp)
 		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 	end
+end
+function s.thlimit(e,c,tp,re)
+	return c:IsCode(e:GetLabel()) and re and re:GetHandler():IsCode(id)
 end
 function s.regcon(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL)
@@ -69,10 +82,10 @@ function s.regop1(e,tp,eg,ep,ev,re,r,rp)
 	e:GetLabelObject():SetLabel(ev)
 end
 function s.effcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetLabel()>0
+	return Duel.GetFlagEffect(tp,id)>0
 end
 function s.spfilter(c,e,tp,lv)
-	return c:IsRace(RACE_SPELLCASTER) and c:IsLevelAbove(lv) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsRace(RACE_SPELLCASTER) and c:IsLevelBelow(lv) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.effop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)
@@ -80,9 +93,8 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.spfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp,lv)
 		and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-			local sg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp,lv)
-			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
-		end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp,lv)
+		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

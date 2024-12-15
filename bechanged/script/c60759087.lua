@@ -24,7 +24,7 @@ function c60759087.cfilter1(c)
 	return  c:IsType(TYPE_MONSTER) and c:IsSetCard(0x2151) and c:IsFaceup()
 end
 function c60759087.con(e)
-	return Duel.IsExistingMatchingCard(c60759087.cfilter1,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c60759087.cfilter1,e:GetHandlerPlayer(),LOCATION_MZONE+LOCATION_GRAVE,0,1,nil)
 end
 function c60759087.cfilter(c,setcode)
 	return c:IsSetCard(setcode) and c:IsFaceup()

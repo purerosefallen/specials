@@ -20,7 +20,7 @@
 
 ·自己手卡的【外星人】怪兽得到以下效果。
 -这张卡可以把对方场上1张【外星人】以外的卡加入自己手卡（额外怪兽加入额外卡组），在对方场上特殊召唤。这个效果特殊召唤成功的场合，这张卡上放置1个A指示物。使用了这个召唤方式的回合，自己不能通常召唤。
--这张卡可以把场上1个【A指示物】去除，在自己场上特殊召唤，自己抽1张。
+-这张卡可以把场上1个【A指示物】去除，自己抽1张，在自己场上特殊召唤。
 
 ·自己手卡·墓地的【爬虫妖】怪兽得到以下效果。
 -自己场上没有从额外卡组特殊召唤的怪兽存在的场合才能发动。这张卡从手卡·墓地特殊召唤，从卡组把1张【爬虫妖】卡加入手卡。这个效果的发动后，自己在这场决斗中不是同调·连接怪兽不能从额外卡组特殊召唤。
@@ -65,9 +65,9 @@ end
 CUNGUI.Used={}
 
 function CUNGUI.useoncecondition(e,tp,eg,ep,ev,re,r,rp)
-    return Duel.Used[e:GetHandler():GetOriginalCode()] == nil
-        or Duel.Used[e:GetHandler():GetOriginalCode()][e:GetLabel()] == nil
-        or Duel.Used[e:GetHandler():GetOriginalCode()][e:GetLabel()] < Duel.GetTurnCount()
+    return CUNGUI.Used[e:GetHandler():GetOriginalCode()] == nil
+        or CUNGUI.Used[e:GetHandler():GetOriginalCode()][e:GetLabel()] == nil
+        or CUNGUI.Used[e:GetHandler():GetOriginalCode()][e:GetLabel()] < Duel.GetTurnCount()
 end
 
 function CUNGUI.RegisterRuleEffect(c,tp)
@@ -215,8 +215,16 @@ function CUNGUI.RegisterRuleEffect(c,tp)
 	c:RegisterEffect(e1)
     
     --溟界-spsummon
-	e0=e0:CLone()
+	e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(39041550,0))
+	e0:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOGRAVE)
+	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e0:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e0:SetRange(LOCATION_GRAVE)
+	e0:SetProperty(EFFECT_FLAG_DELAY)
+	e0:SetCondition(CUNGUI.obspcon)
+	e0:SetTarget(CUNGUI.obsptg)
+	e0:SetOperation(CUNGUI.obspop)
     e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
 	e1:SetRange(LOCATION_REMOVED)
@@ -251,6 +259,7 @@ function CUNGUI.alienspcon2(e,c)
 end
 function CUNGUI.alienspop2(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.RemoveCounter(tp,1,1,0x100e,1,REASON_COST)
+	Duel.Draw(tp,1,REASON_COST)
 end
 function CUNGUI.obdiscon(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp
@@ -260,8 +269,10 @@ function CUNGUI.obdiscost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return c:IsDiscardable() end
 	Duel.SendtoGrave(c,REASON_COST+REASON_DISCARD)
 end
-function CUNGUI.obfiltera(e)
-    return e:GetHandler():IsStatus(STATUS_DISABLED)
+function CUNGUI.obfiltera(e,ev)
+    return not e:GetHandler():IsStatus(STATUS_DISABLED)
+		or e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
+		or not Duel.IsChainNegatable(ev)
 end
 function CUNGUI.obfilterb(tp)
     local g=Duel.GetDecktopGroup(1-tp,1)
@@ -269,19 +280,33 @@ function CUNGUI.obfilterb(tp)
     return g:GetFirst():IsAbleToHand()
 end
 function CUNGUI.obdistg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return CUNGUI.obfiltera(re) or CUNGUI.obfilterb(tp) end
+	if chk==0 then return CUNGUI.obfiltera(re,ev) or CUNGUI.obfilterb(tp) end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+	e1:SetTargetRange(1,0)
+	e1:SetValue(CUNGUI.obaclimit)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+end
+function CUNGUI.obaclimit(e,re,tp)
+	local rc=re:GetHandler()
+	return re:IsActiveType(TYPE_MONSTER) and rc:IsLocation(LOCATION_HAND) and not rc:IsSetCard(0x161)
 end
 function CUNGUI.obdisop(e,tp,eg,ep,ev,re,r,rp)
-    local b1=CUNGUI.obfiltera(re)
+    local b1=CUNGUI.obfiltera(re,ev)
     local b2=CUNGUI.obfilterb(tp)
     local op=-1
     if b1 and not b2 then
         op=0
     elseif b2 and not b1 then
         op=1
+	elseif not b2 and not b1 then
+		return
     end
     if op==-1 then
-        op=Duel.SelectOption(tp,aux.Stringid(1249315,0),aux.Stringid(18847598,0))
+        op=Duel.SelectOption(1-tp,aux.Stringid(1249315,0),aux.Stringid(18847598,0))
     end
     if op==0 then
         local g=Duel.GetDecktopGroup(tp,1)
@@ -293,13 +318,21 @@ end
 function CUNGUI.obsumfilter(c,tp)
 	return c:IsControler(1-tp)
 end
+function CUNGUI.obsumfilter2(c,tp)
+	return c:IsRelateToChain()
+end
 function CUNGUI.obspcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(CUNGUI.obsumfilter,1,nil,tp)
 end
 function CUNGUI.obsptg(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false)
+    if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,59822133)
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and Duel.GetMZoneCount(tp)>0
         and Duel.IsPlayerCanDraw(tp,1) end
-    local g=eg:Filter(CUNGUI.obsumfilter,nil)
+    local g=eg:Filter(CUNGUI.obsumfilter,nil,tp)
+	for c in aux.Next(g) do
+		c:CreateEffectRelation(e)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,#g,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 	local e0=Effect.GlobalEffect()
@@ -311,19 +344,27 @@ function CUNGUI.obsptg(e,tp,eg,ep,ev,re,r,rp,chk)
     Duel.RegisterEffect(e0,tp)
 end
 function CUNGUI.obspop(e,tp,eg,ep,ev,re,r,rp)
-    local g=eg:Filter(CUNGUI.obsumfilter,nil)
+    local g=eg:Filter(CUNGUI.obsumfilter,nil,tp)
+	g=g:Filter(Card.IsRelateToEffect,nil,e)
     if Duel.SendtoGrave(g,REASON_EFFECT)>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,555)
-        local op = Duel.SelectOption(tp,102,103)
-        if op==0 then
-            Duel.Draw(tp,1,REASON_EFFECT)
-        else
-            local g=Duel.GetDecktopGroup(1-tp,math.min(3,Duel.GetFieldGroupCount(1-tp,LOCATION_DECK,0)))
-            Duel.SendtoHand(g,tp,REASON_EFFECT+REASON_DRAW)
-            if #g < 3 then
-                Duel.Draw(1-tp,1,REASON_EFFECT)
-            end
-        end
+		if Duel.IsPlayerAffectedByEffect(tp,59822133) and #g>0 then return end
+		Duel.SpecialSummonStep(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
+		for tc in aux.Next(g) do
+			Duel.SpecialSummonStep(tc,0,1-tp,1-tp,false,false,POS_FACEUP)
+		end
+		if Duel.SpecialSummonComplete()>0 then
+			Duel.Hint(HINT_SELECTMSG,tp,555)
+			local op = Duel.SelectOption(tp,102,103)
+			if op==0 then
+				Duel.Draw(tp,1,REASON_EFFECT)
+			else
+				local g=Duel.GetDecktopGroup(1-tp,math.min(3,Duel.GetFieldGroupCount(1-tp,LOCATION_DECK,0)))
+				Duel.SendtoHand(g,tp,REASON_EFFECT+REASON_DRAW)
+				if #g < 3 then
+					Duel.Draw(1-tp,1,REASON_EFFECT)
+				end
+			end
+		end
     end
 end
 function CUNGUI.reptcond(e,tp,eg,ep,ev,re,r,rp)
@@ -349,8 +390,12 @@ function CUNGUI.reptop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local g=Duel.SelectMatchingCard(tp,CUNGUI.reptdeckfilter,tp,LOCATION_DECK,0,1,1,nil)
-        if #g>0 then Duel.SendtoHand(g) end
+        if #g>0 then
+			Duel.SendtoHand(g,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,g)
+		end
 	end
 end
 function CUNGUI.venomcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -360,6 +405,7 @@ function CUNGUI.venomcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function CUNGUI.alienspfilter(c,tp)
 	return (c:IsAbleToHandAsCost() or c:IsAbleToExtraAsCost()) and Duel.GetMZoneCount(1-tp,c,tp)>0
+		and not c:IsSetCard(0xc)
 end
 function CUNGUI.alienspcon(e,c)
 	if c==nil then return true end
@@ -415,9 +461,16 @@ function CUNGUI.venomop(e,tp,eg,ep,ev,re,r,rp)
     for i=1,3 do
         g:AddCard(Duel.CreateToken(tp,8062132))
     end
-    if Duel.SendtoDeck(g,nil,SEQ_DECKBOTTOM,REASON_RULE) then
+    if Duel.SendtoDeck(g,nil,SEQ_DECKBOTTOM,REASON_RULE)>0 then
         local c=Duel.CreateToken(tp,16067089)
         Duel.SSet(tp,c)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetDescription(aux.Stringid(3160805,0))
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+		e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		c:RegisterEffect(e1)
     end
 end
 function CUNGUI.wormsplimit(e,c,sump,sumtype,sumpos,targetp)
@@ -442,8 +495,8 @@ function CUNGUI.wormtg(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.IsExistingMatchingCard(CUNGUI.wormfilter,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED)
-    if Duel.Used[e:GetHandler():GetOriginalCode()] == nil then Duel.Used[e:GetHandler():GetOriginalCode()]={} end
-    Duel.Used[e:GetHandler():GetOriginalCode()][e:GetLabel()]=Duel.GetTurnCount()
+    if CUNGUI.Used[e:GetHandler():GetOriginalCode()] == nil then CUNGUI.Used[e:GetHandler():GetOriginalCode()]={} end
+    CUNGUI.Used[e:GetHandler():GetOriginalCode()][e:GetLabel()]=Duel.GetTurnCount()
 end
 function CUNGUI.wormop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
@@ -481,7 +534,7 @@ function CUNGUI.wormop2(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,CUNGUI.wormfilter2,tp,0,LOCATION_ONFIELD,1,nil,c)
     if #g>0 then
         local tc=g:GetFirst()
-        if c:IsLevelAbove(5)
+        if c:IsLevelAbove(5) then
             if tc:IsLocation(LOCATION_MZONE) then
                 local pos = Duel.SelectPosition(tp,tc,POS_FACEUP_ATTACK+POS_FACEUP_DEFENSE)
                 Duel.ChangePosition(tc,pos)

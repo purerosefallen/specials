@@ -40,6 +40,19 @@ function c98360333.initial_effect(c)
 	e4:SetTarget(s.thtg1)
 	e4:SetOperation(s.thop)
 	c:RegisterEffect(e4)
+	--act in hand
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	e0:SetCondition(s.scon)
+	e0:SetDescription(aux.Stringid(id,4))
+	c:RegisterEffect(e0)
+end
+function s.cfilter1(c)
+	return  c:IsType(TYPE_MONSTER) and c:IsSetCard(0x2151) and c:IsFaceup()
+end
+function s.scon(e)
+	return Duel.IsExistingMatchingCard(s.cfilter1,e:GetHandlerPlayer(),LOCATION_MZONE+LOCATION_GRAVE,0,1,nil)
 end
 --or
 function s.negreg(e,tp,eg,ep,ev,re,r,rp,chk)
