@@ -1,14 +1,23 @@
 --PSY骨架超载
+local s,id,o=GetID()
 function c36970611.initial_effect(c)
---PSYフレーム・オーバーロード
----@param c Card
-function c36970611.initial_effect(c)
-	--Activate
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMING_END_PHASE)
-	c:RegisterEffect(e1)
+	--activate
+	local e9=Effect.CreateEffect(c)
+	e9:SetType(EFFECT_TYPE_ACTIVATE)
+	e9:SetCode(EVENT_FREE_CHAIN)
+	e9:SetTarget(s.tg)
+	e9:SetHintTiming(0,TIMING_END_PHASE)
+	c:RegisterEffect(e9)
+	--act in set turn
+	local e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(id,5))
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetValue(id)
+	e0:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+	e0:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e0:SetCondition(s.actcon)
+	e0:SetCost(s.cost)
+	c:RegisterEffect(e0)
 	--remove
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(36970611,0))
@@ -34,15 +43,6 @@ function c36970611.initial_effect(c)
 	e3:SetTarget(c36970611.thtg)
 	e3:SetOperation(c36970611.thop)
 	c:RegisterEffect(e3)
-	--act in set turn
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,5))
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
-	e4:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e4:SetCost(s.cost)
-	e4:SetCondition(s.actcon)
-	c:RegisterEffect(e4)
 end
 function c36970611.tgfilter(c,tp,xc)
 	return c:IsAbleToRemove(tp,POS_FACEDOWN) and c~=xc
@@ -89,17 +89,23 @@ function c36970611.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-	
-end
 function s.cfilter(c)
-	return c:IsSetCard(0xc1) and c:IsFaceupEx() and c:IsAbleToGraveAsCost() and c:IsType(TYPE_MONSTER) and not c:IsType(TYPE_TUNER)
+	return c:IsSetCard(0xc1)  and c:IsAbleToGraveAsCost() and c:IsType(TYPE_MONSTER) and not c:IsType(TYPE_TUNER)
+end
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	local res=e:GetHandler():IsHasEffect(EFFECT_TRAP_ACT_IN_SET_TURN,tp)
+	if chk==0 then return res and res:GetOwner()==c and res:GetValue()==id
+		or not c:IsStatus(STATUS_SET_TURN)
+	 end
 end
 function s.actcon(e)
 	return e:GetHandler():IsStatus(STATUS_SET_TURN) and e:GetHandler():IsLocation(LOCATION_ONFIELD)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_MZONE+LOCATION_EXTRA,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_MZONE,0,1,1,nil)
-	Duel.Remove(g,POS_FACEUP,REASON_COST)
+	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_MZONE+LOCATION_EXTRA,0,nil)
+	local sg=g:Select(tp,1,1,nil)
+	Duel.Remove(sg,POS_FACEUP,REASON_COST)
 end

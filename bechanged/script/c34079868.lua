@@ -125,5 +125,5 @@ function c34079868.splimit(e,se,sp,st)
 	return se:GetHandler():IsSetCard(0xf9)
 end
 function c34079868.tgdistg(e,c)
-	return c:IsType(TYPE_RITUAL+TYPE_PENDULUM+TYPE_LINK)
+	return c:IsType(TYPE_RITUAL)
 end

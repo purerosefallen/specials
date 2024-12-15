@@ -1,9 +1,12 @@
 --X・Y・Zハイパーキャノン
+local s,id,o=GetID()
 function c21723081.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetTarget(s.tg)
+	e1:SetHintTiming(0,TIMING_END_PHASE)
 	c:RegisterEffect(e1)
 	--turn
 	local e2=Effect.CreateEffect(c)
@@ -17,12 +20,15 @@ function c21723081.initial_effect(c)
 	e2:SetTarget(c21723081.target)
 	e2:SetOperation(c21723081.operation)
 	c:RegisterEffect(e2)
+	--act in set turn
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetValue(id)
 	e3:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
 	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e3:SetCost(c21723081.cost)
+	e3:SetCondition(s.condition)
+	e3:SetCost(s.cost)
 	c:RegisterEffect(e3)
 end
 c21723081.has_text_type=TYPE_UNION
@@ -68,7 +74,17 @@ end
 function c21723081.cfilter(c)
 	return (c:IsType(TYPE_UNION) or c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_LIGHT)) and c:IsDiscardable()
 end
-function c21723081.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	local res=e:GetHandler():IsHasEffect(EFFECT_TRAP_ACT_IN_SET_TURN,tp)
+	if chk==0 then return res and res:GetOwner()==c and res:GetValue()==id
+	or not c:IsStatus(STATUS_SET_TURN)
+	end
+end
+function s.condition(e)
+	return e:GetHandler():IsStatus(STATUS_SET_TURN) and e:GetHandler():IsLocation(LOCATION_ONFIELD)
+end
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c21723081.cfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,c21723081.cfilter,1,1,REASON_DISCARD+REASON_COST,nil)
 end
