@@ -23,7 +23,7 @@ function Auxiliary.PreloadUds()
 	e2:SetOperation(function (e)
         if Duel.GetCurrentPhase() ~= PHASE_DRAW  then return end
         for tp = 0, 1, 1 do
-            if Duel.GetLP(tp) > 4000 or chk_effect[tp] then goto continue end
+            if Duel.GetLP(tp) > 4000 or chk_effect[tp] or Duel.GetTurnPlayer() ~= tp then goto continue end
             if Duel.IsExistingMatchingCard(nil, tp, LOCATION_DECK, 0, 1, nil) and Duel.SelectYesNo(tp, aux.Stringid(49838105, 1)) then
                 chk_effect[tp] = true
                 local g = Duel.SelectMatchingCard(tp, nil, tp, LOCATION_DECK, 0, 1, 1, nil)
