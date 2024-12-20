@@ -30,9 +30,8 @@
 那之后，把这只怪兽和那只怪兽从墓地特殊召唤到各自场上，自己从自己卡组抽1张，或从对方卡组抽3张。这个效果的发动后，自己在这场决斗中不是超量·连接怪兽不能从额外卡组特殊召唤。
 
 ·自己手卡的【溟界】怪兽得到以下效果。
--对方把效果发动时，把手卡的这张卡丢弃才能发动。对方必须把卡组最上方的卡加入这张卡控制者的手卡，或者让那个发动无效。
+-对方把效果发动时，把手卡的这张卡丢弃才能发动。对方必须把卡组最上方的2张卡加入这张卡控制者的手卡，或者让那个发动无效。
 这个效果的发动后，自己直到结束阶段不能从手卡把【溟界】以外的怪兽效果发动。
-
 ]]--
 CUNGUI = {}
 CUNGUI.disabled={}
@@ -148,6 +147,7 @@ function CUNGUI.RegisterRuleEffect(c,tp)
 	e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD)
 	e0:SetCode(EFFECT_SPSUMMON_PROC)
+	e0:SetDescription(103)
 	e0:SetRange(LOCATION_HAND)
 	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SPSUM_PARAM)
 	e0:SetTargetRange(POS_FACEUP,1)
@@ -165,6 +165,7 @@ function CUNGUI.RegisterRuleEffect(c,tp)
 	e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD)
 	e0:SetCode(EFFECT_SPSUMMON_PROC)
+	e0:SetDescription(102)
 	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e0:SetRange(LOCATION_HAND)
 	e0:SetCondition(CUNGUI.alienspcon2)
@@ -275,8 +276,8 @@ function CUNGUI.obfiltera(e,ev)
 		or not Duel.IsChainNegatable(ev)
 end
 function CUNGUI.obfilterb(tp)
-    local g=Duel.GetDecktopGroup(1-tp,1)
-    if not g or #g==0 then return false end
+    local g=Duel.GetDecktopGroup(1-tp,2)
+    if not g or #g<2 then return false end
     return g:GetFirst():IsAbleToHand()
 end
 function CUNGUI.obdistg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -309,8 +310,9 @@ function CUNGUI.obdisop(e,tp,eg,ep,ev,re,r,rp)
         op=Duel.SelectOption(1-tp,aux.Stringid(1249315,0),aux.Stringid(18847598,0))
     end
     if op==0 then
-        local g=Duel.GetDecktopGroup(tp,1)
-        Duel.SendtoHand(g,tp,REASON_EFFECT)
+		local p=e:GetHandler():GetControler()
+        local g=Duel.GetDecktopGroup(1-p,2)
+        Duel.SendtoHand(g,tp,REASON_RULE)
     else
 	    Duel.NegateActivation(ev)
     end
@@ -520,18 +522,19 @@ function CUNGUI.wormfilter2d(c)
 end
 function CUNGUI.wormfilter2(c,oc)
     if oc:IsLevelAbove(5) then
-        return CUNGUI.wormfilter2a(c) and CUNGUI.wormfilter2b(c)
+        return CUNGUI.wormfilter2a(c) or CUNGUI.wormfilter2b(c)
     end
-    return CUNGUI.wormfilter2c(c) and CUNGUI.wormfilter2d(c)
+    return CUNGUI.wormfilter2c(c) or CUNGUI.wormfilter2d(c)
 end
 function CUNGUI.wormtg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(CUNGUI.wormfilter2,tp,0,LOCATION_ONFIELD,1,nil,e:GetHandler()) end
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+	if chk==0 then return Duel.IsExistingMatchingCard(CUNGUI.wormfilter2,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,e:GetHandler()) end
+    if CUNGUI.Used[e:GetHandler():GetOriginalCode()] == nil then CUNGUI.Used[e:GetHandler():GetOriginalCode()]={} end
+    CUNGUI.Used[e:GetHandler():GetOriginalCode()][e:GetLabel()]=Duel.GetTurnCount()
 end
 function CUNGUI.wormop2(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
-	local g=Duel.SelectMatchingCard(tp,CUNGUI.wormfilter2,tp,0,LOCATION_ONFIELD,1,nil,c)
+	local g=Duel.SelectMatchingCard(tp,CUNGUI.wormfilter2,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,c)
     if #g>0 then
         local tc=g:GetFirst()
         if c:IsLevelAbove(5) then
@@ -539,13 +542,13 @@ function CUNGUI.wormop2(e,tp,eg,ep,ev,re,r,rp)
                 local pos = Duel.SelectPosition(tp,tc,POS_FACEUP_ATTACK+POS_FACEUP_DEFENSE)
                 Duel.ChangePosition(tc,pos)
             else
-                Duel.SendtoGrave(tc)
+                Duel.SendtoGrave(tc,REASON_EFFECT)
             end
         else
             if tc:IsLocation(LOCATION_MZONE) then
                 Duel.ChangePosition(tc,POS_FACEDOWN_DEFENSE)
             else
-                Duel.SendtoGrave(tc)
+                Duel.SendtoGrave(tc,REASON_EFFECT)
             end
         end
     end
