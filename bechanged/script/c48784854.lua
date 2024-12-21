@@ -119,7 +119,7 @@ function c48784854.sumop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c48784854.filter(c,tp)
 	return (c:IsCode(13035077))
-		and not c:IsForbidden() and c:CheckUniqueOnField(tp) and  c:GetActivateEffect():IsActivatable(tp,true,true) and c:IsType(TYPE_FIELD)
+		and not c:IsForbidden() and c:CheckUniqueOnField(tp) and c:IsType(TYPE_FIELD)
 end
 function c48784854.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_SZONE)
@@ -138,7 +138,7 @@ function c48784854.desop(e,tp,eg,ep,ev,re,r,rp)
 		if e:GetLabel()==1 then Duel.RegisterFlagEffect(tp,15248873,RESET_CHAIN,0,1) end
 		Duel.ResetFlagEffect(tp,15248873)
 		local fc=Duel.GetFieldCard(tp,LOCATION_FZONE,0)
-		    if fc then
+			if fc then
 				Duel.SendtoGrave(fc,REASON_RULE)
 				Duel.BreakEffect()
 			end
@@ -148,7 +148,7 @@ function c48784854.desop(e,tp,eg,ep,ev,re,r,rp)
 			local cost=te:GetCost()
 			if cost then cost(te,tep,eg,ep,ev,re,r,rp,1) end
 			Duel.RaiseEvent(tc,4179255,te,0,tp,tp,Duel.GetCurrentChain())
-	    tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1)
+		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_CANNOT_ACTIVATE)

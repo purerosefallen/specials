@@ -98,27 +98,34 @@ function c34079868.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c34079868.spfilter1(c,e,tp)
 	return c:IsSetCard(0xc7) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.IsExistingMatchingCard(c34079868.spfilter2,tp,LOCATION_DECK,0,1,c,e,tp)
 end
 function c34079868.spfilter2(c,e,tp)
 	return c:IsSetCard(0xda) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c34079868.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>1
-		and not Duel.IsPlayerAffectedByEffect(tp,59822133)
-		and Duel.IsExistingMatchingCard(c34079868.spfilter1,tp,LOCATION_DECK,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_DECK)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and (Duel.IsExistingMatchingCard(c34079868.spfilter1,tp,LOCATION_DECK,0,1,nil,e,tp)
+		or Duel.IsExistingMatchingCard(c34079868.spfilter2,tp,LOCATION_DECK,0,1,nil,e,tp)) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
+end
+function c34079868.sfsfilter(c,g)
+	return c:IsSetCard(0xc7) and g:IsExists(Card.IsSetCard,1,c,0xda)
+end
+function c34079868.gcheck(g,tp)
+	return #g==1 or g:IsExists(c34079868.sfsfilter,1,nil,g)
 end
 function c34079868.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2
-		or Duel.IsPlayerAffectedByEffect(tp,59822133) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g1=Duel.SelectMatchingCard(tp,c34079868.spfilter1,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g2=Duel.SelectMatchingCard(tp,c34079868.spfilter2,tp,LOCATION_DECK,0,1,1,g1:GetFirst(),e,tp)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if ft==0 then return end
+	if ft>2 then ft=2 end
+	if ft>1 and Duel.IsPlayerAffectedByEffect(tp,59822133) then ft=1 end
+	local g1=Duel.GetMatchingGroup(tp,c34079868.spfilter1,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+	local g2=Duel.GetMatchingGroup(tp,c34079868.spfilter2,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 	g1:Merge(g2)
-	if g1:GetCount()==2 then
-		Duel.SpecialSummon(g1,0,tp,tp,false,false,POS_FACEUP)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local sg=g1:SelectSubGroup(tp,s.gcheck,false,1,ft,tp)
+	if sg:GetCount()>0 then
+		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
 function c34079868.splimit(e,se,sp,st)

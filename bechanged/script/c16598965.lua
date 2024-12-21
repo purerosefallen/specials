@@ -20,7 +20,7 @@ function c16598965.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c16598965.handcon(e)
-	return Duel.IsExistingMatchingCard(c16598965.hdfilter,e:GetHandlerPlayer(),LOCATION_MZONE,LOCATION_MZONE,1,nil)
+	return Duel.IsExistingMatchingCard(c16598965.hdfilter,e:GetHandlerPlayer(),0,LOCATION_MZONE,1,nil)
 end
 function c16598965.hdfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_FAIRY+RACE_FIEND)
