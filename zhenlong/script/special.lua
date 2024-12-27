@@ -733,13 +733,17 @@ function CUNGUI.wormop2(e,tp,eg,ep,ev,re,r,rp)
                 local pos = Duel.SelectPosition(tp,tc,POS_FACEUP_ATTACK+POS_FACEUP_DEFENSE)
                 Duel.ChangePosition(tc,pos)
             else
-                Duel.SendtoGrave(tc,REASON_EFFECT)
+                if Duel.SendtoGrave(tc,REASON_EFFECT)>0 then
+                    Duel.Draw(tp,1,REASON_EFFECT)
+                end
             end
         else
             if tc:IsLocation(LOCATION_MZONE) then
                 Duel.ChangePosition(tc,POS_FACEDOWN_DEFENSE)
             else
-                Duel.SendtoGrave(tc,REASON_EFFECT)
+                if Duel.SendtoGrave(tc,REASON_EFFECT)>0 then
+                    Duel.Draw(tp,1,REASON_EFFECT)
+                end
             end
         end
     end
