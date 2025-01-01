@@ -603,12 +603,12 @@ end
 function CUNGUI.alienspcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.IsExistingMatchingCard(CUNGUI.alienspfilter,tp,0,LOCATION_MZONE,1,nil,tp)
+	return Duel.IsExistingMatchingCard(CUNGUI.alienspfilter,tp,0,LOCATION_ONFIELD,1,nil,tp)
         and Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0
 end
 function CUNGUI.alienspop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,CUNGUI.alienspfilter,tp,0,LOCATION_MZONE,1,1,nil,tp)
+	local g=Duel.SelectMatchingCard(tp,CUNGUI.alienspfilter,tp,0,LOCATION_ONFIELD,1,1,nil,tp)
 	if #g>0 then Duel.SendtoHand(g,tp,REASON_COST) end
 	local c=e:GetHandler()
 	local e1=Effect.CreateEffect(c)
