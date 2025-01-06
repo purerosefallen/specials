@@ -97,8 +97,8 @@ end,nil,true)
 
 standbyPhaseSkill(2295831, function(e,tp,eg,ep,ev,re,r,rp)
 	local g=Group.CreateGroup()
+	local ac=Duel.AnnounceCard(tp,TYPE_TOKEN,OPCODE_ISTYPE,OPCODE_NOT)
 	for i = 1, 2, 1 do
-		local ac=Duel.AnnounceCard(tp,TYPE_TOKEN,OPCODE_ISTYPE,OPCODE_NOT)
 		local c=Duel.CreateToken(tp,ac)
 		g:AddCard(c)
 	end
@@ -311,58 +311,27 @@ end, function(e,tp)
   return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)==0 and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD+LOCATION_HAND,1,nil) and Duel.GetTurnPlayer()==1-tp and Duel.GetActivityCount(1-tp,ACTIVITY_ATTACK)==0 and Duel.GetTurnCount()>1
 end, true)
 
-wrapDeckSkill(13171876, function(e1)
-	local code=13171876
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_PREDRAW)
-	e1:SetCountLimit(1,0x7ffffff-code)
-	e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
-		return Duel.GetTurnPlayer()==1-tp
-	end)
-	e1:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
-		Duel.Hint(HINT_CARD,0,code)
-		local n=Duel.GetMatchingGroupCount(function (tc)
-			return tc:IsFaceupEx() and tc:IsCode(13171876)
-		end,tp,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,nil)
-		v=2+n
-		for i=1,v do
-			local tc=Duel.CreateToken(1-tp,code)
-			local e2=Effect.CreateEffect(tc)
-			e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-			e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-			e2:SetCode(EVENT_DRAW)
-			e2:SetCountLimit(1)
-			e2:SetOperation(c13171876_op)
-			tc:RegisterEffect(e2)
-			Duel.SendtoDeck(tc,nil,0,REASON_RULE)
-		end
-		Duel.ShuffleDeck(1-tp)
-	end)
+c13171876_chk = {false, false}
+standbyPhaseSkill(13171876, function (e,tp,eg,ep,ev,re,r,rp)
+	if c13171876_chk[tp] then return end
+	Duel.SendtoDeck(Duel.GetFieldGroup(tp,0,LOCATION_HAND),nil,2,REASON_RULE)
+	local ct = Duel.Remove(Duel.GetDecktopGroup(1-tp,20),POS_FACEDOWN,REASON_RULE)
+	local g=Group.CreateGroup()
+	for i=1,ct,1 do
+		local c=Duel.CreateToken(tp,13171876)
+		g:AddCard(c)
+	end
+	Duel.SendtoDeck(g,nil,2,REASON_RULE)
+	Duel.Draw(1-tp,5,REASON_RULE)
+	c13171876_chk[tp] = true
 end)
 
-function c13171876_op(e,tp,eg,ep,ev,re,r,rp)
-	local lp=Duel.GetLP(tp)-3000
-	if lp<0 then lp=0 end
-	Duel.SetLP(tp,lp)
-end
-
-addSkill(13171876, function(e1)
-    e1:SetType(EFFECT_TYPE_FIELD)
-    e1:SetCode(EFFECT_CHANGE_DAMAGE)
-    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-    e1:SetTargetRange(1,0)
-	e1:SetCondition(function (e)
-		local tp=e:GetHandlerPlayer()
-		if not tp then return false end
-		local lp_tp=Duel.GetLP(tp)
-		local lp_op=Duel.GetLP(1-tp)
-		return lp_tp>lp_op and lp_tp-lp_op>=1000
-	end)
-    e1:SetValue(function (e,re,val,r,rp,rc)
-		if bit.band(r,REASON_BATTLE+REASON_EFFECT)~=0 then
-			return val/2
-		end
-		return val
+addSkill(13171876, function (e1)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetTargetRange(0,LOCATION_MZONE)
+    e1:SetValue(function (e,c)
+		return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_GRAVE)*(-500)
 	end)
 end)
 
