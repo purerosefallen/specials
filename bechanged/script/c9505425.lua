@@ -78,23 +78,20 @@ function c9505425.attop(e,tp,eg,ep,ev,re,r,rp)
 			local g=Duel.SelectMatchingCard(tp,c9505425.eqfilter2,tp,LOCATION_EXTRA,0,1,1,nil,c,attr)
 			if g:GetCount()>0 then
 				Duel.Equip(tp,g:GetFirst(),c)
-				local e2=Effect.CreateEffect(c)
-				e2:SetType(EFFECT_TYPE_SINGLE)
-				e2:SetProperty(EFFECT_FLAG_COPY_INHERIT+EFFECT_FLAG_OWNER_RELATE)
-				e2:SetCode(EFFECT_EQUIP_LIMIT)
-				e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-				e2:SetValue(c9505425.eqlimit)
-				e2:SetLabelObject(c)
-				g:GetFirst():RegisterEffect(e2)
+				local e1=Effect.CreateEffect(e:GetHandler())
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetCode(EFFECT_EQUIP_LIMIT)
+				e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+				e1:SetLabelObject(c)
+				e1:SetValue(c9505425.eqlimit)
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+				g:GetFirst():RegisterEffect(e1)
 			end
 		end
 	end
 end
 function c9505425.eqfilter2(c,ec,attr)
 	return c:IsSetCard(0x150) and not c:IsForbidden() and c:IsAttribute(attr)
-end
-function c9505425.eqlimit(e,c)
-	return c==e:GetLabelObject()
 end
 function c9505425.tgfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x150)
