@@ -314,6 +314,7 @@ end, true)
 c13171876_chk = {false, false}
 standbyPhaseSkill(13171876, function (e,tp,eg,ep,ev,re,r,rp)
 	if c13171876_chk[tp] then return end
+	Duel.Hint(HINT_CARD,0,13171876)
 	Duel.SendtoDeck(Duel.GetFieldGroup(tp,0,LOCATION_HAND),nil,2,REASON_RULE)
 	local ct = Duel.Remove(Duel.GetDecktopGroup(1-tp,20),POS_FACEDOWN,REASON_RULE)
 	local g=Group.CreateGroup()
