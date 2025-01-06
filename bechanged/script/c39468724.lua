@@ -50,7 +50,7 @@ function c39468724.tgfilter(c)
 	return c:IsSetCard(0xb4) and c:IsAbleToHand()
 end
 function c39468724.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true Duel.IsExistingMatchingCard(c39468724.tgfilter,tp,LOCATION_DECK,0,1,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(c39468724.tgfilter,tp,LOCATION_DECK,0,1,nil)
 		and Duel.CheckReleaseGroupEx(tp,c39468724.filter,1,REASON_EFFECT,true,e:GetHandler()) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end

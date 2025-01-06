@@ -18,7 +18,6 @@ function c8978197.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
-	e2:SetCost(c8978197.thcost)
 	e2:SetTarget(c8978197.thtg)
 	e2:SetOperation(c8978197.thop)
 	c:RegisterEffect(e2)
@@ -50,13 +49,6 @@ function c8978197.spop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function c8978197.cfilter(c)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDiscardable()
-end
-function c8978197.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c8978197.cfilter,tp,LOCATION_HAND,0,1,nil) end
-	Duel.DiscardHand(tp,c8978197.cfilter,1,1,REASON_COST+REASON_DISCARD)
-end
 function c8978197.thfilter(c)
 	return c:IsCode(71867500,43973174,48800175,71490127) and c:IsAbleToHand()
 end
@@ -75,4 +67,6 @@ function c8978197.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoHand(tg1,nil,REASON_EFFECT)
 	Duel.ConfirmCards(1-tp,tg1)
 	Duel.ShuffleHand(tp)
+	Duel.BreakEffect()
+	Duel.DiscardHand(tp,nil,1,1,REASON_EFFECT+REASON_DISCARD)
 end

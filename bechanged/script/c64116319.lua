@@ -70,12 +70,11 @@ function c64116319.desop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)~=0 
 		and Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_DECK,0,1,nil,TYPE_SPELL+TYPE_TRAP) 
 		and Duel.SelectYesNo(tp,aux.Stringid(10813327,4)) then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-			local g=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,TYPE_SPELL+TYPE_TRAP)
-			if #g>0 then
-				Duel.HintSelection(g)
-				Duel.Destroy(g,REASON_EFFECT)
-			end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+		local g=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,TYPE_SPELL+TYPE_TRAP)
+		if #g>0 then
+			Duel.HintSelection(g)
+			Duel.Destroy(g,REASON_EFFECT)
 		end
 	end
 end

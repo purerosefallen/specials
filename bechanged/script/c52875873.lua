@@ -59,6 +59,17 @@ function s.activate2(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
+	local e0=Effect.CreateEffect(e:GetHandler())
+	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e0:SetTargetRange(1,0)
+	e0:SetTarget(s.splimit)
+	e0:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e0,tp)
+end
+function s.splimit(e,c)
+	return not c:IsRace(RACE_MACHINE) and c:IsLocation(LOCATION_EXTRA)
 end
 function s.thfilter(c)
 	return c:IsCode(78217065,81193865) and c:IsAbleToHand()
