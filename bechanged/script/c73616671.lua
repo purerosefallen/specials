@@ -17,8 +17,8 @@ function c73616671.cosfilter(c)
 	return (c:IsRace(RACE_SPELLCASTER) or (aux.IsCodeListed(c,46986414) and c:IsType(TYPE_SPELL+TYPE_TRAP))) and c:IsAbleToGraveAsCost()
 end
 function c73616671.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c73616671.cosfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
-	local g=Duel.SelectMatchingCard(tp,c73616671.cosfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,1,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(c73616671.cosfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,e:GetHandler()) end
+	local g=Duel.SelectMatchingCard(tp,c73616671.cosfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,1,e:GetHandler())
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function c73616671.filter(c)
@@ -29,7 +29,7 @@ function c73616671.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function c73616671.spfilter(c,e,tp)
-	return c:IsCode(46986414) and c:IsSpecialSummonable(e,0,tp,false,false)
+	return c:IsCode(46986414) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c73616671.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
@@ -38,6 +38,7 @@ function c73616671.activate(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.SendtoHand(g,nil,REASON_EFFECT)~=0 then
 			Duel.ConfirmCards(1-tp,g)
 			local sg=g:Filter(c73616671.spfilter,nil,e,tp)
+			if #sg>=2 and Duel.IsPlayerAffectedByEffect(tp,59822133) then return end
 			if sg and #sg<=Duel.GetLocationCount(tp,LOCATION_MZONE) and Duel.SelectYesNo(tp,aux.Stringid(73616671,0)) then
 				Duel.BreakEffect()
 				Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)

@@ -64,6 +64,7 @@ function c47963370.spop2(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)~=0 and tc:IsLocation(LOCATION_REMOVED)
 			and c:IsRelateToEffect(e) then
 			Duel.SpecialSummon(c,SUMMON_TYPE_RITUAL,tp,tp,true,true,POS_FACEUP)
+			c:CompleteProcedure()
 		end
 	end
 end

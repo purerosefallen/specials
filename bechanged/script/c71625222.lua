@@ -40,7 +40,7 @@ function c71625222.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,1)
 end
 function c71625222.spfilter(c,e,tp)
-	return c:IsCanBeSpecialSummoned(e,0,tp,true,true) and aux.IsCodeListed(c,46986414)
+	return c:IsCanBeSpecialSummoned(e,0,tp,true,true) and aux.IsCodeListed(c,46986414) and c:IsType(TYPE_MONSTER)
 		and (c:IsLocation(LOCATION_DECK) and Duel.GetMZoneCount(tp)>0
 			or c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0)
 end
