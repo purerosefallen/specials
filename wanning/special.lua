@@ -315,15 +315,15 @@ c13171876_chk = {false, false}
 standbyPhaseSkill(13171876, function (e,tp,eg,ep,ev,re,r,rp)
 	if c13171876_chk[tp] then return end
 	Duel.Hint(HINT_CARD,0,13171876)
-	Duel.SendtoDeck(Duel.GetFieldGroup(tp,0,LOCATION_HAND),nil,2,REASON_RULE)
-	local ct = Duel.Remove(Duel.GetDecktopGroup(1-tp,20),POS_FACEDOWN,REASON_RULE)
+	Duel.SendtoDeck(Duel.GetFieldGroup(tp,LOCATION_HAND,0),nil,2,REASON_RULE)
+	local ct = Duel.Remove(Duel.GetDecktopGroup(tp,20),POS_FACEDOWN,REASON_RULE)
 	local g=Group.CreateGroup()
 	for i=1,ct,1 do
 		local c=Duel.CreateToken(tp,13171876)
 		g:AddCard(c)
 	end
 	Duel.SendtoDeck(g,nil,2,REASON_RULE)
-	Duel.Draw(1-tp,5,REASON_RULE)
+	Duel.Draw(tp,5,REASON_RULE)
 	c13171876_chk[tp] = true
 end)
 
@@ -334,6 +334,42 @@ addSkill(13171876, function (e1)
     e1:SetValue(function (e,c)
 		return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_GRAVE)*(-500)
 	end)
+end)
+
+addSkill(13171876, function (e1)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+    e1:SetValue(function (e,c)
+		return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_GRAVE)*(500)
+	end)
+	e1:SetTarget(function(e,c)
+		return c:IsFaceup() and c:IsCode(13171876)
+	end)
+end)
+
+addSkill(13171876, function (e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_SET_SUMMON_COUNT_LIMIT)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetTargetRange(1,0)
+    e1:SetValue(3)
+end)
+
+wrapDeckSkill(13171876, function(e1)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_DIRECT_ATTACK)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(function(e,c)
+		return c:IsFaceup() and c:IsCode(13171876)
+	end)
+end)
+
+standbyPhaseSkill(13171876, function(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_CARD,0,13171876)
+	Duel.Remove(Duel.GetDecktopGroup(1-tp,5),POS_FACEUP,REASON_RULE)
+end, function(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==1-tp
 end)
 
 oneTimeSkill(66957584,function(e,tp,eg,ep,ev,re,r,rp)
