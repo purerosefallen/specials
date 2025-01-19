@@ -36,10 +36,11 @@ function cm.initial_effect(c)
 	c:RegisterEffect(e4)
 	--get effect 3
 	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_XMATERIAL)
-	e6:SetCode(EVENT_DESTROY)
+	e6:SetType(EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e6:SetCode(EFFECT_SEND_REPLACE)
 	e6:SetCondition(cm.condition)
-	e6:SetOperation(cm.repop)
+	e6:SetTarget(cm.reptg)
+	e6:SetValue(cm.repval)
 	c:RegisterEffect(e6)
 	--get effect 4
 	local e7=Effect.CreateEffect(c)
@@ -52,7 +53,7 @@ function cm.initial_effect(c)
 	c:RegisterEffect(e7)
 end
 function cm.imval(e,re)
-	return re:GetHandler()~=e:GetHandler() and (re:GetHandler():IsCode(9940036,24299458,29301450) or re:IsActiveType(TYPE_TRAP))
+	return re:GetHandler()~=e:GetHandler() and re:GetHandler():IsCode(9940036,10045474,29301450)
 end
 function cm.condition(e)
 	return e:GetHandler():GetOriginalRace()==RACE_BEASTWARRIOR
@@ -102,7 +103,12 @@ end
 function cm.repfilter(c,tp)
 	return c:IsControler(1-tp) and c:IsReason(REASON_DESTROY) and c:IsReason(REASON_EFFECT) and c:GetDestination()==LOCATION_GRAVE and c:IsAbleToRemove(tp,POS_FACEDOWN)
 end
-function cm.repop(e,tp,eg)
+function cm.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return eg:IsExists(cm.repfilter,1,nil,tp) end
 	local g=eg:Filter(cm.repfilter,nil,tp)
-	Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT+REASON_DESTROY)
+	Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT)
+	return true
+end
+function cm.repval(e,c)
+	return false
 end
