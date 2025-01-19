@@ -7,7 +7,7 @@ function c48905153.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	--e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetValue(c48905153.atkval)
 	c:RegisterEffect(e1)
@@ -30,7 +30,6 @@ function c48905153.initial_effect(c)
 	e3:SetOperation(c48905153.desop)
 	c:RegisterEffect(e3)
 end
-local snake_code = 31755044
 function c48905153.ovfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xf1) and not c:IsCode(48905153)
 end
@@ -55,7 +54,7 @@ end
 function c48905153.descon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local og=c:GetOverlayGroup()
-	if og and og:IsExists(Card.IsCode,1,nil,snake_code) then
+	if og and og:IsExists(Card.IsCode,1,nil,48905154) then
 		return c:GetFlagEffect(48905154)<2
 	else
 		return c:GetFlagEffect(48905154)<1
@@ -64,8 +63,8 @@ end
 function c48905153.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local og=c:GetOverlayGroup()
-	if chk==0 then return c:CheckRemoveOverlayCard(tp,1,REASON_COST) or (og and og:IsExists(Card.IsCode,1,nil,snake_code)) end
-	if not (og and og:IsExists(Card.IsCode,1,nil,snake_code)) then
+	if chk==0 then return c:CheckRemoveOverlayCard(tp,1,REASON_COST) or (og and og:IsExists(Card.IsCode,1,nil,48905154)) end
+	if not (og and og:IsExists(Card.IsCode,1,nil,48905154)) then
 		e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 	end
 	c:RegisterFlagEffect(48905154,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
