@@ -25,6 +25,16 @@ function cm.initial_effect(c)
 	e3:SetTarget(cm.mattg)
 	e3:SetOperation(cm.matop)
 	c:RegisterEffect(e3)
+	--get effect
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(31755044,1))
+	e4:SetCategory(CATEGORY_REMOVE)
+	e4:SetType(EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_TRIGGER_F)
+	e4:SetCode(EVENT_BATTLED)
+	e4:SetCondition(cm.rmcon)
+	e4:SetTarget(cm.rmtg)
+	e4:SetOperation(cm.rmop)
+	c:RegisterEffect(e4)
 end
 function cm.imval(e,re)
 	return re:GetHandler()~=e:GetHandler() and (re:GetHandler():IsCode(9940036,24299458,29301450) or re:IsActiveType(TYPE_TRAP))
@@ -73,19 +83,4 @@ function cm.rmop(e,tp,eg,ep,ev,re,r,rp)
 	if bc:IsRelateToBattle() and bc:IsControler(1-tp) then
 		Duel.Remove(bc,POS_FACEUP,REASON_EFFECT)
 	end
-end
-
-function cm.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-end
-function cm.operation(e,tp,eg,ep,ev,re,r,rp)
-	local token=Duel.CreateToken(tp,48905153)
-	Duel.SendtoDeck(token,nil,0,REASON_EFFECT)
-end
-function cm.repfilter(c,tp)
-	return c:IsControler(1-tp) and c:IsReason(REASON_DESTROY) and c:IsReason(REASON_EFFECT) and c:GetDestination()==LOCATION_GRAVE and c:IsAbleToRemove(tp,POS_FACEDOWN)
-end
-function cm.repop(e,tp,eg)
-	local g=eg:Filter(cm.repfilter,nil,tp)
-	Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT+REASON_DESTROY)
 end
