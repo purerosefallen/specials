@@ -45,7 +45,7 @@ function c575512.initial_effect(c)
 end
 --to hand
 function s.filter(c,tp)
-	return c:IsSummonType(SUMMON_TYPE_SYNCHRO) and c:IsControler(tp)
+	return c:IsSummonType(SUMMON_TYPE_SYNCHRO) and c:IsControler(tp) and c:IsSetCard(0xc1)
 end
 function s.mgfilter(c,tp,sync)
 	return c:IsControler(tp) and c:IsLocation(LOCATION_GRAVE)
@@ -99,21 +99,21 @@ function c575512.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return tc and tc:IsControler(tp) and tc:IsSetCard(0xc1) and tc:IsRelateToBattle() and Duel.GetAttackTarget()~=nil
 end
 function s.atkfilter(c)
-	return c:IsSetCard(0xc1) and ((c:GetAttack()>0 and c:IsDiscardable() and c:IsLocation(LOCATION_HAND)) or (c:IsAbleToHand() and c:IsLocation(LOCATION_GRAVE)))
+	return c:IsSetCard(0xc1) and ((c:GetAttack()>0 and c:IsDiscardable() and c:IsLocation(LOCATION_HAND)) or (c:IsAbleToHand() and c:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED)))
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.atkfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.atkfilter,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
         Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE+CATEGORY_GRAVE_ACTION,nil,1,0,0)
 end
 function c575512.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.atkfilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.atkfilter),tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
     local ttc=g:GetFirst()
     if ttc then
         if ttc:IsLocation(LOCATION_HAND) then
             Duel.SendtoGrave(ttc,REASON_EFFECT+REASON_DISCARD)
-        elseif ttc:IsLocation(LOCATION_GRAVE)  then
+        elseif ttc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED)  then
             Duel.SendtoHand(ttc,nil,REASON_EFFECT)
         end
         if ttc:IsType(TYPE_MONSTER) and ttc:GetAttack()>0 then

@@ -2,7 +2,7 @@
 function c63144961.initial_effect(c)
 	aux.AddCodeList(c,44508094)
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
+	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,63144961)
@@ -24,25 +24,28 @@ function c63144961.fffilter(c,e,tp,ft)
 	return c:IsSetCard(0x3f) and c:IsType(TYPE_SYNCHRO) and Duel.IsExistingMatchingCard(c63144961.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,c,e,tp,ft)
 end
 function c63144961.spfilter(c,fc,e,tp,ft)
-	return aux.IsMaterialListCode(fc,c:GetCode()) and c:IsAbleToHand()
+	return (c:IsSetCard(0xa3) or aux.IsMaterialListCode(c,44508094)) and c:IsType(TYPE_MONSTER) and (c:IsAbleToHand() or (ft>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)))
 end
 function c63144961.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if chk==0 then return Duel.IsExistingMatchingCard(c63144961.fffilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,ft) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
+	if chk==0 then return Duel.IsExistingMatchingCard(c63144961.fffilter,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,nil,e,tp,ft) end
 end
 function c63144961.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-	local tc=Duel.SelectMatchingCard(tp,c63144961.fffilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,ft):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,c63144961.fffilter,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,1,nil,e,tp,ft):GetFirst()
 	if tc then
 		Duel.ConfirmCards(1-tp,tc)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
 		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c63144961.spfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,tc,e,tp,ft)
 		local cc=g:GetFirst()
 		if cc then
-			Duel.SendtoHand(cc,nil,REASON_EFFECT)
-			Duel.ConfirmCards(1-tp,cc)
+			if cc:IsAbleToHand() and (not cc:IsCanBeSpecialSummoned(e,0,tp,false,false) or ft<=0 or Duel.SelectOption(tp,1190,1152)==0) then
+				Duel.SendtoHand(cc,nil,REASON_EFFECT)
+				Duel.ConfirmCards(1-tp,cc)
+			else
+				Duel.SpecialSummon(cc,0,tp,tp,false,false,POS_FACEUP)
+			end
 		end
 	end
 end

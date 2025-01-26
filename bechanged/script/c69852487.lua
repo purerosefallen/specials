@@ -135,7 +135,7 @@ function c69852487.thop2(e,tp,eg,ep,ev,re,r,rp)
 			Duel.SendtoDeck(tc,nil,SEQ_DECKTOP,REASON_EFFECT)
 		end
 		Duel.ConfirmDecktop(tp,1)
-		if tc:IsCode(62829077,67378935) then
+		if tc:IsCode(35906693,67378935) then
 			Duel.BreakEffect()
 			Duel.Draw(tp,1,REASON_EFFECT)
 		end

@@ -16,7 +16,7 @@ function c36970611.initial_effect(c)
 	e0:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
 	e0:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e0:SetCondition(s.actcon)
-	e0:SetCost(s.cost)
+	e0:SetCost(s.scost)
 	c:RegisterEffect(e0)
 	--remove
 	local e2=Effect.CreateEffect(c)
@@ -48,7 +48,7 @@ function c36970611.tgfilter(c,tp,xc)
 	return c:IsAbleToRemove(tp,POS_FACEDOWN) and c~=xc
 end
 function c36970611.cfilter(c,tp,xc)
-	return c:IsSetCard(0xc1) and c:IsType(TYPE_MONSTER) and (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(0xc1) and c:IsType(TYPE_MONSTER) and c:IsFaceupEx() and c:IsAbleToRemoveAsCost()
 		and Duel.IsExistingTarget(c36970611.tgfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c,tp,xc)
 end
 function c36970611.cost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -102,10 +102,10 @@ end
 function s.actcon(e)
 	return e:GetHandler():IsStatus(STATUS_SET_TURN) and e:GetHandler():IsLocation(LOCATION_ONFIELD)
 end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.scost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_MZONE+LOCATION_EXTRA,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_MZONE+LOCATION_EXTRA,0,nil)
 	local sg=g:Select(tp,1,1,nil)
-	Duel.Remove(sg,POS_FACEUP,REASON_COST)
+	Duel.SendtoGrave(sg,REASON_COST)
 end

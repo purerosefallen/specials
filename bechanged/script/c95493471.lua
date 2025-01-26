@@ -63,6 +63,7 @@ function s.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
 	e4:SetCode(EVENT_FREE_CHAIN)
 	e4:SetRange(LOCATION_GRAVE)
+	e4:SetCountLimit(1,id+o)
 	e4:SetCondition(s.condition)
 	e4:SetTarget(s.sptg1)
 	e4:SetOperation(s.spop1)
@@ -191,7 +192,7 @@ end
 
 
 function s.LinkCondition(f,minct,maxct,gf)
-	return	function(e,c,og,lmat,min,max)
+	return  function(e,c,og,lmat,min,max)
 				if c==nil then return true end
 				if c:IsType(TYPE_PENDULUM) and c:IsFaceup() then return false end
 				local minc=minct
@@ -219,7 +220,7 @@ function s.LinkCondition(f,minct,maxct,gf)
 			end
 end
 function s.LinkTarget(f,minct,maxct,gf)
-	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,og,lmat,min,max)
+	return  function(e,tp,eg,ep,ev,re,r,rp,chk,c,og,lmat,min,max)
 				local minc=minct
 				local maxc=maxct
 				if min then
@@ -250,7 +251,7 @@ function s.LinkTarget(f,minct,maxct,gf)
 			end
 end
 function s.LinkOperation(f,minct,maxct,gf)
-	return	function(e,tp,eg,ep,ev,re,r,rp,c,og,lmat,min,max)
+	return  function(e,tp,eg,ep,ev,re,r,rp,c,og,lmat,min,max)
 				local g=e:GetLabelObject()
 				c:SetMaterial(g)
 				Auxiliary.LExtraMaterialCount(g,c,tp)

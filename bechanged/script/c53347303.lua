@@ -1,6 +1,6 @@
 --青眼の光龍
 function c53347303.initial_effect(c)
-	aux.AddCodeList(c,23995346)
+	aux.AddCodeList(c,23995346,89631139)
 	c:EnableReviveLimit()
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
@@ -58,6 +58,14 @@ function c53347303.initial_effect(c)
 	e6:SetTarget(c53347303.target)
 	e6:SetOperation(c53347303.operation)
 	c:RegisterEffect(e6)
+	local e7=Effect.CreateEffect(c)
+	e7:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e7:SetType(EFFECT_TYPE_IGNITION)
+	e7:SetRange(LOCATION_HAND)
+	e7:SetCost(c53347303.thhcost)
+	e7:SetTarget(c53347303.thhtg)
+	e7:SetOperation(c53347303.thhop)
+	c:RegisterEffect(e7)
 end
 function c53347303.spfilter(c,tp)
 	return c:IsCode(23995346) and Duel.GetMZoneCount(tp,c)>0
@@ -141,5 +149,25 @@ function c53347303.operation(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,true,true,POS_FACEUP)>0 and Duel.NegateAttack() then
 		Duel.BreakEffect()
 		Duel.SkipPhase(1-tp,PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE_STEP,1)
+	end
+end
+function c53347303.thhcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToDeckAsCost() end
+	Duel.SendtoDeck(e:GetHandler(),tp,SEQ_DECKSHUFFLE,REASON_COST)
+end
+function c53347303.thhfilter(c)
+	return aux.IsCodeOrListed(c,89631139) and c:IsRace(RACE_DRAGON+RACE_SPELLCASTER)
+		and c:IsLevel(1) and c:IsAbleToHand()
+end
+function c53347303.thhtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c53347303.thhfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
+end
+function c53347303.thhop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c53347303.thhfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
+	if #g>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
 	end
 end
