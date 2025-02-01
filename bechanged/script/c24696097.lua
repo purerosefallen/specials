@@ -58,8 +58,22 @@ c24696097.material_type=TYPE_SYNCHRO
 function c24696097.mtcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsAbleToEnterBP() and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=5
 end
+function c24696097.cfilter(c)
+	return c:IsType(TYPE_TUNER) and (c:IsLocation(LOCATION_DECK) or c:IsAbleToDeck())
+end
 function c24696097.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(24696097,4))
+	local sg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c24696097.ccfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
+	local tc=sg:GetFirst()
+	if Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,44508094) and tc then
+		Duel.ShuffleDeck(tp)
+		if tc:IsLocation(LOCATION_DECK) then
+			Duel.MoveSequence(tc,SEQ_DECKTOP)
+		else
+			Duel.SendtoDeck(tc,nil,SEQ_DECKTOP,REASON_EFFECT)
+		end
+	end
 	Duel.ConfirmDecktop(tp,5)
 	local g=Duel.GetDecktopGroup(tp,5)
 	local ct=g:FilterCount(Card.IsType,nil,TYPE_TUNER)

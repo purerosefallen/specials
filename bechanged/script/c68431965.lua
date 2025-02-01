@@ -2,7 +2,7 @@
 ---@param c Card
 function c68431965.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
+	aux.AddSynchroMixProcedure(c,aux.Tuner(nil),nil,nil,c68431965.sfilter,1,99,c68431965.syncheck)
 	c:EnableReviveLimit()
 	--lv
 	local e1=Effect.CreateEffect(c)
@@ -29,6 +29,20 @@ function c68431965.initial_effect(c)
 	e2:SetTarget(c68431965.sctarg)
 	e2:SetOperation(c68431965.scop)
 	c:RegisterEffect(e2)
+end
+function c68431965.sfilter(c)
+   return not c:IsTuner(c) or c:IsCode(14943837)
+end
+function c68431965.mgcheck(c,mg)
+	local rg=mg-c
+	if c:IsTuner(c) then
+		return rg:IsExists(Card.IsCode,1,nil,14943837) or #rg>=1
+	else
+		return false
+	end
+end
+function c68431965.syncheck(g)
+	return g:IsExists(c68431965.mgcheck,1,nil,g)
 end
 function c68431965.lvlcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO)

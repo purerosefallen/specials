@@ -24,7 +24,7 @@ function c62517849.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c62517849.thfilter(c)
 	local te1,te2,te3=c:GetActivateEffect()
-	return c:IsType(TYPE_SPELL+TYPE_TRAP) and te1 and (te1:GetCode()==EVENT_ATTACK_ANNOUNCE or te2 and te2:GetCode()==EVENT_ATTACK_ANNOUNCE or te3 and te3:GetCode()==EVENT_ATTACK_ANNOUNCE) and c:IsAbleToHand()
+	return c:IsType(TYPE_SPELL+TYPE_TRAP) and te1 and (te1:GetCode()==EVENT_ATTACK_DISABLED or te2 and te2:GetCode()==EVENT_ATTACK_DISABLED or te3 and te3:GetCode()==EVENT_ATTACK_DISABLED) and c:IsAbleToHand()
 end
 function c62517849.spfilter(c,e,tp,mc)
 	return not c:IsCode(62517849) and c:IsType(TYPE_XYZ) and c:IsSetCard(0x107f) and mc:IsCanBeXyzMaterial(c)

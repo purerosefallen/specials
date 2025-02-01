@@ -115,7 +115,7 @@ function c51543904.disop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c51543904.discon2(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)
-		and ep==1-tp
+		and ep==1-tp and e:GetHandler():GetFlagEffect(51543904)~=0
 end
 function c51543904.discost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -135,7 +135,7 @@ function c51543904.disop2(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c51543904.regcon(e,tp,eg,ep,ev,re,r,rp)
-	return re and re:GetHandler():IsSetCard(0x48) and re:IsActiveType(TYPE_MONSTER)
+	return re and re:GetHandler():IsSetCard(0x48) and re:IsActiveType(TYPE_SPELL)
 end
 function c51543904.regop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():RegisterFlagEffect(51543904,RESET_EVENT+RESET_TURN_SET+RESET_TOHAND+RESET_TODECK+RESET_TOFIELD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(51543904,4))
