@@ -7,10 +7,10 @@ function c45467446.initial_effect(c)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetRange(LOCATION_DECK)
-	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
-	e1:SetCondition(c410904.spcon2)
-	e1:SetTarget(c410904.sptg2)
-	e1:SetOperation(c410904.spop2)
+	e1:SetCountLimit(1,45467446+EFFECT_COUNT_CODE_OATH)
+	e1:SetCondition(c45467446.spcon2)
+	e1:SetTarget(c45467446.sptg2)
+	e1:SetOperation(c45467446.spop2)
 	c:RegisterEffect(e1)
 	--Remove
 	local e3=Effect.CreateEffect(c)
@@ -47,29 +47,29 @@ function c45467446.initial_effect(c)
 	e7:SetValue(TYPE_EFFECT)
 	c:RegisterEffect(e7)
 end
-function c410904.spfilter2(c)
-	return c:IsFaceupEx() and c:IsCode(89631139) and c:IsAbleToGraveAsCost()
+function c45467446.spfilter2(c)
+	return c:IsFaceupEx() and (c:IsCode(89631139) or c:IsLevel(1) and c:IsRace(RACE_SPELLCASTER)) and c:IsAbleToGraveAsCost()
 end
-function c410904.fselect2(g,tp)
+function c45467446.fselect2(g,tp)
 	return aux.mzctcheck(g,tp)
 end
-function c410904.spcon2(e,c)
+function c45467446.spcon2(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local g=Duel.GetMatchingGroup(c410904.spfilter2,tp,LOCATION_MZONE+LOCATION_HAND,0,nil)
-	return g:CheckSubGroup(c410904.fselect2,1,1,tp)
+	local g=Duel.GetMatchingGroup(c45467446.spfilter2,tp,LOCATION_MZONE+LOCATION_HAND,0,nil)
+	return g:CheckSubGroup(c45467446.fselect2,1,1,tp)
 end
-function c410904.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,c)
-	local g=Duel.GetMatchingGroup(c410904.spfilter2,tp,LOCATION_MZONE+LOCATION_HAND,0,nil)
+function c45467446.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,c)
+	local g=Duel.GetMatchingGroup(c45467446.spfilter2,tp,LOCATION_MZONE+LOCATION_HAND,0,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local sg=g:SelectSubGroup(tp,c410904.fselect2,true,1,1,tp)
+	local sg=g:SelectSubGroup(tp,c45467446.fselect2,true,1,1,tp)
 	if sg then
 		sg:KeepAlive()
 		e:SetLabelObject(sg)
 		return true
 	else return false end
 end
-function c410904.spop2(e,tp,eg,ep,ev,re,r,rp,c)
+function c45467446.spop2(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=e:GetLabelObject()
 	Duel.SendtoGrave(g,REASON_SPSUMMON)
 	g:DeleteGroup()
@@ -118,38 +118,40 @@ function c45467446.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToDeckAsCost() end
 	Duel.SendtoDeck(e:GetHandler(),nil,2,REASON_COST)
 end
-function c45467446.filter(c)
-	return c:IsSetCard(0xdd) and c:IsType(TYPE_RITUAL) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
-end
-function c45467446.filter2(c)
-	return c:IsType(TYPE_RITUAL) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+function c45467446.filter(c,e,tp)
+	if not (c:IsType(TYPE_MONSTER) and c:IsSetCard(0xdd)) then return false end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	return c:IsAbleToHand() or ft>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c45467446.sspfilter(c,e,tp)
 	return c:IsFaceupEx() and c:IsCode(89631139) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c45467446.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_MZONE,0,1,nil,89631139)
-		and Duel.IsExistingMatchingCard(c45467446.filter,tp,LOCATION_DECK,0,1,nil)
-		and Duel.IsExistingMatchingCard(c45467446.filter2,tp,LOCATION_DECK,0,1,nil)
+		and Duel.IsExistingMatchingCard(c45467446.filter,tp,LOCATION_DECK,0,1,nil,e,tp)
 		or not Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_MZONE,0,1,nil,89631139)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c90027012.sspfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+		and Duel.IsExistingMatchingCard(c45467446.sspfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp) end
 end
 function c45467446.thop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_MZONE,0,1,nil,89631139) then
-		if not (Duel.IsExistingMatchingCard(c45467446.filter,tp,LOCATION_DECK,0,1,nil)
-			and Duel.IsExistingMatchingCard(c45467446.filter2,tp,LOCATION_DECK,0,1,nil)) then return end
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local g=Duel.SelectMatchingCard(tp,c45467446.filter,tp,LOCATION_DECK,0,1,1,nil)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local g2=Duel.SelectMatchingCard(tp,c45467446.filter2,tp,LOCATION_DECK,0,1,1,nil)
-		g:Merge(g2)
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
+		if not Duel.IsExistingMatchingCard(c45467446.filter,tp,LOCATION_DECK,0,1,nil,e,tp) then return end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
+		local g=Duel.SelectMatchingCard(tp,c45467446.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+		local tc=g:GetFirst()
+		if tc then
+			if tc:IsAbleToHand() and (not tc:IsCanBeSpecialSummoned(e,0,tp,false,false) or ft<=0 or Duel.SelectOption(tp,1190,1152)==0) then
+				Duel.SendtoHand(tc,nil,REASON_EFFECT)
+				Duel.ConfirmCards(1-tp,tc)
+			else
+				Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+			end
+		end
 	else
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,c45467446.sspfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c45467446.sspfilter),tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
 		if g:GetCount()>0 then
 			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		end

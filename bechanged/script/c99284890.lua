@@ -8,6 +8,7 @@ function c99284890.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
 	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,99284890)
 	e1:SetCost(c99284890.cost1)
 	e1:SetOperation(c99284890.operation1)
 	c:RegisterEffect(e1)
@@ -65,7 +66,7 @@ function c99284890.cfilter(c,tp)
 	return c:IsControler(1-tp) and c:IsPreviousLocation(LOCATION_DECK)
 end
 function c99284890.drcon1(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c99284890.cfilter,1,nil,tp) and not Duel.IsChainSolving()
+	return eg:IsExists(c99284890.cfilter,1,nil,tp) and not Duel.IsChainSolving() and re:IsActivated() and rp==1-tp
 end
 function c99284890.drop1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,99284890)
@@ -73,7 +74,7 @@ function c99284890.drop1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterFlagEffect(tp,99284890+1,0,0,0)
 end
 function c99284890.regcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c99284890.cfilter,1,nil,tp) and Duel.IsChainSolving()
+	return eg:IsExists(c99284890.cfilter,1,nil,tp) and Duel.IsChainSolving() and re:IsActivated() and rp==1-tp
 end
 function c99284890.regop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterFlagEffect(tp,99284890,RESET_CHAIN,0,1)
@@ -125,7 +126,7 @@ function c99284890.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
-function c99284890.spop(e,tp,eg,ep,ev,re,r,rp,c)
+function c99284890.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	if c:IsRelateToEffect(e) then

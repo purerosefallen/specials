@@ -65,6 +65,7 @@ function s.initial_effect(c)
 	e4:SetRange(LOCATION_GRAVE)
 	e4:SetCountLimit(1,id+o)
 	e4:SetCondition(s.condition)
+	e4:SetCost(s.sspcost)
 	e4:SetTarget(s.sptg1)
 	e4:SetOperation(s.spop1)
 	c:RegisterEffect(e4)
@@ -152,6 +153,11 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
 	return (ph==PHASE_MAIN1 or ph==PHASE_MAIN2) and Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,58753372)
 end
+function s.sspcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToExtraAsCost() end
+	Duel.SendtoDeck(c,nil,SEQ_DECKTOP,REASON_COST)
+end
 function s.sptgexfilter(c,e,tp)
 	local sc=e:GetHandler()
 	return c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) and c:IsCode(84025439)
@@ -171,7 +177,6 @@ function s.spop1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local xg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_GRAVE,0,nil,e)
 	if not aux.MustMaterialCheck(g,tp,EFFECT_MUST_BE_XMATERIAL) then return end
-	if not c:IsRelateToChain() or c:IsImmuneToEffect(e)or c:IsControler(1-tp) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.sptgexfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 	if #g<1 then return end
@@ -179,8 +184,7 @@ function s.spop1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 	sc:CompleteProcedure()
 	local xyzg=xg:SelectSubGroup(tp,aux.dncheck,false,xg:GetClassCount(Card.GetCode),xg:GetClassCount(Card.GetCode))
-	if xyzg and #xyzg>0 and (not c:IsImmuneToEffect(e)) and c:IsCanOverlay() then
-		Duel.Overlay(sc,c)
+	if xyzg and #xyzg>0 then
 		Duel.Overlay(sc,xyzg)
 	end
 end

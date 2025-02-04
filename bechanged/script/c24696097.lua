@@ -27,7 +27,7 @@ function c24696097.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_MATERIAL_CHECK)
-	e3:SetValue(c26268488.valcheck)
+	e3:SetValue(c24696097.valcheck)
 	c:RegisterEffect(e3)
 	--disable attack
 	local e4=Effect.CreateEffect(c)
@@ -64,7 +64,7 @@ end
 function c24696097.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(24696097,4))
-	local sg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c24696097.ccfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
+	local sg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c24696097.cfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
 	local tc=sg:GetFirst()
 	if Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,44508094) and tc then
 		Duel.ShuffleDeck(tp)
