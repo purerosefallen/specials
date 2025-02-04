@@ -29,7 +29,7 @@ function c73616671.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function c73616671.spfilter(c,e,tp)
-	return c:IsCode(46986414) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c73616671.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
@@ -39,7 +39,7 @@ function c73616671.activate(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ConfirmCards(1-tp,g)
 			local sg=g:Filter(c73616671.spfilter,nil,e,tp)
 			if #sg>=2 and Duel.IsPlayerAffectedByEffect(tp,59822133) then return end
-			if sg and #sg<=Duel.GetLocationCount(tp,LOCATION_MZONE) and Duel.SelectYesNo(tp,aux.Stringid(73616671,0)) then
+			if sg and g:IsExists(Card.IsCode,1,nil,46986414) and #sg<=Duel.GetLocationCount(tp,LOCATION_MZONE) and Duel.SelectYesNo(tp,aux.Stringid(73616671,0)) then
 				Duel.BreakEffect()
 				Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 			end

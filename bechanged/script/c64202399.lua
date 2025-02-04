@@ -88,7 +88,7 @@ function c64202399.thop1(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.SelectMatchingCard(tp,c64202399.thfilter1,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
 	if tc and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND) then
 		Duel.ConfirmCards(1-tp,tc)
-		if not (tc:IsCode(24094653) or aux.IsCodeListed(c,89631139) or aux.IsCodeListed(c,23995346)) then
+		if not (tc:IsCode(24094653) or aux.IsCodeListed(c,89631139) or aux.IsCodeListed(tc,23995346)) then
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_FIELD)
 			e1:SetCode(EFFECT_CANNOT_ACTIVATE)
