@@ -65,7 +65,7 @@ function s.control(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,Card.IsControlerCanBeChanged,tp,0,LOCATION_MZONE,1,1,nil)
 	if #g>0 then
 		Duel.HintSelection(g)
-		Duel.GetControl(g:GetFirst(),tp,PHASE_END,1)
+		Duel.GetControl(g:GetFirst(),tp)
 	end
 end
 function s.filter(c,tp)
