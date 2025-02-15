@@ -58,14 +58,15 @@ function c68543408.cfilter(c,tp)
 	return c:IsSummonType(SUMMON_TYPE_SYNCHRO) and c:IsSummonPlayer(tp)
 end
 function c68543408.ccfilter(c,tp)
-	return (c:IsSetCard(44508094) or aux.IsCodeListed(c,44508094)) and c:IsSummonType(SUMMON_TYPE_SYNCHRO) and c:IsSummonPlayer(tp)
+	Debug.Message(1)
+	return (c:IsCode(44508094) or aux.IsCodeListed(c,44508094)) and c:IsSummonType(SUMMON_TYPE_SYNCHRO) and c:IsSummonPlayer(tp)
 end
 function c68543408.thcon(e,tp,eg,ep,ev,re,r,rp)
-	if eg:IsExists(c68543408.ccfilter,1,nil,tp) then e:SetLabel(100) else e:SetLabel(0) end
 	return eg:IsExists(c68543408.cfilter,1,nil,tp)
 end
 function c68543408.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToHand() end
+	if eg:IsExists(c68543408.ccfilter,1,nil,tp) then e:SetLabel(100) else e:SetLabel(0) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
 end
 function c68543408.thop(e,tp,eg,ep,ev,re,r,rp)

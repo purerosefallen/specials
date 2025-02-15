@@ -60,7 +60,7 @@ end
 function c26268488.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local ct=1
-	if c:GetFlagEffectLabel(26268488) then ct=c:GetFlagEffectLabel(26268488) end
+	if c:GetFlagEffectLabel(26268488) then ct=c:GetFlagEffectLabel(26268488)+1 end
 	if chk==0 then return c:GetFlagEffect(26268489)<ct end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
