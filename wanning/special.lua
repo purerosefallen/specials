@@ -578,21 +578,28 @@ oneTimeSkill(27970830, function(e,tp,eg,ep,ev,re,r,rp)
 end)
 
 --草船借箭（敌人操纵器）
+function controllercheck(c,e)
+	return c:IsAbleToChangeControler() and not c:IsImmuneToEffect(e)
+end
 endPhaseSkill(98045062, function(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(Card.IsAbleToChangeControler,tp,0,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(controllercheck,tp,0,LOCATION_MZONE,nil,e)
+	local rg=Group.CreateGroup()
 	local ct=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if g:GetCount()>ct then
-		g=g:Select(tp,ct,ct,nil)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
+		rg=g:Select(tp,ct,ct,nil)
+	else
+		rg=g:Clone()
 	end
-	for tc in aux.Next(g) do
+	for tc in aux.Next(rg) do
 		Duel.GetControl(tc,tp)
 	end
-	local sg=Duel.GetMatchingGroup(Card.IsAbleToChangeControler,tp,0,LOCATION_MZONE,nil)
-	for tc in aux.Next(sg) do
-		Duel.SendtoGrave(tc,REASON_RULE)
+	g:Sub(rg)
+	for dc in aux.Next(g) do
+		Duel.SendtoGrave(dc,REASON_RULE)
 	end
 end, function(e,tp)
-	return Duel.GetTurnPlayer()==1-tp and Duel.GetMatchingGroupCount(nil,tp,0,LOCATION_MZONE,nil)>=3
+	return Duel.GetTurnPlayer()==1-tp and Duel.GetMatchingGroupCount(nil,tp,0,LOCATION_MZONE,nil)>=2
 end, true)
 
 wrapDeckSkill(98045062, function(e1)
