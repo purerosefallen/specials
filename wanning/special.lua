@@ -65,10 +65,10 @@ local function oneTimeSkill(code, op)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_ADJUST)
 	e1:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
-	  Duel.Hint(HINT_CARD,0,code)
-	  op(e,tp,eg,ep,ev,re,r,rp)
-	  e:Reset()
-	end)
+	  					Duel.Hint(HINT_CARD,0,code)
+	  					op(e,tp,eg,ep,ev,re,r,rp)
+	  					e:Reset()
+					end)
   end)
 end
 
@@ -232,10 +232,10 @@ end,true)
 --闪电风暴
 standbyPhaseSkill(14532163, function(e,tp,eg,ep,ev,re,r,rp)
 	if skillSelections[1-tp]==47529357 then return end
-  local sg=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_ONFIELD,nil)
-	Duel.Remove(sg,POS_FACEUP,REASON_RULE)
+  local sg=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,nil)
+	Duel.SendtoDeck(sg,nil,2,REASON_RULE)
 end, function(e,tp)
-  return Duel.IsExistingMatchingCard(aux.TRUE,tp,0,LOCATION_ONFIELD,1,nil)
+  return Duel.IsExistingMatchingCard(aux.TRUE,tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,1,nil)
 end)
 
 phaseSkill(71490127, PHASE_BATTLE_START, function(e,tp,eg,ep,ev,re,r,rp)
@@ -278,14 +278,18 @@ addSkill(47529357, function(e1)
 end)
 addSkill(47529357, function(e1)
     e1:SetType(EFFECT_TYPE_FIELD)
-    e1:SetCode(EFFECT_CANNOT_REMOVE)
     e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-    e1:SetTargetRange(0,1)
+    e1:SetCode(EFFECT_CANNOT_REMOVE)
+    e1:SetTargetRange(1,1)
+    e1:SetTarget(c47529357_efilter)
 	e1:SetTarget(function (e,c,p)
 		return c:IsControler(e:GetHandlerPlayer())
 	end)
 end)
-
+function c47529357_efilter(e,c,rp,r,re)
+    local tp=e:GetHandlerPlayer()
+    return c:IsControler(tp) and re and r&REASON_EFFECT>0 and rp==1-tp
+end
 function c69015963_filter(c,e,tp)
   return c:IsCanBeSpecialSummoned(e,0,tp,true,true) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
 end
@@ -365,11 +369,21 @@ wrapDeckSkill(13171876, function(e1)
 	end)
 end)
 
-standbyPhaseSkill(13171876, function(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_CARD,0,13171876)
-	Duel.Remove(Duel.GetDecktopGroup(1-tp,5),POS_FACEUP,REASON_RULE)
+wrapDeckSkill(13171876, function(e1)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
+		e1:SetCountLimit(1,0x7ffffff-13171876-PHASE_STANDBY)
+		e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+			return Duel.GetTurnPlayer()==1-tp
+		end)
+		e1:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
+			Duel.Hint(HINT_CARD,0,code)
+			Duel.Hint(HINT_CARD,0,13171876)
+	        Duel.Remove(Duel.GetDecktopGroup(1-tp,5),POS_FACEUP,REASON_RULE)
+		end)
+	
 end, function(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==1-tp
+	return true
 end)
 
 oneTimeSkill(66957584,function(e,tp,eg,ep,ev,re,r,rp)
@@ -736,7 +750,12 @@ end
 --四象之阵
 oneTimeSkill(13513663, function(e,tp,eg,ep,ev,re,r,rp)
 	local g=Group.FromCards(Duel.CreateToken(tp,26400609),Duel.CreateToken(tp,53804307),Duel.CreateToken(tp,89399912),Duel.CreateToken(tp,90411554))
+	local g1=Group.FromCards(Duel.CreateToken(tp,26400609),Duel.CreateToken(tp,53804307),Duel.CreateToken(tp,89399912),Duel.CreateToken(tp,90411554))
+	local g2=Group.FromCards(Duel.CreateToken(tp,26400609),Duel.CreateToken(tp,53804307),Duel.CreateToken(tp,89399912),Duel.CreateToken(tp,90411554))
+	g:Merge(g1)
+	g:Merge(g2)
 	Duel.SendtoGrave(g,REASON_RULE)
+	Duel.RegisterFlagEffect(tp,13513663,0,0,0)
 	for tc in aux.Next(g) do
 		local e1=Effect.CreateEffect(tc)
 		e1:SetType(EFFECT_TYPE_FIELD)
@@ -785,9 +804,9 @@ end
 
 standbyPhaseSkill(13513663,function (e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(function (tc)
-		return tc:IsCanBeSpecialSummoned(e,0,tp,true,true) and tc:IsType(TYPE_MONSTER)
-		and (tc:IsAttribute(ATTRIBUTE_FIRE) or tc:IsAttribute(ATTRIBUTE_EARTH) or tc:IsAttribute(ATTRIBUTE_WATER) or tc:IsAttribute(ATTRIBUTE_WIND))
-	end,tp,LOCATION_HAND+LOCATION_DECK,0,nil)
+		return tc:IsCanBeSpecialSummoned(e,0,tp,false,false) and tc:IsType(TYPE_NORMAL) and tc:IsFaceupEx() and tc:IsType(TYPE_MONSTER)
+	end,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
+	if g:GetCount()==0 or Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then return false end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=g:SelectSubGroup(tp,aux.dabcheck,true,0,4)
 	Duel.SpecialSummon(sg,0,tp,tp,true,true,POS_FACEUP)
