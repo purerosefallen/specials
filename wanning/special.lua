@@ -660,7 +660,8 @@ function c37313786_op(e,tp,eg,ep,ev,re,r,rp)
 		end
 		local g=Duel.GetDecktopGroup(1-tp,2*ct)
 		Duel.DisableShuffleCheck()
-		Duel.Remove(g,POS_FACEUP,REASON_RULE)
+		local sg=g:Filter(Card.IsAbleToRemove,nil)
+		Duel.Remove(sg,POS_FACEUP,REASON_RULE)
 	end
 	if ct2==4 then
 		local lp=Duel.GetLP(1-tp)-20220222
@@ -804,9 +805,9 @@ end
 
 standbyPhaseSkill(13513663,function (e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(function (tc)
-		return tc:IsCanBeSpecialSummoned(e,0,tp,false,false) and tc:IsType(TYPE_NORMAL) and tc:IsFaceupEx() and tc:IsType(TYPE_MONSTER)
+		return tc:IsCanBeSpecialSummoned(e,0,tp,false,false) and tc:IsType(TYPE_NORMAL) and (tc:IsFaceupEx() or tc:IsLocation(LOCATION_HAND+LOCATION_DECK)) and tc:IsType(TYPE_MONSTER)
 	end,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
-	if g:GetCount()==0 or Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then return false end
+	if g:GetCount()==0 or Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then return false end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=g:SelectSubGroup(tp,aux.dabcheck,true,0,4)
 	Duel.SpecialSummon(sg,0,tp,tp,true,true,POS_FACEUP)
@@ -1224,7 +1225,12 @@ addSkill(92714517, function(e1)
 		if re:GetHandler():GetType()~=TYPE_TRAP then return end
 		local rg=Group.CreateGroup()
 		local g=Duel.GetDecktopGroup(1-tp,1)
-		if #g>0 then rg:Merge(g) end
+		if #g>0 then
+			local tc=g:GetFirst()
+			if tc:IsAbleToRemove() then
+				rg:AddCard(tc)
+			end
+		end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local sg=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,1,nil)
 		if #sg>0 then rg:Merge(sg) end
