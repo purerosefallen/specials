@@ -82,9 +82,9 @@ function c89474727.discon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c89474727.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local ct=1
-	if c:GetFlagEffectLabel(89474727) then ct=c:GetFlagEffectLabel(89474727) end
-	if chk==0 then return c:GetFlagEffect(89474728)<ct end
+	local dt=1
+	if c:GetFlagEffectLabel(89474727) then dt=c:GetFlagEffectLabel(89474727) end
+	if chk==0 then return c:GetFlagEffect(89474728)<dt end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
@@ -96,8 +96,14 @@ function c89474727.disop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end
+function c89474727.valfilter(c)
+   return c:IsType(TYPE_SYNCHRO) and not c:IsTuner(c)
+end
 function c89474727.valcheck(e,c)
-	c:RegisterFlagEffect(89474727,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1,c:GetMaterialCount()-1)
+	local dt=c:GetMaterial():FilterCount(c89474727.valfilter,nil)+1
+	if dt>0 then
+		c:RegisterFlagEffect(89474727,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1,dt)
+	end
 end
 function c89474727.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp and e:GetHandler():IsPreviousControler(tp)

@@ -61,7 +61,7 @@ function c61257789.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsPublic() end
 end
 function c61257789.thfilter(c)
-	return (aux.IsCodeListed(c,80280737) or aux.IsCodeListed(c,44508094)) and c:IsAbleToHand()
+	return aux.IsCodeListed(c,80280737) and (c:IsAbleToHand() or c:IsAbleToGrave())
 end
 function c61257789.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c61257789.thfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -72,10 +72,14 @@ function c61257789.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,c61257789.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if g:GetCount()>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 then
-		Duel.ConfirmCards(1-tp,g)
-		Duel.ShuffleDeck(tp)
-		Duel.ShuffleHand(tp)
+	if g:GetCount()>0 then
+		local tc=g:GetFirst()
+		if tc:IsAbleToHand() and (not tc:IsAbleToGrave() or Duel.SelectOption(tp,1190,1191)==0) then
+			Duel.SendtoHand(tc,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,tc)
+		else
+			Duel.SendtoGrave(tc,REASON_EFFECT)
+		end
 		if c:IsRelateToEffect(e) then
 			Duel.SendtoDeck(c,nil,2,REASON_EFFECT)
 		end

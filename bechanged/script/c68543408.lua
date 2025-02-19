@@ -58,7 +58,6 @@ function c68543408.cfilter(c,tp)
 	return c:IsSummonType(SUMMON_TYPE_SYNCHRO) and c:IsSummonPlayer(tp)
 end
 function c68543408.ccfilter(c,tp)
-	Debug.Message(1)
 	return (c:IsCode(44508094) or aux.IsCodeListed(c,44508094)) and c:IsSummonType(SUMMON_TYPE_SYNCHRO) and c:IsSummonPlayer(tp)
 end
 function c68543408.thcon(e,tp,eg,ep,ev,re,r,rp)

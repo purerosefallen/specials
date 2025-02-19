@@ -1,5 +1,6 @@
 --シューティング・クェーサー・ドラゴン
 function c35952884.initial_effect(c)
+	aux.AddMaterialCodeList(c,75874514,44508094)
 	--synchro summon
 	aux.AddSynchroMixProcedure(c,c35952884.sfilter1,nil,nil,c35952884.sfilter2,1,99,c35952884.syncheck)
 	c:EnableReviveLimit()
@@ -11,18 +12,17 @@ function c35952884.initial_effect(c)
 	e1:SetValue(aux.synlimit)
 	c:RegisterEffect(e1)
 	--multi attack
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_MATERIAL_CHECK)
-	e3:SetValue(c35952884.valcheck)
-	c:RegisterEffect(e3)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_MATERIAL_CHECK)
+	e2:SetValue(c35952884.valcheck)
+	c:RegisterEffect(e2)
 	--negate
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(35952884,0))
 	e3:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_CHAINING)
-	e3:SetCountLimit(1)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCondition(c35952884.discon)
@@ -60,11 +60,12 @@ end
 function c35952884.syncheck(g)
 	return g:IsExists(c35952884.mgcheck,1,nil,g)
 end
-function c35952884.smfilter(c,syncard)
-	return c:IsSummonType(TYPE_SYNCHRO) or c:IsCode(75874514)
+function c35952884.valfilter(c)
+   return c:IsType(TYPE_SYNCHRO) and not c:IsTuner(c)
 end
 function c35952884.valcheck(e,c)
 	local ct=c:GetMaterialCount()-1
+	local dt=c:GetMaterial():FilterCount(c35952884.valfilter,nil)+1
 	if ct>1 then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -72,7 +73,9 @@ function c35952884.valcheck(e,c)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_DISABLE-RESET_TOFIELD)
 		e1:SetValue(ct-1)
 		c:RegisterEffect(e1)
-		c:RegisterFlagEffect(35952884,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1,c:GetMaterialCount()-1)
+	end
+	if dt>0 then
+		c:RegisterFlagEffect(35952884,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1,dt)
 	end
 end
 function c35952884.discon(e,tp,eg,ep,ev,re,r,rp)
@@ -80,9 +83,9 @@ function c35952884.discon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c35952884.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local ct=1
-	if c:GetFlagEffectLabel(35952884) then ct=c:GetFlagEffectLabel(35952884) end
-	if chk==0 then return c:GetFlagEffect(35952885)<ct end
+	local dt=1
+	if c:GetFlagEffectLabel(35952884) then dt=c:GetFlagEffectLabel(35952884) end
+	if chk==0 then return c:GetFlagEffect(35952885)<dt end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)

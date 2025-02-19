@@ -1,6 +1,6 @@
 --シューティング・ライザー・ドラゴン
----@param c Card
 function c68431965.initial_effect(c)
+	aux.AddMaterialCodeList(c,14943837)
 	--synchro summon
 	aux.AddSynchroMixProcedure(c,aux.Tuner(nil),nil,nil,c68431965.sfilter,1,99,c68431965.syncheck)
 	c:EnableReviveLimit()

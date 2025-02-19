@@ -57,15 +57,14 @@ function c62892347.spcon(e,c)
 	return Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)>0
 end
 function c62892347.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EVENT_CHAIN_SOLVING)
-	e2:SetOperation(c62892347.disop)
-	e2:SetReset(RESET_EVENT+0xff0000)
-	c:RegisterEffect(e2)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EVENT_CHAIN_SOLVING)
+	e1:SetOperation(c62892347.disop1)
+	c:RegisterEffect(e1)
 end
-function c62892347.disop(e,tp,eg,ep,ev,re,r,rp)
+function c62892347.disop1(e,tp,eg,ep,ev,re,r,rp)
 	if rp==tp and re:IsActiveType(TYPE_SPELL) then
 		local rc=re:GetHandler()
 		if Duel.NegateEffect(ev,true) and rc:IsRelateToEffect(re) then

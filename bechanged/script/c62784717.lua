@@ -49,13 +49,13 @@ function c62784717.coinop(e,tp,eg,ep,ev,re,r,rp)
 		local op=Duel.SelectOption(tp,table.unpack(ops))
 		res=opval[op]
 	else
-		res=Duel.TossCoin(tp,1)
+		res=1-Duel.TossCoin(tp,1)
 	end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EFFECT_CANNOT_SUMMON)
-	if res==0 then
+	if res==1 then
 		e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN)
 		e1:SetTargetRange(1,0)
 		e1:SetCondition(c62784717.limcon)

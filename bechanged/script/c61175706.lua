@@ -30,7 +30,7 @@ end
 c61175706.toss_coin=true
 function c61175706.chainfilter(re,tp,cid)
 	local rc=re:GetHandler()
-	return not (rc.toss_coin)
+	return not rc:IsEffectProperty(aux.EffectPropertyFilter(EFFECT_FLAG_COIN))
 end
 function c61175706.cointg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

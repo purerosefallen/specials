@@ -67,7 +67,7 @@ function c14943837.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c14943837.tgfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK+LOCATION_HAND)
 end
-function c14943837.filter(c)
+function c14943837.thfilter(c)
 	return aux.IsCodeListed(c,44508094) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
 end
 function c14943837.spop(e,tp,eg,ep,ev,re,r,rp)

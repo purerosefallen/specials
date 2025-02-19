@@ -37,6 +37,6 @@ function c37812118.activate(e,tp,eg,ep,ev,re,r,rp)
 	else
 		res=1-Duel.TossCoin(tp,1)
 	end
-	if res==1 then Duel.Draw(tp,2,REASON_EFFECT)
+	if res==0 then Duel.Draw(tp,2,REASON_EFFECT)
 	else Duel.Draw(1-tp,2,REASON_EFFECT) end
 end

@@ -59,9 +59,9 @@ function c26268488.discon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c26268488.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local ct=1
-	if c:GetFlagEffectLabel(26268488) then ct=c:GetFlagEffectLabel(26268488)+1 end
-	if chk==0 then return c:GetFlagEffect(26268489)<ct end
+	local dt=1
+	if c:GetFlagEffectLabel(26268488) then dt=c:GetFlagEffectLabel(26268488) end
+	if chk==0 then return c:GetFlagEffect(26268489)<dt end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
@@ -76,8 +76,14 @@ function c26268488.disop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(g,REASON_EFFECT)
 	end
 end
+function c26268488.valfilter(c)
+   return c:IsType(TYPE_SYNCHRO) and not c:IsTuner(c)
+end
 function c26268488.valcheck(e,c)
-	c:RegisterFlagEffect(26268488,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1,c:GetMaterialCount()-1)
+	local dt=c:GetMaterial():FilterCount(c26268488.valfilter,nil)+1
+	if dt>0 then
+		c:RegisterFlagEffect(26268488,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1,dt)
+	end
 end
 function c26268488.spfilter(c,e,tp)
 	return c:IsSetCard(0xa3) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
