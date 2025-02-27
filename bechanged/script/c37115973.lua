@@ -46,6 +46,14 @@ function c37115973.initial_effect(c)
 	e6:SetCode(EFFECT_IMMUNE_EFFECT)
 	e6:SetValue(c37115973.efilter)
 	c:RegisterEffect(e6)
+	--Gains Effect
+	local e7=Effect.CreateEffect(c)
+	e7:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e7:SetCode(EVENT_BE_MATERIAL)
+	e7:SetProperty(EFFECT_FLAG_EVENT_PLAYER)
+	e7:SetCondition(c37115973.efcon)
+	e7:SetOperation(c37115973.efop)
+	c:RegisterEffect(e7)
 end
 function c37115973.cpfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSetCard(0x55,0x7b) and c:IsAbleToGraveAsCost()
@@ -109,4 +117,54 @@ function c37115973.indval(e,c)
 end
 function c37115973.efilter(e,te)
 	return te:IsActiveType(TYPE_XYZ)
+end
+function c37115973.efcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return r==REASON_XYZ and c:GetReasonCard():IsSetCard(0x107f)
+end
+function c37115973.efop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local rc=c:GetReasonCard()
+	local e1=Effect.CreateEffect(rc)
+	e1:SetDescription(aux.Stringid(8512558,2))
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetTarget(c37115973.thtg)
+	e1:SetOperation(c37115973.thop)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	rc:RegisterEffect(e1,true)
+	if not rc:IsType(TYPE_EFFECT) then
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_ADD_TYPE)
+		e2:SetValue(TYPE_EFFECT)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+		rc:RegisterEffect(e2,true)
+	end
+end
+function c37115973.tcfilter(c)
+	return (c:IsLocation(LOCATION_DECK) or c:IsAbleToDeck())
+end
+function c37115973.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c37115973.tcfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
+end
+function c37115973.thop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(37115973,3))
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c37115973.tcfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
+	local tc=g:GetFirst()
+	if tc then
+		Duel.ShuffleDeck(tp)
+		if tc:IsLocation(LOCATION_DECK) then
+			Duel.MoveSequence(tc,SEQ_DECKTOP)
+		else
+			Duel.SendtoDeck(tc,nil,SEQ_DECKTOP,REASON_EFFECT)
+		end
+		Duel.ConfirmDecktop(tp,1)
+		if tc:IsCode(45283341,67378935) then
+			Duel.BreakEffect()
+			Duel.Draw(tp,1,REASON_EFFECT)
+		end
+	end
 end
