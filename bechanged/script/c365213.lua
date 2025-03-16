@@ -43,7 +43,7 @@ function c365213.tdfilter(c)
 	return c:IsRace(RACE_DRAGON) and c:IsLevel(1) and (c:IsAbleToDeck() or c:IsLocation(LOCATION_DECK))
 end
 function c365213.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c365213.tdfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c365213.tdfilter,tp,LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE,0,1,nil) end
 end
 function c365213.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)

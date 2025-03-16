@@ -1,6 +1,5 @@
---邪炎帝王テスタロス
+--邪炎帝王 泰斯塔罗斯
 local s,id,o=GetID()
----@param c Card
 function s.initial_effect(c)
 	--tribute from each field for advance summon
 	local e1=Effect.CreateEffect(c)
@@ -35,38 +34,22 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function s.tfilter(c,tp)
-	return c:IsSummonType(SUMMON_TYPE_ADVANCE) and c:IsControler(tp)
-end
-function s.tcheck(g,tp)
-	return (g:IsExists(s.tfilter,1,nil,tp) or g:IsExists(Card.IsControler,1,nil,1-tp))
-		and Duel.GetMZoneCount(tp,g)>0
+	return c:IsSummonType(SUMMON_TYPE_ADVANCE) and c:IsControler(tp) or c:IsControler(1-tp)
 end
 function s.otcon(e,c,minc)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local g=Duel.GetMatchingGroup(Card.IsReleasable,tp,LOCATION_MZONE,LOCATION_MZONE,nil,REASON_SUMMON)
-	return c:IsLevelAbove(7) and minc<=2 and g:CheckSubGroup(s.tcheck,1,1,tp)
+	local mg=Duel.GetMatchingGroup(s.tfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	return c:IsLevelAbove(7) and minc<=1 and Duel.CheckTribute(c,1,1,mg)
 end
 function s.otop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetMatchingGroup(Card.IsReleasable,tp,LOCATION_MZONE,LOCATION_MZONE,nil,REASON_SUMMON)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:SelectSubGroup(tp,s.tcheck,false,1,1,tp)
+	local mg=Duel.GetMatchingGroup(s.tfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local sg=Duel.SelectTribute(tp,c,1,1,mg)
 	c:SetMaterial(sg)
-	Duel.Release(sg,REASON_MATERIAL+REASON_SUMMON)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
-	e1:SetTargetRange(1,0)
-	e1:SetTarget(s.splimit)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
-end
-function s.splimit(e,c)
-	return c:IsLocation(LOCATION_EXTRA)
+	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end
 function s.mfilter(c)
-	return c:IsLevelAbove(8) and c:IsSummonType(SUMMON_TYPE_ADVANCE)
+	return c:IsLevelAbove(8) or c:IsAttribute(ATTRIBUTE_DARK+ATTRIBUTE_FIRE)
 end
 function s.mchk(e,c)
 	if c:GetMaterial():IsExists(s.mfilter,1,nil) then

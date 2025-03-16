@@ -1,0 +1,33 @@
+--X-剑士 乌尔贝鲁姆
+local s,id=GetID()
+function s.initial_effect(c)
+	aux.AddSynchroMixProcedure(c,s.matfilter1,nil,nil,aux.NonTuner(nil),1,99)
+	c:EnableReviveLimit()
+	--handes
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_TODECK)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetCode(EVENT_BATTLE_DAMAGE)
+	e1:SetCondition(s.condition)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
+	c:RegisterEffect(e1)
+
+end
+function s.matfilter1(c,syncard)
+	return c:IsTuner(syncard) or c:IsAttribute(ATTRIBUTE_EARTH)
+end
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return ep~=tp
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,1-tp,LOCATION_HAND)
+end
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetFieldGroup(ep,LOCATION_HAND,0)
+	if g:GetCount()==0 then return end
+	local sg=g:RandomSelect(1-tp,1)
+	Duel.SendtoDeck(sg,nil,SEQ_DECKTOP,REASON_EFFECT)
+end

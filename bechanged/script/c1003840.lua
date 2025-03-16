@@ -8,12 +8,13 @@ function c1003840.initial_effect(c)
 	--spsummon
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(1003840,0))
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_TOGRAVE)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetCountLimit(1,1003840)
-	e2:SetTarget(c1003840.thtg1)
-	e2:SetOperation(c1003840.thop1)
+	e2:SetCost(c1003840.spcost2)
+	e2:SetTarget(c1003840.sptg2)
+	e2:SetOperation(c1003840.spop2)
 	c:RegisterEffect(e2)
 	--todeck
 	local e3=Effect.CreateEffect(c)
@@ -105,5 +106,40 @@ function c1003840.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
 		Duel.SendtoDeck(tc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+	end
+end
+function c1003840.cfilter2(c,e,tp,ft)
+	local cs=0
+	if c:IsSetCard(0x1017,0x27) then cs=1 end
+	local lv=c:GetLevel()
+	return lv>0 and c:IsType(TYPE_TUNER)
+		and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) and (c:IsControler(tp) or c:IsFaceup())
+		and Duel.IsExistingMatchingCard(c1003840.spfilter2,tp,LOCATION_DECK,0,1,nil,e,tp,lv,cs)
+end
+function c1003840.spfilter2(c,e,tp,lv,cs)
+	return (c:IsSetCard(0x1017,0x27) or cs==1 and c:IsType(TYPE_TUNER)) and not c:IsLevel(lv) and c:IsLevelAbove(1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function c1003840.spcost2(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if chk==0 then return ft>-1 and Duel.CheckReleaseGroupEx(tp,c1003840.cfilter2,1,REASON_COST,true,nil,e,tp,ft) end
+	local g=Duel.SelectReleaseGroup(tp,c1003840.cfilter2,1,1,REASON_COST,true,nil,e,tp,ft)
+	if g:GetFirst():IsSetCard():IsSetCard(0x1017,0x27) then
+		e:SetLabel(g:GetFirst():GetLevel(),1)
+	else
+		e:SetLabel(g:GetFirst():GetLevel(),0)
+	end
+	Duel.Release(g,REASON_COST)
+end
+function c1003840.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
+end
+function c1003840.spop2(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	local lv,cs=e:GetLabel()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,c1003840.spfilter2,tp,LOCATION_DECK,0,1,1,nil,e,tp,lv,cs)
+	if g:GetCount()>0 then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
