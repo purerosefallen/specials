@@ -122,8 +122,8 @@ end
 function c1003840.spcost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if chk==0 then return ft>-1 and Duel.CheckReleaseGroupEx(tp,c1003840.cfilter2,1,REASON_COST,true,nil,e,tp,ft) end
-	local g=Duel.SelectReleaseGroup(tp,c1003840.cfilter2,1,1,REASON_COST,true,nil,e,tp,ft)
-	if g:GetFirst():IsSetCard():IsSetCard(0x1017,0x27) then
+	local g=Duel.SelectReleaseGroupEx(tp,c1003840.cfilter2,1,1,REASON_COST,true,nil,e,tp,ft)
+	if g:GetFirst():IsSetCard(0x1017,0x27) then
 		e:SetLabel(g:GetFirst():GetLevel(),1)
 	else
 		e:SetLabel(g:GetFirst():GetLevel(),0)

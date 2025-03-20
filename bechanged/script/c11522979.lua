@@ -2,9 +2,9 @@
 --CNo.69 紋章死神カオス・オブ・アームズ
 local s,id=GetID()
 function s.initial_effect(c)
-	aux.AddCodeList(c,77571455)
+	aux.AddCodeList(c,77571455,2407234)
 	--xyz summon
-	aux.AddXyzProcedure(c,nil,5,4)
+	aux.AddXyzProcedure(c,nil,5,4,s.ovfilter,aux.Stringid(id,3))
 	c:EnableReviveLimit()
 	--indes
 	local e0=Effect.CreateEffect(c)
@@ -39,6 +39,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 aux.xyz_number[id]=69
+function s.ovfilter(c)
+	return c:IsFaceup() and c:GetOriginalCode()==2407234
+end
 function s.indval(e,c)
 	return not c:IsSetCard(0x48)
 end

@@ -68,7 +68,7 @@ function s.LConditionFilter(c,f,lc,e)
 		and c:IsCanBeLinkMaterial(lc) and (not f or f(c))
 end
 function s.LFilter(c)
-	return c:IsLinkSetCard(0xdc) and c:IsLinkType(TYPE_EFFECT)and c:IsLinkType(TYPE_MONSTER)
+	return c:IsLinkSetCard(0xdc) and c:IsLinkType(TYPE_EFFECT) and c:IsLinkType(TYPE_MONSTER)
 end
 function s.GetLinkMaterials(tp,f,lc,e)
 	local mg=Duel.GetMatchingGroup(s.LConditionFilter,tp,LOCATION_MZONE,0,nil,f,lc,e)
@@ -135,51 +135,6 @@ function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	e:SetLabel(c:GetAttribute())
 	return c:IsReason(REASON_BATTLE) or (rp==1-tp and c:IsReason(REASON_EFFECT) and c:IsPreviousControler(tp))
 end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	local ph=Duel.GetCurrentPhase()
-	return (ph==PHASE_MAIN1 or ph==PHASE_MAIN2) and Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,58753372)
-end
-function s.sspcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToExtraAsCost() end
-	Duel.SendtoDeck(c,nil,SEQ_DECKTOP,REASON_COST)
-end
-function s.sptgexfilter(c,e,tp)
-	local sc=e:GetHandler()
-	return c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) and c:IsCode(84025439)
-		and c:IsType(TYPE_XYZ) and sc:IsCanBeXyzMaterial(c) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
-end
-function s.sptg1(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_GRAVE,0,nil,0xdc)
-	if chk==0 then return aux.MustMaterialCheck(g,tp,EFFECT_MUST_BE_XMATERIAL)
-		and Duel.IsExistingMatchingCard(s.sptgexfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
-end
-function s.xyzfilter(c,e)
-	return c:IsSetCard(0xdc)and (not c:IsImmuneToEffect(e))
-		and c:IsType(TYPE_MONSTER) and c:IsCanOverlay() and c~=e:GetHandler()
-end
-function s.spop1(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local xg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_GRAVE,0,nil,e)
-	if not aux.MustMaterialCheck(g,tp,EFFECT_MUST_BE_XMATERIAL) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.sptgexfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
-	if #g<1 then return end
-	local sc=g:GetFirst()
-	Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
-	sc:CompleteProcedure()
-	local xyzg=xg:SelectSubGroup(tp,aux.dncheck,false,xg:GetClassCount(Card.GetCode),xg:GetClassCount(Card.GetCode))
-	if xyzg and #xyzg>0 then
-		Duel.Overlay(sc,xyzg)
-	end
-end
-function s.sptgfilter(c,e,tp)
-	return not c:IsPublic() and c:IsType(TYPE_QUICKPLAY) and c:IsSetCard(0x18c) and c:IsCanOverlay()
-		and Duel.IsExistingMatchingCard(s.sptgexfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c:GetCode())
-end
-
-
 
 function s.LinkCondition(f,minct,maxct,gf)
 	return  function(e,c,og,lmat,min,max)
