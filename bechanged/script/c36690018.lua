@@ -67,14 +67,6 @@ function c36690018.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.IsPlayerCanSpecialSummonMonster(tp,36690018,0,TYPES_NORMAL_TRAP_MONSTER,2000,2000,4,RACE_FAIRY,ATTRIBUTE_LIGHT) then
 		c:AddMonsterAttribute(TYPE_NORMAL)
-		Duel.SpecialSummonStep(c,0,tp,tp,true,false,POS_FACEUP)
-		local e3=Effect.CreateEffect(c)
-		e3:SetType(EFFECT_TYPE_SINGLE)
-		e3:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e3:SetReset(RESET_EVENT+RESETS_REDIRECT)
-		e3:SetValue(LOCATION_REMOVED)
-		c:RegisterEffect(e3,true)
-		Duel.SpecialSummonComplete()
+		Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)
 	end
 end
