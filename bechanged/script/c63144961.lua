@@ -1,6 +1,6 @@
 --セイヴァー・アブソープション
 function c63144961.initial_effect(c)
-	aux.AddCodeList(c,44508094,7841112,21159309,63436931)
+	aux.AddCodeList(c,44508094,7841112,21159309,63436931,70902743)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -24,7 +24,7 @@ function c63144961.fffilter(c,e,tp,ft)
 	return (c:IsCode(63436931) or c:IsSetCard(0x3f)) and c:IsType(TYPE_SYNCHRO) and Duel.IsExistingMatchingCard(c63144961.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,c,e,tp,ft)
 end
 function c63144961.spfilter(c,fc,e,tp,ft)
-	return (c:IsSetCard(0xa3) or c:IsSetCard(0x1045) or aux.IsCodeListed(c,21159309)) and c:IsType(TYPE_MONSTER) and (c:IsAbleToHand() or (ft>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)))
+	return (c:IsCode(70902743,44508094,21159309) or aux.IsCodeListed(c,70902743) or aux.IsCodeListed(c,44508094) or aux.IsCodeListed(c,21159309)) and c:IsType(TYPE_MONSTER) and (c:IsAbleToHand() or (ft>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)))
 end
 function c63144961.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
