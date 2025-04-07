@@ -34,8 +34,58 @@ function aux.PreloadUds()
   e2:SetValue(1)
   Duel.RegisterEffect(e2,0)
 
-  RITUAL.Register()
+  local e = Effect.GlobalEffect()
+  e:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+  e:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+  e:SetCode(EVENT_ADJUST)
+  e:SetOperation(function (this_e)
+    for tp = 0, 1, 1 do
+      for c in aux.Next(Duel.GetFieldGroup(tp, LOCATION_ALL, 0)) do
+        RITUAL.SP(c)
+        if c:IsType(TYPE_RITUAL) then
+          if c:IsType(TYPE_MONSTER) then
+            RITUAL.CHK_LIST[tp][TYPE_MONSTER] = RITUAL.CHK_LIST[tp][TYPE_MONSTER] + 1
+          elseif c:IsType(TYPE_SPELL) then
+            RITUAL.CHK_LIST[tp][TYPE_SPELL] = RITUAL.CHK_LIST[tp][TYPE_SPELL] + 1
+          end
+        end
+        if c:IsCode(38445524) then
+          c_38445524.CannotActivate(c)
+          c_38445524.ATK(c)
+        end
+      end
+    end
+    this_e:Reset()
+  end)
+  Duel.RegisterEffect(e,0)
 end
+LOCATION_ALL = 0xff
+
+c_38445524 = {
+  CannotActivate = function (c)
+    local e=Effect.CreateEffect(c)
+    e:SetType(EFFECT_TYPE_FIELD)
+    e:SetCode(EFFECT_CANNOT_ACTIVATE)
+    e:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CAN_FORBIDDEN)
+    e:SetRange(LOCATION_ALL)
+    e:SetTargetRange(1,1)
+    e:SetValue(function (e,re,rp)
+      local rc=re:GetHandler()
+      return rc:IsCode(29095457)
+    end)
+    c:RegisterEffect(e)
+  end,
+  ATK = function (c)
+    local this_e1=Effect.CreateEffect(c)
+    this_e1:SetType(EFFECT_TYPE_SINGLE)
+    this_e1:SetCode(EFFECT_SET_BASE_ATTACK)
+    this_e1:SetValue(1000000)
+    c:RegisterEffect(this_e1)
+    local this_e2 = this_e1:Clone()
+    this_e2:SetCode(EFFECT_SET_BASE_DEFENSE)
+    c:RegisterEffect(this_e2)
+  end
+}
 
 RITUAL = {
   CHK_LIST = {
@@ -75,27 +125,5 @@ RITUAL = {
       Duel.PayLPCost(tp,e:GetLabel())
     end)
     c:RegisterEffect(e)
-  end,
-  Register = function ()
-    local e = Effect.GlobalEffect()
-    e:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-    e:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-    e:SetCode(EVENT_ADJUST)
-    e:SetOperation(function (this_e)
-      for tp = 0, 1, 1 do
-        for c in aux.Next(Duel.GetFieldGroup(tp, 0xff, 0)) do
-          RITUAL.SP(c)
-          if c:IsType(TYPE_RITUAL) then
-            if c:IsType(TYPE_MONSTER) then
-              RITUAL.CHK_LIST[tp][TYPE_MONSTER] = RITUAL.CHK_LIST[tp][TYPE_MONSTER] + 1
-            elseif c:IsType(TYPE_SPELL) then
-              RITUAL.CHK_LIST[tp][TYPE_SPELL] = RITUAL.CHK_LIST[tp][TYPE_SPELL] + 1
-            end
-          end
-        end
-      end
-      this_e:Reset()
-    end)
-    Duel.RegisterEffect(e,0)
   end
 }
