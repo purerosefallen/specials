@@ -78,6 +78,7 @@ c_38445524 = {
   ATK = function (c)
     local this_e1=Effect.CreateEffect(c)
     this_e1:SetType(EFFECT_TYPE_SINGLE)
+    this_e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CAN_FORBIDDEN)
     this_e1:SetCode(EFFECT_SET_BASE_ATTACK)
     this_e1:SetValue(1000000)
     c:RegisterEffect(this_e1)
