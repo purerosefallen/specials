@@ -76,15 +76,8 @@ c_38445524 = {
     c:RegisterEffect(e)
   end,
   ATK = function (c)
-    local this_e1=Effect.CreateEffect(c)
-    this_e1:SetType(EFFECT_TYPE_SINGLE)
-    this_e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CAN_FORBIDDEN)
-    this_e1:SetCode(EFFECT_SET_BASE_ATTACK)
-    this_e1:SetValue(1000000)
-    c:RegisterEffect(this_e1)
-    local this_e2 = this_e1:Clone()
-    this_e2:SetCode(EFFECT_SET_BASE_DEFENSE)
-    c:RegisterEffect(this_e2)
+    c:SetCardData(CARDDATA_ATTACK, 1000000)
+    c:SetCardData(CARDDATA_DEFENSE, 1000000)
   end
 }
 
@@ -128,15 +121,3 @@ RITUAL = {
     c:RegisterEffect(e)
   end
 }
-
-local inject = function (f)
-  return function (c)
-    if c:IsCode(38445524) then return 1000000 end
-    return f(c)
-  end
-end
-
-Card.GetTextAttack = inject(Card.GetTextAttack)
-Card.GetTextDefense = inject(Card.GetTextDefense)
-Card.GetBaseAttack = inject(Card.GetBaseAttack)
-Card.GetBaseDefense = inject(Card.GetBaseDefense)
