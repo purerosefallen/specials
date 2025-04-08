@@ -128,3 +128,15 @@ RITUAL = {
     c:RegisterEffect(e)
   end
 }
+
+local inject = function (f)
+  return function (c)
+    if c:IsCode(38445524) then return 1000000 end
+    return f(c)
+  end
+end
+
+Card.GetTextAttack = inject(Card.GetTextAttack)
+Card.GetTextDefense = inject(Card.GetTextDefense)
+Card.GetBaseAttack = inject(Card.GetBaseAttack)
+Card.GetBaseDefense = inject(Card.GetBaseDefense)
