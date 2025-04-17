@@ -1,6 +1,6 @@
 local skillLists={}
 local skillSelections={}
-
+local lp_record=0
 local function addSkill(code, skill)
 	if not skillLists[code] then
 		skillLists[code]={}
@@ -48,10 +48,25 @@ end
 local function phaseSkill(code, phase, op, con, both)
 	wrapDeckSkill(code, function(e1)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_PHASE+phase)
+		e1:SetCode(EVENT_FREE_CHAIN)
 		e1:SetCountLimit(1,0x7ffffff-code-phase)
 		e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
-			return (both or Duel.GetTurnPlayer()==tp) and (not con or con(e,tp,eg,ep,ev,re,r,rp))
+			return (both or Duel.GetTurnPlayer()==tp) and Duel.GetCurrentPhase()==phase and (not con or con(e,tp,eg,ep,ev,re,r,rp))
+		end)
+		e1:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
+			Duel.Hint(HINT_CARD,0,code)
+			op(e,tp,eg,ep,ev,re,r,rp)
+		end)
+	end)
+end
+
+local function mainphaseSkill(code, op, con, both)
+	wrapDeckSkill(code, function(e1)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_FREE_CHAIN)
+		e1:SetCountLimit(1)
+		e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+			return (both or Duel.GetTurnPlayer()==tp) and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2) and (not con or con(e,tp,eg,ep,ev,re,r,rp))
 		end)
 		e1:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
 			Duel.Hint(HINT_CARD,0,code)
@@ -100,6 +115,112 @@ oneTimeSkill(85852291, function(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ShuffleDeck(tp)
 	Duel.Draw(tp,ct,REASON_RULE)
 end)
+
+--成金
+oneTimeSkill(70368879, function(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Draw(tp,1,REASON_RULE)
+	Duel.Draw(1-tp,1,REASON_RULE)
+end,true)
+
+--青眼白龙
+local function lvcheck(c)
+	return c:IsFaceup() and c:IsLevelAbove(5)
+end
+mainphaseSkill(89631139,
+function(ce,ctp)
+	local g=Duel.GetMatchingGroup(lvcheck,ctp,LOCATION_MZONE,0,nil)
+	local atk=g:GetCount()*300
+	local ag=Duel.GetMatchingGroup(Card.IsFaceup,ctp,LOCATION_MZONE,0,nil)
+	for tc in aux.Next(ag) do
+		local e3=Effect.CreateEffect(ce:GetHandler())
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_UPDATE_ATTACK)
+		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e3:SetValue(atk)
+		tc:RegisterEffect(e3)
+	end
+	Duel.RegisterFlagEffect(ctp,89631139,RESET_PHASE+PHASE_END,0,1)
+end,
+function(ce,ctp) 
+	local g=Duel.GetMatchingGroup(lvcheck,ctp,LOCATION_MZONE,0,nil)
+	return Duel.GetFlagEffect(ctp,89631139)==0 and #g>0 
+end,
+false)
+
+--黑魔术师
+local function lvcheck(c)
+	return c:IsFaceup()
+end
+mainphaseSkill(46986414,
+function(ce,ctp)
+	local g=Duel.GetMatchingGroup(nil,ctp,LOCATION_MZONE,0,nil)
+	local atk=g:GetCount()*100
+	local ag=Duel.GetMatchingGroup(Card.IsFaceup,ctp,LOCATION_MZONE,0,nil)
+	for tc in aux.Next(ag) do
+		local e3=Effect.CreateEffect(ce:GetHandler())
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_UPDATE_ATTACK)
+		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e3:SetValue(atk)
+		tc:RegisterEffect(e3)
+	end
+	Duel.RegisterFlagEffect(ctp,46986414,RESET_PHASE+PHASE_END,0,1)
+end,
+function(ce,ctp) 
+	local g=Duel.GetMatchingGroup(Card.IsFaceup,ctp,LOCATION_MZONE,0,nil)
+	return Duel.GetFlagEffect(ctp,46986414)==0 and #g>0 
+end,
+false)
+
+--注定一抽
+local function repcon(e,tp,eg,ep,ev,re,r,rp)
+    return Duel.GetDrawCount(tp)>0 and Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_DECK,0,1,nil)
+end
+local function repop(e,tp,eg,ep,ev,re,r,rp)
+	local tp=Duel.GetTurnPlayer()
+	local dt=Duel.GetDrawCount(tp)
+	if dt>0 and Duel.SelectYesNo(tp,1108) then
+		local e1=Effect.GlobalEffect()
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e1:SetCode(EFFECT_DRAW_COUNT)
+		e1:SetTargetRange(1,0)
+		e1:SetReset(RESET_PHASE+PHASE_DRAW)
+		e1:SetValue(0)
+		Duel.RegisterEffect(e1,tp)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+		local g=Duel.SelectMatchingCard(tp,Card.IsAbleToHand,tp,LOCATION_DECK,0,1,1,nil)
+		if g:GetCount()>0 then
+			Duel.SendtoHand(g,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,g)
+		end
+	end
+	e:Reset()
+end
+local function bufreg(e,tp,eg,ep,ev,re,r,rp)
+	local cur_lp=Duel.GetLP(tp)
+	local comp = (cur_lp < lp_record) and (lp_record-cur_lp>=10)
+	if comp then
+		local e7=Effect.GlobalEffect()
+		e7:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+		e7:SetCode(EVENT_PREDRAW)
+		e7:SetCountLimit(1)
+		e7:SetCondition(repcon)
+		e7:SetOperation(repop)
+		Duel.RegisterEffect(e7,tp)
+	end
+	lp_record=cur_lp
+end
+
+oneTimeSkill(2295831, function(e,tp,eg,ep,ev,re,r,rp)
+	lp_record=Duel.GetLP(tp)
+	local ge2=Effect.GlobalEffect()
+	ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	ge2:SetCode(EVENT_TURN_END)
+	ge2:SetCountLimit(1)
+	ge2:SetOperation(bufreg)
+	Duel.RegisterEffect(ge2,tp)
+end,true)
 
 --成金
 oneTimeSkill(70368879, function(e,tp,eg,ep,ev,re,r,rp)
