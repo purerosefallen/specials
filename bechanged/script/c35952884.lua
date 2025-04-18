@@ -1,8 +1,7 @@
 --シューティング・クェーサー・ドラゴン
 function c35952884.initial_effect(c)
-	aux.AddMaterialCodeList(c,75874514,44508094)
 	--synchro summon
-	aux.AddSynchroMixProcedure(c,c35952884.sfilter1,nil,nil,c35952884.sfilter2,1,99,c35952884.syncheck)
+	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsSynchroType,TYPE_SYNCHRO),aux.NonTuner(Card.IsSynchroType,TYPE_SYNCHRO),2)
 	c:EnableReviveLimit()
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
@@ -43,23 +42,6 @@ function c35952884.initial_effect(c)
 end
 c35952884.material_type=TYPE_SYNCHRO
 c35952884.cosmic_quasar_dragon_summon=true
-function c35952884.sfilter1(c)
-   return c:IsType(TYPE_SYNCHRO) and c:IsTuner(c) or c:IsCode(75874514)
-end
-function c35952884.sfilter2(c)
-   return c:IsType(TYPE_SYNCHRO) and not c:IsTuner(c) or c:IsCode(44508094)
-end
-function c35952884.mgcheck(c,mg)
-	local rg=mg-c
-	if c:IsType(TYPE_SYNCHRO) and c:IsTuner(c) or c:IsCode(75874514) then
-		return rg:IsExists(Card.IsCode,1,nil,44508094) or #rg>=2
-	else
-		return false
-	end
-end
-function c35952884.syncheck(g)
-	return g:IsExists(c35952884.mgcheck,1,nil,g)
-end
 function c35952884.valfilter(c)
    return c:IsType(TYPE_SYNCHRO) and not c:IsTuner(c)
 end

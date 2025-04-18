@@ -1,7 +1,7 @@
 --シューティング・スター
----@param c Card
 function c47264717.initial_effect(c)
-	aux.AddCodeList(c,44508094)
+	aux.AddCodeList(c,44508094,58120309)
+	aux.AddMaterialCodeList(c,44508094,58120309)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DESTROY)
@@ -9,27 +9,24 @@ function c47264717.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(TIMING_ATTACK,0x11e0)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCountLimit(1,47264717)
 	e1:SetTarget(c47264717.target)
 	e1:SetOperation(c47264717.activate)
 	c:RegisterEffect(e1)
+	--Act in Hand
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(47264717,0))
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	e2:SetCountLimit(1,47264717)
 	e2:SetCondition(c47264717.handcon)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_TOHAND)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_LEAVE_FIELD)
-	e3:SetRange(LOCATION_GRAVE)
-	e3:SetProperty(EFFECT_FLAG_DELAY)
-	e3:SetCountLimit(1,47264718)
-	e3:SetCondition(c47264717.thcon)
-	e3:SetTarget(c47264717.thtg)
-	e3:SetOperation(c47264717.thop)
-	c:RegisterEffect(e3)
+end
+function c47264717.cfilter(c)
+	return c:IsSetCard(0xa3) and c:IsFaceup()
+end
+function c47264717.cfilter2(c)
+	return (c:IsCode(44508094) or (aux.IsCodeListed(c,44508094) and c:IsType(TYPE_SYNCHRO) and c:IsLocation(LOCATION_MZONE)))
+		and c:IsFaceup()
 end
 function c47264717.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc~=e:GetHandler() end
@@ -37,35 +34,24 @@ function c47264717.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+	local ct=Duel.GetMatchingGroupCount(c47264717.cfilter2,tp,LOCATION_ONFIELD,0,nil)
+	e:SetLabel(ct)
+end
+function c47264717.stfilter(c)
+	return c:IsCode(58120309) and c:IsSSetable()
 end
 function c47264717.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		Duel.Destroy(tc,REASON_EFFECT)
+	if tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 then
+		local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(c47264717.stfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,nil)
+		if e:GetLabel()>0 and g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(47264717,1)) then
+			Duel.BreakEffect()
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+			local sc=g:Select(tp,1,1,nil)
+			Duel.SSet(tp,sc)
+		end
 	end
-end
-function c47264717.filter(c)
-	return c:IsFaceup() and (c:IsSetCard(0xa3) or aux.IsCodeListed(c,44508094)) and c:IsType(TYPE_MONSTER)
 end
 function c47264717.handcon(e)
-	return Duel.IsExistingMatchingCard(c47264717.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
-end
-function c47264717.cfilter2(c,tp,rp)
-	return c:IsPreviousControler(tp) and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousLocation(LOCATION_ONFIELD)
-		and (c:IsCode(44508094) or c:GetPreviousTypeOnField()&TYPE_SYNCHRO~=0 and aux.IsCodeListed(c,44508094))
-		and c:IsReason(REASON_COST+REASON_EFFECT) and rp==tp
-end
-function c47264717.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c47264717.cfilter2,1,nil,tp,rp)
-end
-function c47264717.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToHand() end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
-end
-function c47264717.thop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.SendtoHand(c,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,c)
-	end
+	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)==0 or Duel.IsExistingMatchingCard(c47264717.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end

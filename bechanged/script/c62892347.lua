@@ -10,7 +10,6 @@ function c62892347.initial_effect(c)
 	e0:SetCondition(c62892347.spcon)
 	e0:SetOperation(c62892347.spop)
 	c:RegisterEffect(e0)
-	--battle indestructable
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
@@ -51,27 +50,6 @@ function c62892347.initial_effect(c)
 	e5:SetTarget(c62892347.distg)
 	c:RegisterEffect(e5)
 end
-function c62892347.spcon(e,c)
-	if c==nil then return true end
-	local tp=c:GetControler()
-	return Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)>0
-end
-function c62892347.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EVENT_CHAIN_SOLVING)
-	e1:SetOperation(c62892347.disop1)
-	c:RegisterEffect(e1)
-end
-function c62892347.disop1(e,tp,eg,ep,ev,re,r,rp)
-	if rp==tp and re:IsActiveType(TYPE_SPELL) then
-		local rc=re:GetHandler()
-		if Duel.NegateEffect(ev,true) and rc:IsRelateToEffect(re) then
-			Duel.Destroy(rc,REASON_EFFECT)
-		end
-	end
-end
 function c62892347.poscon(e)
 	return e:GetHandler():IsPosition(POS_FACEUP_ATTACK)
 end
@@ -95,5 +73,26 @@ function c62892347.disop(e,tp,eg,ep,ev,re,r,rp)
 	if not g or not g:IsContains(ec) then return end
 	if Duel.NegateEffect(ev,true) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(re:GetHandler(),REASON_EFFECT)
+	end
+end
+function c62892347.spcon(e,c)
+	if c==nil then return true end
+	local tp=c:GetControler()
+	return Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)>0
+end
+function c62892347.spop(e,tp,eg,ep,ev,re,r,rp,c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EVENT_CHAIN_SOLVING)
+	e1:SetOperation(c62892347.disop1)
+	c:RegisterEffect(e1)
+end
+function c62892347.disop1(e,tp,eg,ep,ev,re,r,rp)
+	if rp==tp and re:IsActiveType(TYPE_SPELL) then
+		local rc=re:GetHandler()
+		if Duel.NegateEffect(ev,true) and rc:IsRelateToEffect(re) then
+			Duel.Destroy(rc,REASON_EFFECT)
+		end
 	end
 end

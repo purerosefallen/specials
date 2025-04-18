@@ -1,5 +1,6 @@
 --スターライト・ジャンクション
 function c1003840.initial_effect(c)
+	aux.AddCodeList(c,44508094,50091196,62560742)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

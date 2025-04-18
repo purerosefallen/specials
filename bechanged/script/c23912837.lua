@@ -24,19 +24,6 @@ function c23912837.initial_effect(c)
 	e2:SetTarget(c23912837.postg)
 	e2:SetOperation(c23912837.posop)
 	c:RegisterEffect(e2)
-	--act in hand
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(23912837,4))
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e3:SetCondition(c23912837.handcon)
-	c:RegisterEffect(e3)
-end
-function c23912837.hcfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9d)
-end
-function c23912837.handcon(e)
-	return Duel.IsExistingMatchingCard(c23912837.hcfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 function c23912837.filter(c,e,tp)
 	return c:IsSetCard(0x9d) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_DEFENSE)

@@ -2,8 +2,7 @@
 function c9069157.initial_effect(c)
 	--to hand
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,9069157)
 	e1:SetCost(c9069157.cost)
@@ -19,12 +18,14 @@ function c9069157.initial_effect(c)
 	e2:SetOperation(c9069157.rcop)
 	c:RegisterEffect(e2)
 end
+
+--th
 function c9069157.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsDiscardable() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
 end
 function c9069157.thfilter(c)
-	return (c:IsNonAttribute(ATTRIBUTE_WIND) and c:IsSetCard(0x16) and c:IsType(TYPE_MONSTER)) or c:IsCode(03659803) or c:IsCode(37630732) and c:IsAbleToHand()
+	return (c:IsNonAttribute(ATTRIBUTE_WIND) and c:IsSetCard(0x16) and c:IsType(TYPE_MONSTER)) or c:IsCode(37630732) or (c:IsSetCard(0x4093) and c:IsType(TYPE_MONSTER)) and c:IsAbleToHand()
 end
 function c9069157.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b1=Duel.IsExistingMatchingCard(c9069157.thfilter,tp,LOCATION_DECK,0,1,nil)
@@ -122,6 +123,8 @@ end
 function c9069157.chainlm(e,rp,tp)
 	return tp==rp
 end
+
+--rcchange
 function c9069157.rctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsRace(RACE_DRAGON) end
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,e:GetHandler(),1,0,0)
@@ -137,3 +140,4 @@ function c9069157.rcop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
+

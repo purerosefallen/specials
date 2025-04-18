@@ -48,12 +48,12 @@ end
 -------1
 
 function c71218746.cfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsType(TYPE_FUSION) and c:IsAbleToExtraAsCost()
+	return c:IsType(TYPE_MONSTER) and c:IsType(TYPE_FUSION) and c:IsAbleToExtraAsCost() and c:IsPosition(POS_FACEUP)
 end
 function c71218746.spcost1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c71218746.cfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c71218746.cfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,c71218746.cfilter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler())
+	local g=Duel.SelectMatchingCard(tp,c71218746.cfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,e:GetHandler())
 	Duel.HintSelection(g)
 	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_COST)
 end
@@ -80,9 +80,10 @@ function c71218746.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetTarget(c71218746.splimit)
 	Duel.RegisterEffect(e1,tp)
 end
-function c71218746.splimit(e,c)
-	return not c:IsSetCard(0x16)
+function c71218746.splimit(e,c,sump,sumtype,sumpos,targetp,se)
+	return not c:IsType(TYPE_FUSION) and c:IsLocation(LOCATION_EXTRA)
 end
+
 function c71218746.filter(c)
 	return c:IsSetCard(0x16) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end

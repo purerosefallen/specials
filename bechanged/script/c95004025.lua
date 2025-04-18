@@ -64,3 +64,32 @@ function c95004025.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
+function c95004025.thcon2(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_ADVANCE)
+end
+function c95004025.thfilter2(c)
+	return c:IsType(TYPE_FIELD) and c:IsAbleToHand()
+end
+function c95004025.thtg2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c95004025.thfilter2,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,0,0,0)
+end
+function c95004025.thop2(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,c95004025.thfilter2,tp,LOCATION_DECK,0,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
+		if Duel.IsExistingMatchingCard(Card.IsSummonable,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil,true,nil)
+			and Duel.SelectYesNo(tp,aux.Stringid(95004025,3)) then
+			Duel.BreakEffect()
+			Duel.ShuffleHand(tp)
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
+			local sg=Duel.SelectMatchingCard(tp,Card.IsSummonable,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil,true,nil)
+			if sg:GetCount()>0 then
+				Duel.Summon(tp,sg:GetFirst(),true,nil)
+			end
+		end
+	end
+end

@@ -21,15 +21,15 @@ function c51779204.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c51779204.thfilter(c)
-	return c:IsAttackBelow(1500) and c:IsRace(RACE_FIEND+RACE_DRAGON) and c:IsType(TYPE_TUNER) and c:IsAbleToHand()
+	return c:IsAttribute(ATTRIBUTE_FIRE+ATTRIBUTE_DARK) and c:IsRace(RACE_FIEND+RACE_DRAGON) and c:IsType(TYPE_TUNER) and c:IsAbleToHand()
 end
 function c51779204.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c51779204.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	if chk==0 then return Duel.IsExistingMatchingCard(c51779204.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function c51779204.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c51779204.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c51779204.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)

@@ -9,56 +9,66 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_PIERCE)
 	c:RegisterEffect(e1)
-	--set
+	--tograve
 	local e2=Effect.CreateEffect(c) 
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCountLimit(1,id+1)
-	e2:SetOperation(s.setop)
+	e2:SetOperation(s.regop)
 	c:RegisterEffect(e2)
-	--special summon rule
+	--spsummon condition
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e3:SetCode(EFFECT_SPSUMMON_PROC)
-	e3:SetRange(LOCATION_EXTRA)
-	e3:SetCondition(s.sprcon)
-	e3:SetOperation(s.sprop)
+	e3:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e3:SetValue(s.splimit)
 	c:RegisterEffect(e3)
+	--special summon rule
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e4:SetCode(EFFECT_SPSUMMON_PROC)
+	e4:SetRange(LOCATION_EXTRA)
+	e4:SetCondition(s.sprcon)
+	e4:SetOperation(s.sprop)
+	c:RegisterEffect(e4)
 end
 
 
--------set
-function s.setop(e,tp,eg,ep,ev,re,r,rp) 
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)  
+--tograve
+function s.regop(e,tp,eg,ep,ev,re,r,rp)
+	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_PHASE+PHASE_END) 
-	e1:SetCountLimit(1)   
-	e1:SetOperation(s.xsetop)
+	e1:SetCode(EVENT_PHASE+PHASE_END)
+	e1:SetCountLimit(1)
+	e1:SetOperation(s.tgop)
 	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp) 
-end 
-function s.setfilter(c)
-	return c:IsSetCard(0x16) and c:IsType(TYPE_TRAP) and c:IsSSetable()
+	Duel.RegisterEffect(e1,tp)
 end
-function s.xsetop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_CARD,0,id) 
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local tc=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil):GetFirst()
-	if tc then
-		Duel.SSet(tp,tc)	   
+function s.filter(c)
+	return c:IsSetCard(0x16) and c:IsAbleToGrave()
+end
+function s.tgop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_CARD,0,id)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil)
+	if #g>0 then
+		Duel.SendtoGrave(g,nil,REASON_EFFECT)
 	end
+end
+--spcon
+function s.splimit(e,se,sp,st)
+	return not e:GetHandler():IsLocation(LOCATION_EXTRA) or aux.fuslimit(e,se,sp,st)
 end
 
 -----spsummon
-
 function s.sprfilter1(c,sc)
-	return c:IsFusionSetCard(0x16) and c:IsFusionType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost() and c:IsCanBeFusionMaterial(sc,SUMMON_TYPE_SPECIAL)
+	return c:IsFusionSetCard(0x16) and c:IsFusionType(TYPE_MONSTER) and c:IsAbleToGraveAsCost() and c:IsCanBeFusionMaterial(sc,SUMMON_TYPE_SPECIAL)
 end
 function s.sprfilter2(c,tp,sc)
-	return c:IsFusionCode(71218746) and c:IsAbleToRemoveAsCost() and Duel.GetLocationCountFromEx(tp,tp,c,sc)>0 and c:IsCanBeFusionMaterial(sc,SUMMON_TYPE_SPECIAL)
+	return c:IsFusionCode(71218746) and c:IsAbleToGraveAsCost() and Duel.GetLocationCountFromEx(tp,tp,c,sc)>0 and c:IsCanBeFusionMaterial(sc,SUMMON_TYPE_SPECIAL)
 end
 function s.sprcon(e,c)
 	if c==nil then return true end
