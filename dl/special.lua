@@ -270,6 +270,10 @@ oneTimeSkill(74677422, function(e,tp,eg,ep,ev,re,r,rp)
 		end)
 		Duel.RegisterEffect(ge2,tp)
 
+
+		local function skipcon(ge)
+			return Duel.GetTurnCount()~=ge:GetLabel()
+		end
 		local e1=Effect.CreateEffect(rc)
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_CHANGE_DAMAGE)
@@ -282,6 +286,21 @@ oneTimeSkill(74677422, function(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_NO_EFFECT_DAMAGE)
 		e2:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e2,tp)
+
+		local ph=Duel.GetCurrentPhase()
+        local e1=Effect.CreateEffect(e:GetHandler())
+        e1:SetType(EFFECT_TYPE_FIELD)
+        e1:SetCode(EFFECT_SKIP_BP)
+        e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+        e1:SetTargetRange(1,0)
+        if Duel.GetTurnPlayer()==tp and ph>PHASE_MAIN1 and ph<PHASE_MAIN2 then
+            e1:SetLabel(Duel.GetTurnCount())
+            e1:SetCondition(skipcon)
+            e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_SELF_TURN,2)
+        else
+            e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_SELF_TURN,1)
+        end
+        Duel.RegisterEffect(e1,tp)
 	end
 	)
 	Duel.RegisterEffect(e1,tp)
