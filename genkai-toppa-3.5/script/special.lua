@@ -305,13 +305,15 @@ end
 function CUNGUI.inftregop(e,tp,eg)
 	for tc in aux.Next(eg) do
 		local race = tc:GetRace()
-		if CUNGUI.inftlimit[tp] ~= race and CUNGUI.inftlimit[tp+2] ~= race then
-			if CUNGUI.inftlimit[tp]==0 then
-				CUNGUI.inftlimit[tp] = race
-			elseif CUNGUI.inftlimit[tp+2] == 0 then
-				CUNGUI.inftlimit[tp+2] = race
-			else
-				Duel.SendtoGrave(tc,REASON_RULE)
+		if tc:IsControler(tp) then
+			if CUNGUI.inftlimit[tp] ~= race and CUNGUI.inftlimit[tp+2] ~= race then
+				if CUNGUI.inftlimit[tp]==0 then
+					CUNGUI.inftlimit[tp] = race
+				elseif CUNGUI.inftlimit[tp+2] == 0 then
+					CUNGUI.inftlimit[tp+2] = race
+				else
+					Duel.SendtoGrave(tc,REASON_RULE)
+				end
 			end
 		end
 	end
