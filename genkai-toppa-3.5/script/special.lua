@@ -292,9 +292,6 @@ end
 function CUNGUI.inftregop(e,tp,eg)
 	for tc in aux.Next(eg) do
 		local race = tc:GetRace()
-		Debug.Message("race:"..tostring(race))
-		Debug.Message("inftlimit-tp:"..tostring(CUNGUI.inftlimit[tp]))
-		Debug.Message("inftlimit-tp+2:"..tostring(CUNGUI.inftlimit[tp+2]))
 		if CUNGUI.inftlimit[tp] ~= race and CUNGUI.inftlimit[tp+2] ~= race then
 			if CUNGUI.inftlimit[tp]==0 then
 				CUNGUI.inftlimit[tp] = race
@@ -313,9 +310,6 @@ CUNGUI.inftlimit[2]=0
 CUNGUI.inftlimit[3]=0
 function CUNGUI.inftsplimit(e,c)
 	local tp=e:GetHandlerPlayer()
-	Debug.Message("con-race:"..tostring(c:GetRace()))
-	Debug.Message("con-inftlimit-tp:"..tostring(CUNGUI.inftlimit[tp]))
-	Debug.Message("con-inftlimit-tp+2:"..tostring(CUNGUI.inftlimit[tp+2]))
 	return not ((c:IsRace(CUNGUI.inftlimit[tp]) or CUNGUI.inftlimit[tp]==0)
 		or (c:IsRace(CUNGUI.inftlimit[tp+2]) or CUNGUI.inftlimit[tp+2]==0))
 end
