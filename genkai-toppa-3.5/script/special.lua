@@ -178,7 +178,6 @@ function CUNGUI.RegisterRuleEffect(c,tp)
 	c:RegisterEffect(e1)
 end
 function CUNGUI.bdnexcon(e,tp,eg,ep,ev,re,r,rp)
-	Debug.Message(Duel.GetCurrentChain())
 	return Duel.GetCurrentChain()<2
 end
 function CUNGUI.bdnextg(e,tp,eg,ep,ev,re,r,rp,chk)
