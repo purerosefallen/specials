@@ -288,7 +288,7 @@ oneTimeSkill(74677422, function(e,tp,eg,ep,ev,re,r,rp)
 		Duel.RegisterEffect(e2,tp)
 
 		local ph=Duel.GetCurrentPhase()
-        local e1=Effect.CreateEffect(e:GetHandler())
+        local e1=Effect.CreateEffect(rc)
         e1:SetType(EFFECT_TYPE_FIELD)
         e1:SetCode(EFFECT_SKIP_BP)
         e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
