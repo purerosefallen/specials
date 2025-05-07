@@ -406,7 +406,7 @@ oneTimeSkill(23446369, function (e,tp,eg,ep,ev,re,r,rp)
 		local ac=Duel.AnnounceCard(tp, table.unpack(afilter))
 		g:AddCard(Duel.CreateToken(tp, ac))
 	end
-	Duel.SendtoHand(g, tp, REASON_RULE)
+	Duel.SendtoDeck(g, tp, 2, REASON_RULE)
 	Duel.BreakEffect()
 	Duel.Draw(1 - tp, 1, REASON_RULE)
 	local e1=Effect.CreateEffect(e:GetHandler())
