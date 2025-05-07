@@ -3,13 +3,13 @@ CUNGUI.disabled={}
 CUNGUI.RuleCards=Group.CreateGroup()
 CUNGUI._IsSetCard=Card.IsSetCard
 
-function Card.IsSetCard(c,setcode)
+function Card.IsSetCard(c,...)
     if c:GetFlagEffect(98765432)>0 then return false end
-    return CUNGUI._IsSetCard(c, setcode)
+    return CUNGUI._IsSetCard(c, ...)
 end
 
-function Card.IsOrigSetCard(c,setcode)
-    return CUNGUI._IsSetCard(c, setcode)
+function Card.IsOrigSetCard(c,...)
+    return CUNGUI._IsSetCard(c, ...)
 end
 
 CUNGUI._Exile = Duel.Exile
@@ -112,6 +112,19 @@ function CUNGUI.RegisterRuleEffect(c,tp)
 	e1:SetTarget(CUNGUI.eftgsyl2)
 	e1:SetLabelObject(e0)
 	c:RegisterEffect(e1)
+    --Atk/def
+    local e2=Effect.CreateEffect(c)
+    e2:SetType(EFFECT_TYPE_FIELD)
+    e2:SetCode(EFFECT_UPDATE_ATTACK)
+    e2:SetRange(LOCATION_REMOVED)
+    e2:SetTargetRange(LOCATION_MZONE,0)
+    e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+    e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x90))
+    e2:SetValue(2000)
+    c:RegisterEffect(e2)
+    local e3=e2:Clone()
+    e3:SetCode(EFFECT_UPDATE_DEFENSE)
+    c:RegisterEffect(e3)
 	--spsummon
 	e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(75425043,0))
@@ -165,7 +178,6 @@ function CUNGUI.RegisterRuleEffect(c,tp)
 	c:RegisterEffect(e1)
 end
 function CUNGUI.bdnexcon(e,tp,eg,ep,ev,re,r,rp)
-	Debug.Message(Duel.GetCurrentChain())
 	return Duel.GetCurrentChain()<2
 end
 function CUNGUI.bdnextg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -282,24 +294,25 @@ function CUNGUI.inftspop(e,tp,eg,ep,ev,re,r,rp)
 		CUNGUI.inftreg = true
 		--reg
 		local e4=Effect.CreateEffect(c)
-		e4:SetCategory(CATEGORY_DESTROY)
-		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e4:SetCode(EVENT_SUMMON_SUCCESS)
+		e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 		e4:SetOperation(CUNGUI.inftregop)
-		Duel.RegisterEffect(e1,tp)
+		Duel.RegisterEffect(e4,tp)
 	end
 end
 function CUNGUI.inftregop(e,tp,eg)
 	for tc in aux.Next(eg) do
 		local race = tc:GetRace()
-		if CUNGUI.inftlimit[tp] ~= race and CUNGUI.inftlimit[tp+2] ~= race then
-			if CUNGUI.inftlimit[tp]==0 then
-				CUNGUI.inftlimit[tp] = race
-			elseif CUNGUI.inftlimit[tp+2] == 0 then
-				CUNGUI.inftlimit[tp+2] = race
-			else
-				Duel.SendtoGrave(tc,REASON_RULE)
+		if tc:IsControler(tp) then
+			if CUNGUI.inftlimit[tp] ~= race and CUNGUI.inftlimit[tp+2] ~= race then
+				if CUNGUI.inftlimit[tp]==0 then
+					CUNGUI.inftlimit[tp] = race
+				elseif CUNGUI.inftlimit[tp+2] == 0 then
+					CUNGUI.inftlimit[tp+2] = race
+				else
+					Duel.SendtoGrave(tc,REASON_RULE)
+				end
 			end
 		end
 	end
@@ -311,8 +324,8 @@ CUNGUI.inftlimit[2]=0
 CUNGUI.inftlimit[3]=0
 function CUNGUI.inftsplimit(e,c)
 	local tp=e:GetHandlerPlayer()
-	return (c:IsRace(CUNGUI.inftlimit[tp]) or CUNGUI.inftlimit[tp]==0)
-		or (c:IsRace(CUNGUI.inftlimit[tp+2]) or CUNGUI.inftlimit[tp+2]==0)
+	return not ((c:IsRace(CUNGUI.inftlimit[tp]) or CUNGUI.inftlimit[tp]==0)
+		or (c:IsRace(CUNGUI.inftlimit[tp+2]) or CUNGUI.inftlimit[tp+2]==0))
 end
 function CUNGUI.efilter(e,te)
 	return te:GetOwner()~=e:GetOwner()
@@ -322,7 +335,7 @@ function CUNGUI.eftgsyl1(e,c)
 	return c:IsSetCard(0x90) and c:IsType(TYPE_MONSTER)
 end
 function CUNGUI.eftgsyl2(e,c)
-	return c:IsSetCard(0x90) and c:IsType(TYPE_MONSTER) and c:IsLevelAbove(5)
+	return c:IsSetCard(0x90) and c:IsType(TYPE_MONSTER)
 end
 function CUNGUI.eftginft(e,c)
 	return c:IsSetCard(0x127) and c:IsType(TYPE_MONSTER)
