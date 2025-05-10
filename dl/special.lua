@@ -2,6 +2,24 @@ local skillLists={}
 local skillSelections={}
 local lp_record={[0]=0,[1]=0}
 local need_shuffle={[0]=true,[1]=true}
+local toss_coin=Duel.TossCoin
+
+function Duel.TossCoin(player,count)
+	if Duel.GetLP(player)<=1000 and Duel.GetFlagEffect(player,37812118)>0 then
+		if count < 0 then
+			return 1,1,1,1,1,1,1
+		end
+		if count > 0 then
+			local tab={}
+			for i=1,count do
+				table.insert(tab,1)
+			end
+			return table.unpack(tab)
+		end
+	else
+		return toss_coin(player,count)
+	end
+end
 
 local function addSkill(code, skill)
 	if not skillLists[code] then
@@ -307,6 +325,64 @@ oneTimeSkill(74677422, function(e,tp,eg,ep,ev,re,r,rp)
 	)
 	Duel.RegisterEffect(e1,tp)
 end)
+--抽卡放弃
+local function skipdrcon(e,tp,eg,ep,ev,re,r,rp,chk)
+    return aux.IsPlayerCanNormalDraw(tp) and Duel.IsPlayerCanDiscardDeck(tp,1) and Duel.GetTurnPlayer()==tp
+end
+local function skipdrop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.SelectOption(tp,aux.Stringid(49838105,1)) then
+		aux.GiveUpNormalDraw(e,tp)
+		Duel.Recover(tp,600,REASON_RULE)
+		Duel.DiscardDeck(tp,1,REASON_RULE)
+	end
+end
+oneTimeSkill(3701074, function(e,tp,eg,ep,ev,re,r,rp)
+	local rc=Duel.GetMatchingGroup(nil,tp,0xff,0,nil):GetFirst()
+	local ge1=Effect.CreateEffect(rc)
+    ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+    ge1:SetCode(EVENT_PREDRAW)
+    ge1:SetCondition(skipdrcon)
+	ge1:SetOperation(skipdrop)
+	Duel.RegisterEffect(ge1,tp)
+end,true)
+
+--生命增加
+oneTimeSkill(47852924, function(e,tp,eg,ep,ev,re,r,rp)
+	Duel.SetLP(tp,Duel.GetLP(tp)+1500)
+end)
+
+--最后的赌博
+local function dicecon(e,tp)
+	return Duel.GetTurnCount()>=3 and Duel.GetTurnPlayer()==tp and Duel.GetFlagEffect(tp,3280747)==0 and Duel.GetMatchingGroupCount(Card.IsDiscardable,tp,LOCATION_HAND,0,nil)>=2
+end
+local function diceop(e,tp)
+
+	Duel.RegisterFlagEffect(tp,3280747,0,0,0)
+	local lp=Duel.GetLP(tp)
+	Duel.SetLP(tp,100)
+	Duel.DiscardHand(tp,aux.TRUE,2,2,REASON_COST,nil)
+
+	local dice=Duel.TossDice(tp,1)
+	Duel.Draw(tp,dice,REASON_RULE)
+end
+standbyPhaseSkill(3280747, diceop, dicecon, false)
+
+----幸运的朋友
+oneTimeSkill(37812118, function(e,tp,eg,ep,ev,re,r,rp)
+	Duel.RegisterFlagEffect(tp,37812118,0,0,0)
+end)
+
+--神秘抽卡
+local function hdchangecon(e,tp)
+	return Duel.GetTurnPlayer()==tp and Duel.GetMatchingGroupCount(Card.IsAbleToDeck,tp,LOCATION_HAND,0,nil)>=1
+end
+local function hdchangeop(e,tp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local sg=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,LOCATION_HAND,0,1,1,nil)
+	Duel.SendtoDeck(sg,nil,2,REASON_RULE)
+	Duel.Draw(tp,1,REASON_RULE)
+end
+mainphaseSkill(48712195, hdchangeop, hdchangecon, false)
 
 --成金
 oneTimeSkill(70368879, function(e,tp,eg,ep,ev,re,r,rp)
