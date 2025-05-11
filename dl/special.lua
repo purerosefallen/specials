@@ -385,13 +385,15 @@ end)
 
 --神秘抽卡
 local function hdchangecon(e,tp)
-	return Duel.GetTurnPlayer()==tp and Duel.GetMatchingGroupCount(Card.IsAbleToDeck,tp,LOCATION_HAND,0,nil)>=1
+	return Duel.GetTurnPlayer()==tp and Duel.GetMatchingGroupCount(Card.IsAbleToDeck,tp,LOCATION_HAND,0,nil)>=1 and Duel.GetFlagEffect(tp,48712196)==0 and Duel.GetFlagEffect(tp,48712195)<2
 end
 local function hdchangeop(e,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local sg=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,LOCATION_HAND,0,1,1,nil)
 	Duel.SendtoDeck(sg,nil,2,REASON_RULE)
 	Duel.Draw(tp,1,REASON_RULE)
+	Duel.RegisterFlagEffect(tp,48712195,0,0,0)
+	Duel.RegisterFlagEffect(tp,48712196,RESET_PHASE+PHASE_END,0,0)
 end
 mainphaseSkill(48712195, hdchangeop, hdchangecon, false)
 
