@@ -330,7 +330,7 @@ local function skipdrcon(e,tp,eg,ep,ev,re,r,rp,chk)
     return aux.IsPlayerCanNormalDraw(tp) and Duel.IsPlayerCanDiscardDeck(tp,1) and Duel.GetTurnPlayer()==tp
 end
 local function skipdrop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.SelectOption(tp,aux.Stringid(49838105,1)) then
+	if Duel.SelectYesNo(tp,aux.Stringid(49838105,1)) then
 		aux.GiveUpNormalDraw(e,tp)
 		Duel.Recover(tp,600,REASON_RULE)
 		Duel.DiscardDeck(tp,1,REASON_RULE)
