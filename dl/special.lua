@@ -5,20 +5,13 @@ local need_shuffle={[0]=true,[1]=true}
 local toss_coin=Duel.TossCoin
 
 function Duel.TossCoin(player,count)
+	local tmp_count=count
 	if Duel.GetLP(player)<=1000 and Duel.GetFlagEffect(player,37812118)>0 then
 		if count < 0 then
-			return 1,1,1,1,1,1,1
+			tmp_count=7
 		end
-		if count > 0 then
-			local tab={}
-			for i=1,count do
-				table.insert(tab,1)
-			end
-			return table.unpack(tab)
-		end
-	else
-		return toss_coin(player,count)
 	end
+	return toss_coin(player,tmp_count)
 end
 
 local function addSkill(code, skill)
@@ -356,7 +349,6 @@ local function dicecon(e,tp)
 	return Duel.GetTurnCount()>=3 and Duel.GetTurnPlayer()==tp and Duel.GetFlagEffect(tp,3280747)==0 and Duel.GetMatchingGroupCount(Card.IsDiscardable,tp,LOCATION_HAND,0,nil)>=2
 end
 local function diceop(e,tp)
-
 	Duel.RegisterFlagEffect(tp,3280747,0,0,0)
 	local lp=Duel.GetLP(tp)
 	Duel.SetLP(tp,100)
@@ -368,8 +360,27 @@ end
 standbyPhaseSkill(3280747, diceop, dicecon, false)
 
 ----幸运的朋友
+local function coincon(e,tp,eg,ep,ev,re,r,rp)
+    return rp==tp and Duel.GetLP(tp)<=1000
+end
+local function coinop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_CARD,0,37812118)
+    local res={Duel.GetCoinResult()}
+    local ct=ev
+    for i=1,ct do
+        res[i]=1
+    end
+    Duel.SetCoinResult(table.unpack(res))
+end
 oneTimeSkill(37812118, function(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterFlagEffect(tp,37812118,0,0,0)
+	local rc=Duel.GetMatchingGroup(nil,tp,0xff,0,nil):GetFirst()
+	local e1=Effect.CreateEffect(rc)
+    e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+    e1:SetCode(EVENT_TOSS_COIN_NEGATE)
+    e1:SetCondition(coincon)
+    e1:SetOperation(coinop)
+    Duel.RegisterEffect(e1,tp)
 end)
 
 --神秘抽卡
