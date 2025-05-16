@@ -525,3 +525,16 @@ end
 
 -- disable EFFECT_SKIP_M1
 EFFECT_SKIP_M1=0
+
+-- 正对面的自身的主要怪兽区域（群豪）
+function aux.FrontSequence(c)
+    local seq = c:GetSequence()
+    local list = {}
+    if c:IsLocation(LOCATION_PZONE) then
+        list = {
+            [0] = 1,
+            [4] = 3
+        }
+    end
+    return 1 << (list[seq] or seq)
+end
