@@ -531,6 +531,91 @@ addMakerPool(23446369, {32731036,94689206,72270339,76794549,4928565,6637331,3385
 --无脸幻想魔术师
 addMakerPool(15173384, {68304193,1845204,2295440,18144506,32807846,35261759,35726888,49238328,72892473,73628505,81439173,83764718,84211599,24224830,48130397,65681983,67723438,73468603,45112597,38342335,45819647,2857636,8264361,9839945,30674956,48815792,73309655,97661969,75452921,34755994,41999284,60303245,94259633,74586817,90953320,93039339,75433814,6983839,90590303,46772449,66011101,86066372})
 
+--霸道灵摆
+local function emcheck(c)
+	return c:IsSetCard(0x99,0x98,0x9f,0x20f8,0x10f8)
+end
+oneTimeSkill(76840111, function(e,tp,eg,ep,ev,re,r,rp)
+	if not Duel.IsExistingMatchingCard(emcheck,tp,LOCATION_DECK,0,10,nil) then return end
+	local pc1=Duel.CreateToken(tp,24094258)
+	local pc2=Duel.CreateToken(tp,76794549)
+	Duel.SendtoDeck(pc1,tp,0,REASON_RULE)
+	Duel.SendtoDeck(pc2,tp,2,REASON_RULE)
+end)
+oneTimeSkill(76840111, function(e,tp,eg,ep,ev,re,r,rp)
+	if not Duel.IsExistingMatchingCard(emcheck,tp,LOCATION_DECK,0,10,nil) then return end
+	local pc1=Duel.CreateToken(tp,94415058)
+	local pc2=Duel.CreateToken(tp,20409757)
+	if Duel.SelectYesNo(tp,97) then
+		Duel.MoveToField(pc1,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
+		Duel.MoveToField(pc2,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
+	end
+end)
+local function pmcheck(c)
+	return c:IsType(TYPE_PENDULUM) and c:IsFaceup() and c:IsAbleToHand()
+end
+mainphaseSkill(76840111,
+function(ce,ctp)
+	local g=Duel.GetMatchingGroup(pmcheck,ctp,LOCATION_EXTRA,0,nil)
+	Duel.SendtoHand(g:Select(ctp,1,1,nil),ctp,REASON_RULE)
+end,
+function(ce,ctp)
+	local g=Duel.GetMatchingGroup(pmcheck,ctp,LOCATION_EXTRA,0,nil)
+	return #g>0 and Duel.IsExistingMatchingCard(emcheck,tp,LOCATION_DECK,0,10,nil)
+end,
+false)
+local function fivesplimit(e,c,tp,sumtp,sumpos)
+	return c:IsLevel(5) or c:IsRank(5) and sumtp&SUMMON_TYPE_XYZ>0
+end
+oneTimeSkill(76840111, function(e,tp,eg,ep,ev,re,r,rp)
+	local e1=Effect.GlobalEffect()
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(fivesplimit)
+	Duel.RegisterEffect(e1,tp)
+end)
+
+--三幻神
+local function MRcheck(c)
+	return c:IsCode(83764718) and c:IsAbleToHand()
+end
+local exgodlist={79339613,85182315,85758066,59094601}
+local function godcheck(c)
+	local bool=false
+	local code=c:GetCode()
+	for i,v in ipairs(exgodlist) do		
+		if v==code then bool=true break end
+	end
+	if aux.IsCodeOrListed(c,10000000) or aux.IsCodeOrListed(c,10000010) or aux.IsCodeOrListed(c,10000020) then bool=true end
+	return bool and c:IsAbleToHand()
+end
+mainphaseSkill(78665705,
+function(ce,ctp)
+	local g=Duel.GetMatchingGroup(MRcheck,ctp,LOCATION_GRAVE,0,nil)
+	Duel.SendtoHand(g:Select(ctp,1,1,nil),ctp,REASON_RULE)
+	Duel.RegisterFlagEffect(ctp,78665705,RESET_PHASE+PHASE_END,0,1)
+end,
+function(ce,ctp) 
+	local g=Duel.GetMatchingGroup(MRcheck,ctp,LOCATION_GRAVE,0,nil)
+	return Duel.GetFlagEffect(ctp,78665705)==0 and #g>0 
+end,
+false)
+
+mainphaseSkill(78665705,
+function(ce,ctp)
+	local g=Duel.GetMatchingGroup(godcheck,ctp,LOCATION_DECK,0,nil)
+	if Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_RULE+REASON_DISCARD,nil,REASON_EFFECT)>0 then
+		Duel.SendtoHand(g:Select(ctp,1,1,nil),ctp,REASON_RULE)
+	end
+end,
+function(ce,ctp) 
+	local g=Duel.GetMatchingGroup(godcheck,ctp,LOCATION_DECK,0,nil)
+	return #g>0 and Duel.IsExistingMatchingCard(Card.IsDiscardable,ctp,LOCATION_HAND,0,1,nil,REASON_RULE)
+end,
+false)
+
 local function initialize(e,_tp,eg,ep,ev,re,r,rp)
 	local skillCodes=getAllSkillCodes()
 	for tp=0,1 do
