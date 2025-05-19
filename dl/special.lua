@@ -561,7 +561,7 @@ function(ce,ctp)
 end,
 function(ce,ctp)
 	local g=Duel.GetMatchingGroup(pmcheck,ctp,LOCATION_EXTRA,0,nil)
-	return #g>0 and Duel.IsExistingMatchingCard(emcheck,tp,LOCATION_DECK,0,10,nil)
+	return #g>0 and Duel.IsExistingMatchingCard(emcheck,ctp,LOCATION_DECK,0,10,nil)
 end,
 false)
 local function fivesplimit(e,c,tp,sumtp,sumpos)
@@ -606,7 +606,7 @@ false)
 mainphaseSkill(78665705,
 function(ce,ctp)
 	local g=Duel.GetMatchingGroup(godcheck,ctp,LOCATION_DECK,0,nil)
-	if Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_RULE+REASON_DISCARD,nil,REASON_EFFECT)>0 then
+	if Duel.DiscardHand(ctp,Card.IsDiscardable,1,1,REASON_RULE+REASON_DISCARD,nil,REASON_EFFECT)>0 then
 		Duel.SendtoHand(g:Select(ctp,1,1,nil),ctp,REASON_RULE)
 	end
 end,
