@@ -182,7 +182,7 @@ false)
 --注定一抽
 local function repcon(e,tp,eg,ep,ev,re,r,rp)
 	local cur_lp = Duel.GetLP(tp)
-	return Duel.GetDrawCount(tp)>0 and Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_DECK,0,1,nil) and lp_record[tp] - cur_lp >= 2000 and Duel.GetTurnPlayer()==tp
+    return Duel.GetDrawCount(tp)>0 and Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_DECK,0,1,nil) and lp_record[tp] - cur_lp >= 2000 and Duel.GetTurnPlayer()==tp
 end
 local function repop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.SelectYesNo(tp,1108) then
@@ -219,7 +219,7 @@ oneTimeSkill(2295831, function(e,tp,eg,ep,ev,re,r,rp)
 end)
 --传说的渔夫
 local function activate_check(c,tp)
-	return c:GetActivateEffect():IsActivatable(tp,true,true)
+    return c:GetActivateEffect():IsActivatable(tp,true,true)
 end
 oneTimeSkill(3643300, function(e,tp,eg,ep,ev,re,r,rp)
 	local field_1=Duel.CreateToken(tp,43175858)
@@ -237,21 +237,21 @@ oneTimeSkill(3643300, function(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local tc=field_group:FilterSelect(tp,activate_check,1,1,nil,tp):GetFirst()
 	if tc then
-		field_group:RemoveCard(tc)
+        field_group:RemoveCard(tc)
 		Duel.Exile(field_group,REASON_RULE)
-		local fc=Duel.GetFieldCard(tp,LOCATION_FZONE,0)
-		if fc then
-			Duel.SendtoGrave(fc,REASON_RULE)
-			Duel.BreakEffect()
-		end
-		Duel.MoveToField(tc,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
-		local te=tc:GetActivateEffect()
-		te:UseCountLimit(tp,1,true)
-		local tep=tc:GetControler()
-		local cost=te:GetCost()
-		if cost then cost(te,tep,eg,ep,ev,re,r,rp,1) end
-		Duel.RaiseEvent(tc,4179255,te,0,tp,tp,Duel.GetCurrentChain())
-	end
+        local fc=Duel.GetFieldCard(tp,LOCATION_FZONE,0)
+        if fc then
+            Duel.SendtoGrave(fc,REASON_RULE)
+            Duel.BreakEffect()
+        end
+        Duel.MoveToField(tc,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
+        local te=tc:GetActivateEffect()
+        te:UseCountLimit(tp,1,true)
+        local tep=tc:GetControler()
+        local cost=te:GetCost()
+        if cost then cost(te,tep,eg,ep,ev,re,r,rp,1) end
+        Duel.RaiseEvent(tc,4179255,te,0,tp,tp,Duel.GetCurrentChain())
+    end
 end)
 --毅力
 oneTimeSkill(74677422, function(e,tp,eg,ep,ev,re,r,rp)
@@ -301,26 +301,26 @@ oneTimeSkill(74677422, function(e,tp,eg,ep,ev,re,r,rp)
 		Duel.RegisterEffect(e2,tp)
 
 		local ph=Duel.GetCurrentPhase()
-		local e1=Effect.CreateEffect(rc)
-		e1:SetType(EFFECT_TYPE_FIELD)
-		e1:SetCode(EFFECT_SKIP_BP)
-		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
-		e1:SetTargetRange(1,0)
-		if Duel.GetTurnPlayer()==tp and ph>PHASE_MAIN1 and ph<PHASE_MAIN2 then
-			e1:SetLabel(Duel.GetTurnCount())
-			e1:SetCondition(skipcon)
-			e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_SELF_TURN,2)
-		else
-			e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_SELF_TURN,1)
-		end
-		Duel.RegisterEffect(e1,tp)
+        local e1=Effect.CreateEffect(rc)
+        e1:SetType(EFFECT_TYPE_FIELD)
+        e1:SetCode(EFFECT_SKIP_BP)
+        e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+        e1:SetTargetRange(1,0)
+        if Duel.GetTurnPlayer()==tp and ph>PHASE_MAIN1 and ph<PHASE_MAIN2 then
+            e1:SetLabel(Duel.GetTurnCount())
+            e1:SetCondition(skipcon)
+            e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_SELF_TURN,2)
+        else
+            e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_SELF_TURN,1)
+        end
+        Duel.RegisterEffect(e1,tp)
 	end
 	)
 	Duel.RegisterEffect(e1,tp)
 end)
 --抽卡放弃
 local function skipdrcon(e,tp,eg,ep,ev,re,r,rp,chk)
-	return aux.IsPlayerCanNormalDraw(tp) and Duel.IsPlayerCanDiscardDeck(tp,1) and Duel.GetTurnPlayer()==tp
+    return aux.IsPlayerCanNormalDraw(tp) and Duel.IsPlayerCanDiscardDeck(tp,1) and Duel.GetTurnPlayer()==tp
 end
 local function skipdrop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.SelectYesNo(tp,aux.Stringid(49838105,1)) then
@@ -332,9 +332,9 @@ end
 oneTimeSkill(3701074, function(e,tp,eg,ep,ev,re,r,rp)
 	local rc=Duel.GetMatchingGroup(nil,tp,0xff,0,nil):GetFirst()
 	local ge1=Effect.CreateEffect(rc)
-	ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	ge1:SetCode(EVENT_PREDRAW)
-	ge1:SetCondition(skipdrcon)
+    ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+    ge1:SetCode(EVENT_PREDRAW)
+    ge1:SetCondition(skipdrcon)
 	ge1:SetOperation(skipdrop)
 	Duel.RegisterEffect(ge1,tp)
 end,true)
@@ -361,26 +361,26 @@ standbyPhaseSkill(3280747, diceop, dicecon, false)
 
 ----幸运的朋友
 local function coincon(e,tp,eg,ep,ev,re,r,rp)
-	return rp==tp and Duel.GetLP(tp)<=1000
+    return rp==tp and Duel.GetLP(tp)<=1000
 end
 local function coinop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,37812118)
-	local res={Duel.GetCoinResult()}
-	local ct=ev
-	for i=1,ct do
-		res[i]=1
-	end
-	Duel.SetCoinResult(table.unpack(res))
+    local res={Duel.GetCoinResult()}
+    local ct=ev
+    for i=1,ct do
+        res[i]=1
+    end
+    Duel.SetCoinResult(table.unpack(res))
 end
 oneTimeSkill(37812118, function(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterFlagEffect(tp,37812118,0,0,0)
 	local rc=Duel.GetMatchingGroup(nil,tp,0xff,0,nil):GetFirst()
 	local e1=Effect.CreateEffect(rc)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_TOSS_COIN_NEGATE)
-	e1:SetCondition(coincon)
-	e1:SetOperation(coinop)
-	Duel.RegisterEffect(e1,tp)
+    e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+    e1:SetCode(EVENT_TOSS_COIN_NEGATE)
+    e1:SetCondition(coincon)
+    e1:SetOperation(coinop)
+    Duel.RegisterEffect(e1,tp)
 end)
 
 --神秘抽卡
@@ -511,18 +511,18 @@ local function addMakerPool(code, codeList)
 			local _tp = _e:GetHandlerPlayer()
 			return (ph >= PHASE_BATTLE_START and ph <= PHASE_BATTLE) and Duel.GetTurnPlayer() == _tp
 		end)
-			Duel.RegisterEffect(e1,tp)
+	    	Duel.RegisterEffect(e1,tp)
 		local e2=Effect.CreateEffect(e:GetHandler())
-			e2:SetType(EFFECT_TYPE_FIELD + EFFECT_TYPE_CONTINUOUS)
+    		e2:SetType(EFFECT_TYPE_FIELD + EFFECT_TYPE_CONTINUOUS)
 		e2:SetCode(EVENT_PHASE + PHASE_BATTLE)
 		e2:SetCondition(function (_e, _tp)
 			return Duel.GetTurnPlayer() == _tp
 		end)
-			e2:SetOperation(function (_e)
+    		e2:SetOperation(function (_e)
 			e1:Reset()
 			_e:Reset()
 		end)
-			Duel.RegisterEffect(e2,tp)
+    		Duel.RegisterEffect(e2,tp)
 	end,true)
 end
 
@@ -533,89 +533,89 @@ addMakerPool(15173384, {68304193,1845204,2295440,18144506,32807846,35261759,3572
 
 --霸道灵摆
 local function emcheck(c)
-	return c:IsSetCard(0x99,0x98,0x9f,0x20f8,0x10f8)
+    return c:IsSetCard(0x99,0x98,0x9f,0x20f8,0x10f8)
 end
 oneTimeSkill(76840111, function(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFlagEffect(tp,76840111)==0 then return end
-	local pc1=Duel.CreateToken(tp,24094258)
-	local pc2=Duel.CreateToken(tp,76794549)
-	Duel.SendtoDeck(pc1,tp,0,REASON_RULE)
-	Duel.SendtoDeck(pc2,tp,2,REASON_RULE)
+    if Duel.GetFlagEffect(tp,76840111)==0 then return end
+    local pc1=Duel.CreateToken(tp,24094258)
+    local pc2=Duel.CreateToken(tp,76794549)
+    Duel.SendtoDeck(pc1,tp,0,REASON_RULE)
+    Duel.SendtoDeck(pc2,tp,2,REASON_RULE)
 end)
 oneTimeSkill(76840111, function(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFlagEffect(tp,76840111)==0 then return end
-	local pc1=Duel.CreateToken(tp,94415058)
-	local pc2=Duel.CreateToken(tp,20409757)
-	if Duel.SelectYesNo(tp,97) then
-		Duel.MoveToField(pc1,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
-		Duel.MoveToField(pc2,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
-	end
+    if Duel.GetFlagEffect(tp,76840111)==0 then return end
+    local pc1=Duel.CreateToken(tp,94415058)
+    local pc2=Duel.CreateToken(tp,20409757)
+    if Duel.SelectYesNo(tp,97) then
+        Duel.MoveToField(pc1,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
+        Duel.MoveToField(pc2,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
+    end
 end)
 local function pmcheck(c)
-	return c:IsType(TYPE_PENDULUM) and c:IsFaceup() and c:IsAbleToHand()
+    return c:IsType(TYPE_PENDULUM) and c:IsFaceup() and c:IsAbleToHand()
 end
 mainphaseSkill(76840111,
 function(ce,ctp)
-	local g=Duel.GetMatchingGroup(pmcheck,ctp,LOCATION_EXTRA,0,nil)
-	Duel.SendtoHand(g:Select(ctp,1,1,nil),ctp,REASON_RULE)
+    local g=Duel.GetMatchingGroup(pmcheck,ctp,LOCATION_EXTRA,0,nil)
+    Duel.SendtoHand(g:Select(ctp,1,1,nil),ctp,REASON_RULE)
 end,
 function(ce,ctp)
-	local g=Duel.GetMatchingGroup(pmcheck,ctp,LOCATION_EXTRA,0,nil)
-	return #g>0 and Duel.GetFlagEffect(ctp,76840111)>0
+    local g=Duel.GetMatchingGroup(pmcheck,ctp,LOCATION_EXTRA,0,nil)
+    return #g>0 and Duel.GetFlagEffect(ctp,76840111)>0
 end,
 false)
 local function fivesplimit(e,c,tp,sumtp,sumpos)
-	return c:IsLevel(5) or c:IsRank(5) and sumtp&SUMMON_TYPE_XYZ>0
+    return c:IsLevel(5) or c:IsRank(5) and sumtp&SUMMON_TYPE_XYZ>0
 end
 oneTimeSkill(76840111, function(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsExistingMatchingCard(emcheck,tp,LOCATION_DECK+LOCATION_HAND,0,10,nil) then
-		Duel.RegisterFlagEffect(tp,76840111,0,0,1)
-	end
-	local e1=Effect.GlobalEffect()
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetTargetRange(1,0)
-	e1:SetTarget(fivesplimit)
-	Duel.RegisterEffect(e1,tp)
+    if Duel.IsExistingMatchingCard(emcheck,tp,LOCATION_DECK+LOCATION_HAND,0,10,nil) then
+        Duel.RegisterFlagEffect(tp,76840111,0,0,1)
+    end
+    local e1=Effect.GlobalEffect()
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetTargetRange(1,0)
+    e1:SetTarget(fivesplimit)
+    Duel.RegisterEffect(e1,tp)
 end)
 
 --三幻神
 local function MRcheck(c)
-	return c:IsCode(83764718) and c:IsAbleToHand()
+    return c:IsCode(83764718) and c:IsAbleToHand()
 end
 local exgodlist={79339613,85182315,85758066,59094601}
 local function godcheck(c)
-	local bool=false
-	local code=c:GetCode()
-	for i,v in ipairs(exgodlist) do	 
-		if v==code then bool=true break end
-	end
-	if aux.IsCodeOrListed(c,10000000) or aux.IsCodeOrListed(c,10000010) or aux.IsCodeOrListed(c,10000020) then bool=true end
-	return bool and c:IsAbleToHand()
+    local bool=false
+    local code=c:GetCode()
+    for i,v in ipairs(exgodlist) do     
+        if v==code then bool=true break end
+    end
+    if aux.IsCodeOrListed(c,10000000) or aux.IsCodeOrListed(c,10000010) or aux.IsCodeOrListed(c,10000020) then bool=true end
+    return bool and c:IsAbleToHand()
 end
 mainphaseSkill(78665705,
 function(ce,ctp)
-	local g=Duel.GetMatchingGroup(MRcheck,ctp,LOCATION_GRAVE,0,nil)
-	Duel.SendtoHand(g:Select(ctp,1,1,nil),ctp,REASON_RULE)
-	Duel.RegisterFlagEffect(ctp,78665705,0,0,1)
+    local g=Duel.GetMatchingGroup(MRcheck,ctp,LOCATION_GRAVE,0,nil)
+    Duel.SendtoHand(g:Select(ctp,1,1,nil),ctp,REASON_RULE)
+    Duel.RegisterFlagEffect(ctp,78665705,0,0,1)
 end,
 function(ce,ctp) 
-	local g=Duel.GetMatchingGroup(MRcheck,ctp,LOCATION_GRAVE,0,nil)
-	return Duel.GetFlagEffect(ctp,78665705)==0 and #g>0 
+    local g=Duel.GetMatchingGroup(MRcheck,ctp,LOCATION_GRAVE,0,nil)
+    return Duel.GetFlagEffect(ctp,78665705)==0 and #g>0 
 end,
 false)
 
 mainphaseSkill(78665705,
 function(ce,ctp)
-	local g=Duel.GetMatchingGroup(godcheck,ctp,LOCATION_DECK,0,nil)
-	if Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_RULE+REASON_DISCARD,nil,REASON_EFFECT)>0 then
-		Duel.SendtoHand(g:Select(ctp,1,1,nil),ctp,REASON_RULE)
-	end
+    local g=Duel.GetMatchingGroup(godcheck,ctp,LOCATION_DECK,0,nil)
+    if Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_RULE+REASON_DISCARD,nil,REASON_EFFECT)>0 then
+        Duel.SendtoHand(g:Select(ctp,1,1,nil),ctp,REASON_RULE)
+    end
 end,
 function(ce,ctp) 
-	local g=Duel.GetMatchingGroup(godcheck,ctp,LOCATION_DECK,0,nil)
-	return #g>0 and Duel.IsExistingMatchingCard(Card.IsDiscardable,ctp,LOCATION_HAND,0,1,nil,REASON_RULE)
+    local g=Duel.GetMatchingGroup(godcheck,ctp,LOCATION_DECK,0,nil)
+    return #g>0 and Duel.IsExistingMatchingCard(Card.IsDiscardable,ctp,LOCATION_HAND,0,1,nil,REASON_RULE)
 end,
 false)
 
@@ -710,13 +710,13 @@ EFFECT_SKIP_M1=0
 
 -- 正对面的自身的主要怪兽区域（群豪）
 function aux.FrontSequence(c)
-	local seq = c:GetSequence()
-	local list = {}
-	if c:IsLocation(LOCATION_PZONE) then
-		list = {
-			[0] = 1,
-			[4] = 3
-		}
-	end
-	return 1 << (list[seq] or seq)
+    local seq = c:GetSequence()
+    local list = {}
+    if c:IsLocation(LOCATION_PZONE) then
+        list = {
+            [0] = 1,
+            [4] = 3
+        }
+    end
+    return 1 << (list[seq] or seq)
 end
