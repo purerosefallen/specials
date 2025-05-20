@@ -588,7 +588,7 @@ local exgodlist={79339613,85182315,85758066,59094601}
 local function godcheck(c)
 	local bool=false
 	local code=c:GetCode()
-	for i,v in ipairs(exgodlist) do	 
+	for i,v in ipairs(exgodlist) do
 		if v==code then bool=true break end
 	end
 	if aux.IsCodeOrListed(c,10000000) or aux.IsCodeOrListed(c,10000010) or aux.IsCodeOrListed(c,10000020) then bool=true end
@@ -609,7 +609,7 @@ false)
 mainphaseSkill(78665705,
 function(ce,ctp)
 	local g=Duel.GetMatchingGroup(godcheck,ctp,LOCATION_DECK,0,nil)
-	if Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_RULE+REASON_DISCARD,nil,REASON_EFFECT)>0 then
+	if Duel.DiscardHand(ctp,Card.IsDiscardable,1,1,REASON_RULE+REASON_DISCARD,nil,REASON_EFFECT)>0 then
 		Duel.SendtoHand(g:Select(ctp,1,1,nil),ctp,REASON_RULE)
 	end
 end,
