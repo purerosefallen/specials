@@ -584,7 +584,7 @@ end)
 local function MRcheck(c)
 	return c:IsCode(83764718) and c:IsAbleToHand()
 end
-local exgodlist={79339613,85182315,85758066,59094601}
+local exgodlist={79339613,85182315,85758066,59094601,79868386}
 local function godcheck(c)
 	local bool=false
 	local code=c:GetCode()
