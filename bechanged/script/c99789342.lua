@@ -18,7 +18,7 @@ function c99789342.initial_effect(c)
 	e1:SetRange(LOCATION_GRAVE)
 	e1:SetCondition(c99789342.condition)
 	e1:SetCost(c99789342.cost)
-	e1:SetTarget(c99789342.target)
+	e1:SetTarget(c99789342.target2)
 	e1:SetOperation(c99789342.operation)
 	c:RegisterEffect(e1)
 end
@@ -52,7 +52,7 @@ function c99789342.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
 	aux.bfgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
-function c99789342.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c99789342.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 end

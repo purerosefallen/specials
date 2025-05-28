@@ -16,18 +16,22 @@ function c3078380.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(3078380,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
-	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,3078381)
+	e2:SetCondition(c3078380.spcon)
 	e2:SetTarget(c3078380.fsptg)
 	e2:SetOperation(c3078380.fspop)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(3078380,2))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
-	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,3078382)
+	e3:SetCondition(c3078380.spcon)
 	e3:SetTarget(c3078380.sptg2)
 	e3:SetOperation(c3078380.spop2)
 	c:RegisterEffect(e3)
@@ -60,7 +64,7 @@ function c3078380.filter2(c,e,tp,m,f,chkf)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,nil,chkf)
 end
 function c3078380.fcheck(tp,sg,fc)
-	return sg:IsExists(Card.IsRace,1,nil,RACE_SPELLCASTER+RACE_WARRIOR)
+	return sg:IsExists(Card.IsRace,1,nil,RACE_SPELLCASTER+RACE_WARRIOR+RACE_DRAGON)
 end
 function c3078380.fsptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -141,4 +145,7 @@ function c3078380.spop2(e,tp,eg,ep,ev,re,r,rp)
 			end
 		end
 	end
+end
+function c3078380.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2
 end
