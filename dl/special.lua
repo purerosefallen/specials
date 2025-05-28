@@ -590,13 +590,13 @@ local function pmcheck(c)
 	return c:IsType(TYPE_PENDULUM) and c:IsFaceup() and c:IsAbleToHand()
 end
 mainphaseSkillEx(76840111,
-function(ce,ctp)
-	local g=Duel.GetMatchingGroup(pmcheck,ctp,LOCATION_EXTRA,0,nil)
-	Duel.SendtoHand(g:Select(ctp,1,1,nil),ctp,REASON_RULE)
+function(e,tp)
+	local g=Duel.GetMatchingGroup(pmcheck,tp,LOCATION_EXTRA,0,nil)
+	Duel.SendtoHand(g:Select(tp,1,1,nil),tp,REASON_RULE)
 end,
-function(ce,ctp)
-	local g=Duel.GetMatchingGroup(pmcheck,ctp,LOCATION_EXTRA,0,nil)
-	return #g>0 and Duel.GetFlagEffect(ctp,76840111)>0
+function(e,tp)
+	local g=Duel.GetMatchingGroup(pmcheck,tp,LOCATION_EXTRA,0,nil)
+	return #g>0 and Duel.GetFlagEffect(tp,76840111)>0
 end,
 false,1,76840112)
 local function fivesplimit(e,c,tp,sumtp,sumpos)
@@ -633,26 +633,26 @@ local function disgodcheck(c)
 	return godcheck(c) and c:IsDiscardable()
 end
 mainphaseSkillEx(78665705,
-function(ce,ctp)
-	local g=Duel.GetMatchingGroup(MRcheck,ctp,LOCATION_GRAVE,0,nil)
-	Duel.SendtoHand(g:Select(ctp,1,1,nil),ctp,REASON_RULE)
+function(e,tp)
+	local g=Duel.GetMatchingGroup(MRcheck,tp,LOCATION_GRAVE,0,nil)
+	Duel.SendtoHand(g:Select(tp,1,1,nil),tp,REASON_RULE)
 end,
-function(ce,ctp) 
-	local g=Duel.GetMatchingGroup(MRcheck,ctp,LOCATION_GRAVE,0,nil)
+function(e,tp) 
+	local g=Duel.GetMatchingGroup(MRcheck,tp,LOCATION_GRAVE,0,nil)
 	return #g>0
 end,
 false,1,78665705,true,1110)
 
 mainphaseSkillEx(78665705,
-function(ce,ctp)
-	local g=Duel.GetMatchingGroup(godcheck,ctp,LOCATION_DECK,0,nil)
-	if Duel.DiscardHand(ctp,disgodcheck,1,1,REASON_RULE+REASON_DISCARD,nil,REASON_EFFECT)>0 then
-		Duel.SendtoHand(g:Select(ctp,1,1,nil),ctp,REASON_RULE)
+function(e,tp)
+	local g=Duel.GetMatchingGroup(godcheck,tp,LOCATION_DECK,0,nil)
+	if Duel.DiscardHand(tp,disgodcheck,1,1,REASON_RULE+REASON_DISCARD,nil,REASON_EFFECT)>0 then
+		Duel.SendtoHand(g:Select(tp,1,1,nil),tp,REASON_RULE)
 	end
 end,
-function(ce,ctp) 
-	local g=Duel.GetMatchingGroup(godcheck,ctp,LOCATION_DECK,0,nil)
-	return #g>0 and Duel.IsExistingMatchingCard(disgodcheck,ctp,LOCATION_HAND,0,1,nil,REASON_RULE)
+function(e,tp) 
+	local g=Duel.GetMatchingGroup(godcheck,tp,LOCATION_DECK,0,nil)
+	return #g>0 and Duel.IsExistingMatchingCard(disgodcheck,tp,LOCATION_HAND,0,1,nil,REASON_RULE)
 end,
 false,3,78665706,false,1109)
 
@@ -697,7 +697,7 @@ local function msplimit1(e,re,tp)
 	return c:IsType(TYPE_MONSTER) and not c:IsRace(RACE_MACHINE+RACE_DRAGON)
 end
 mainphaseSkillEx(77565204,
-function(ce,ctp)
+function(e,tp)
 	local gc1=Duel.CreateToken(tp,77625948)
 	local gc2=Duel.CreateToken(tp,41230939)
 	local gc3=Duel.CreateToken(tp,3019642)
@@ -710,10 +710,10 @@ function(ce,ctp)
 	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e1:SetTargetRange(1,0)
 	e1:SetValue(msplimit1)
-	Duel.RegisterEffect(e1,ctp)
+	Duel.RegisterEffect(e1,tp)
 end,
-function(ce,ctp)
-	return Duel.GetFlagEffect(ctp,77565204)>0
+function(e,tp)
+	return Duel.GetFlagEffect(tp,77565204)>0
 end,
 false,1,77565205,true,1103)
 
@@ -725,12 +725,12 @@ local function msplimit2(e,re,tp)
 	return c:IsType(TYPE_MONSTER) and not c:IsRace(RACE_MACHINE)
 end
 mainphaseSkillEx(77565204,
-function(ce,ctp)
-	local g=Duel.GetMatchingGroup(cybertograve,ctp,LOCATION_HAND+LOCATION_MZONE,0,nil,ctp)
-	if Duel.SendtoGrave(g:Select(ctp,1,1,nil),REASON_RULE)>0 then
+function(e,tp)
+	local g=Duel.GetMatchingGroup(cybertograve,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,tp)
+	if Duel.SendtoGrave(g:Select(tp,1,1,nil),REASON_RULE)>0 then
 		for i=1,2 do
-			local token=Duel.CreateToken(ctp,26439287)
-			Duel.SpecialSummonStep(token,0,ctp,ctp,false,false,POS_FACEUP_ATTACK)
+			local token=Duel.CreateToken(tp,26439287)
+			Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP_ATTACK)
 		end
 		Duel.SpecialSummonComplete()
 	end
@@ -740,11 +740,11 @@ function(ce,ctp)
 	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e1:SetTargetRange(1,0)
 	e1:SetValue(msplimit2)
-	Duel.RegisterEffect(e1,ctp)
+	Duel.RegisterEffect(e1,tp)
 end,
-function(ce,ctp)
-	local g=Duel.GetMatchingGroup(cybertograve,ctp,LOCATION_HAND+LOCATION_MZONE,0,nil,ctp)
-	return #g>0 and Duel.GetFlagEffect(ctp,77565204)>0 and Duel.IsPlayerCanSpecialSummonMonster(ctp,26439287,0x1093,TYPE_EFFECT,1100,600,3,RACE_MACHINE,ATTRIBUTE_LIGHT,POS_FACEUP_ATTACK) and not Duel.IsPlayerAffectedByEffect(ctp,59822133)
+function(e,tp)
+	local g=Duel.GetMatchingGroup(cybertograve,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,tp)
+	return #g>0 and Duel.GetFlagEffect(tp,77565204)>0 and Duel.IsPlayerCanSpecialSummonMonster(tp,26439287,0x1093,TYPE_EFFECT,1100,600,3,RACE_MACHINE,ATTRIBUTE_LIGHT,POS_FACEUP_ATTACK) and not Duel.IsPlayerAffectedByEffect(tp,59822133)
 end,
 false,1,77565205,true,1075)
 
