@@ -1,6 +1,7 @@
 --地征龙-迹龙
 local s,id=GetID()
 function s.initial_effect(c)
+	aux.AddCodeList(c,90411554)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -12,7 +13,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	s.discard_effect=e1
+	s.Dragon_Ruler_handes_effect=e1
 	-- 新增效果②
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
@@ -20,6 +21,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
 	e2:SetCode(EVENT_REMOVE)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetCountLimit(1,id+1)
 	e2:SetCondition(s.spcon2)
 	e2:SetTarget(s.sptg2)
 	e2:SetOperation(s.spop2)
@@ -54,7 +56,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.spcon2(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.attfilter,tp,LOCATION_MZONE,0,1,nil,e:GetHandler())
-	and e:GetHandler():IsLocation(LOCATION_REMOVED)
+	or re:GetHandler():IsAttribute(e:GetHandler():GetAttribute())
 end
 
 function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -67,7 +69,7 @@ end
 
 function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then return end
+	if not (Duel.GetLocationCount(tp,LOCATION_MZONE)>0) then return end
 	if c:IsRelateToEffect(e) then
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end

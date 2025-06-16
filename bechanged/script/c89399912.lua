@@ -33,7 +33,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.tgtg)
 	e3:SetOperation(s.tgop)
 	c:RegisterEffect(e3)
-	s.discard_effect=e3
+	s.Dragon_Ruler_handes_effect=e3
 
 	--search
 	local e4=Effect.CreateEffect(c)
