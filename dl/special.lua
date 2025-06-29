@@ -1089,7 +1089,7 @@ local function dddamval(e,re,val,r,rp,rc)
 	else return val end
 end
 local function checkMainDeck(c)
-	return c:IsSetCard(0xaf,0xae)
+	return c:IsSetCard(0xaf,0xae) and not c:IsType(TYPE_XYZ|TYPE_SYNCHRO|TYPE_FUSION|TYPE_LINK)
 end
 oneTimeSkill(46372010, function(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsExistingMatchingCard(checkMainDeck,tp,0xff,0,12,nil) then
@@ -1570,7 +1570,7 @@ local function dddamval(e,re,val,r,rp,rc)
 	else return val end
 end
 local function NotFtmCheck(c)
-	return not c:IsSetCard(0x10db,0xba) and c:IsType(TYPE_MONSTER)
+	return not c:IsSetCard(0x10db,0xba) and c:IsType(TYPE_MONSTER) and not c:IsType(TYPE_XYZ|TYPE_SYNCHRO|TYPE_FUSION|TYPE_LINK)
 end
 local function ExtraCheck(c)
     return not c:IsAttribute(ATTRIBUTE_DARK)
@@ -1580,14 +1580,15 @@ local function ActivateCon(e,tp)
 end
 oneTimeSkill(52159691, function(e,tp,eg,ep,ev,re,r,rp)
 	if ActivateCon(e,tp) then
-		local ac=Duel.CreateToken(tp,73347079)
-		local ac2=Duel.CreateToken(tp,73347079)
-		local bc=Duel.CreateToken(tp,8617563)
-		local cc=Duel.CreateToken(tp,96157835)
-		local dc=Duel.CreateToken(tp,86221741)
-		local ec=Duel.CreateToken(tp,71222868)
+        local ac=Duel.CreateToken(tp,73347079)
+        local ac2=Duel.CreateToken(tp,73347079)
+        local bc=Duel.CreateToken(tp,8617563)
+        local cc=Duel.CreateToken(tp,96157835)
+        local dc=Duel.CreateToken(tp,86221741)
+        local ec=Duel.CreateToken(tp,71222868)
         local g=Group.FromCards(ac,ac2,bc,cc,dc,ec)
         Duel.SendtoDeck(g,tp,2,REASON_RULE)
+        Duel.RegisterFlagEffect(tp,52159693,0,0,0)
 	end
 end)
 local function tdcheck(c)
@@ -1597,7 +1598,7 @@ local function setfilter(c)
     return c:IsSetCard(0x95) and c:IsType(TYPE_SPELL) and c:IsSSetable()
 end
 local function setcon(e,tp)
-    return ActivateCon(e,tp) and Duel.GetFlagEffect(tp,52159692)==0 and Duel.IsExistingMatchingCard(tdcheck,tp,LOCATION_HAND,0,1,nil) and Duel.IsExistingMatchingCard(setfilter,tp,LOCATION_DECK,0,1,1,nil)
+    return Duel.GetFlagEffect(tp,52159693)>0 and Duel.GetFlagEffect(tp,52159692)==0 and Duel.IsExistingMatchingCard(tdcheck,tp,LOCATION_HAND,0,1,nil) and Duel.IsExistingMatchingCard(setfilter,tp,LOCATION_DECK,0,1,1,nil)
 end
 local function setop(e,tp)
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
@@ -1630,7 +1631,7 @@ local function sendfilter2(c)
     return c:IsSetCard(0xba) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
 end
 local function sendcon(e,tp)
-    return ActivateCon(e,tp) and Duel.GetFlagEffect(tp,52159691)==0 and Duel.GetTurnPlayer()==tp and Duel.IsExistingMatchingCard(sendfilter,tp,LOCATION_DECK,0,1,1,nil)
+    return Duel.GetFlagEffect(tp,52159693)>0 and Duel.GetFlagEffect(tp,52159691)==0 and Duel.GetTurnPlayer()==tp and Duel.IsExistingMatchingCard(sendfilter,tp,LOCATION_DECK,0,1,1,nil)
 end
 local function sendop(e,tp)
     if Duel.SelectYesNo(tp,1103) then
