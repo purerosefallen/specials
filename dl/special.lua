@@ -1597,7 +1597,7 @@ local function setfilter(c)
     return c:IsSetCard(0x95) and c:IsType(TYPE_SPELL) and c:IsSSetable()
 end
 local function setcon(e,tp)
-    return ActivateCon(e,tp) and Duel.IsExistingMatchingCard(tdcheck,tp,LOCATION_HAND,0,1,nil) and Duel.IsExistingMatchingCard(setfilter,tp,LOCATION_DECK,0,1,1,nil)
+    return ActivateCon(e,tp) and Duel.GetFlagEffect(tp,52159692)==0 and Duel.IsExistingMatchingCard(tdcheck,tp,LOCATION_HAND,0,1,nil) and Duel.IsExistingMatchingCard(setfilter,tp,LOCATION_DECK,0,1,1,nil)
 end
 local function setop(e,tp)
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
@@ -1617,6 +1617,7 @@ local function setop(e,tp)
             tc:RegisterEffect(e1)
         end
     end
+	Duel.RegisterFlagEffect(tp,52159692,RESET_PHASE+PHASE_END,0,0)
 end
 mainphaseSkill(52159691, setop, setcon, false)
 local function tdcheck(c)
@@ -1629,7 +1630,7 @@ local function sendfilter2(c)
     return c:IsSetCard(0xba) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
 end
 local function sendcon(e,tp)
-    return ActivateCon(e,tp) and Duel.GetTurnPlayer()==tp and Duel.IsExistingMatchingCard(sendfilter,tp,LOCATION_DECK,0,1,1,nil)
+    return ActivateCon(e,tp) and Duel.GetFlagEffect(tp,52159691)==0 and Duel.GetTurnPlayer()==tp and Duel.IsExistingMatchingCard(sendfilter,tp,LOCATION_DECK,0,1,1,nil)
 end
 local function sendop(e,tp)
     if Duel.SelectYesNo(tp,1103) then
@@ -1641,6 +1642,7 @@ local function sendop(e,tp)
             g:Merge(g2)
             Duel.SendtoGrave(g,REASON_RULE)
         end
+		Duel.RegisterFlagEffect(tp,52159691,0,0,0)
     end
 end
 standbyPhaseSkill(52159691, sendop, sendcon, false)
