@@ -61,7 +61,7 @@ end
 local function phaseSkill(code, phase, op, con, both)
 	wrapDeckSkill(code, function(e1)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_FREE_CHAIN)
+		e1:SetCode(EVENT_PHASE+phase)
 		e1:SetCountLimit(1,0x7ffffff-code-phase)
 		e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
 			return (both or Duel.GetTurnPlayer()==tp) and Duel.GetCurrentPhase()==phase and (not con or con(e,tp,eg,ep,ev,re,r,rp))
@@ -1563,6 +1563,88 @@ function(e,tp)
 	return #cg>0 and #g>0 and Duel.GetFlagEffect(tp,97345699)>0
 end,
 false,1,97345700)
+
+--袭击队集结
+local function dddamval(e,re,val,r,rp,rc)
+	if bit.band(r,REASON_EFFECT)~=0 and re:GetHandler():IsSetCard(0xae) then return 0
+	else return val end
+end
+local function NotFtmCheck(c)
+	return not c:IsSetCard(0x10db,0xba) and c:IsType(TYPE_MONSTER)
+end
+local function ExtraCheck(c)
+    return not c:IsAttribute(ATTRIBUTE_DARK)
+end
+local function ActivateCon(e,tp)
+    return not Duel.IsExistingMatchingCard(NotFtmCheck,tp,0xff,0,1,nil) and not Duel.IsExistingMatchingCard(ExtraCheck,tp,LOCATION_EXTRA,0,1,nil)
+end
+oneTimeSkill(52159691, function(e,tp,eg,ep,ev,re,r,rp)
+	if ActivateCon(e,tp) then
+		local ac=Duel.CreateToken(tp,73347079)
+		local ac2=Duel.CreateToken(tp,73347079)
+		local bc=Duel.CreateToken(tp,8617563)
+		local cc=Duel.CreateToken(tp,96157835)
+		local dc=Duel.CreateToken(tp,86221741)
+		local ec=Duel.CreateToken(tp,71222868)
+        local g=Group.FromCards(ac,ac2,bc,cc,dc,ec)
+        Duel.SendtoDeck(g,tp,2,REASON_RULE)
+	end
+end)
+local function tdcheck(c)
+    return c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToDeck()
+end
+local function setfilter(c)
+    return c:IsSetCard(0x95) and c:IsType(TYPE_SPELL) and c:IsSSetable()
+end
+local function setcon(e,tp)
+    return ActivateCon(e,tp) and Duel.IsExistingMatchingCard(tdcheck,tp,LOCATION_HAND,0,1,nil) and Duel.IsExistingMatchingCard(setfilter,tp,LOCATION_DECK,0,1,1,nil)
+end
+local function setop(e,tp)
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+    local g1=Duel.SelectMatchingCard(tp,tdcheck,tp,LOCATION_HAND,0,1,1,nil)
+    Duel.SendtoDeck(g1,nil,2,REASON_RULE)
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+    local g=Duel.SelectMatchingCard(tp,setfilter,tp,LOCATION_DECK,0,1,1,nil)
+    local tc=g:GetFirst()
+    if tc and Duel.SSet(tp,tc)~=0 then
+        if tc:IsType(TYPE_QUICKPLAY) then
+            local e1=Effect.CreateEffect(e:GetHandler())
+            e1:SetDescription(aux.Stringid(36429703,2))
+            e1:SetType(EFFECT_TYPE_SINGLE)
+            e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+            e1:SetCode(EFFECT_QP_ACT_IN_SET_TURN)
+            e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+            tc:RegisterEffect(e1)
+        end
+    end
+end
+mainphaseSkill(52159691, setop, setcon, false)
+local function tdcheck(c)
+    return c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToDeck()
+end
+local function sendfilter(c)
+    return c:IsSetCard(0x10db) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave() and Duel.IsExistingMatchingCard(sendfilter2,tp,LOCATION_DECK,0,1,c)
+end
+local function sendfilter2(c)
+    return c:IsSetCard(0xba) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
+end
+local function sendcon(e,tp)
+    return ActivateCon(e,tp) and Duel.GetTurnPlayer()==tp and Duel.IsExistingMatchingCard(sendfilter,tp,LOCATION_DECK,0,1,1,nil)
+end
+local function sendop(e,tp)
+    if Duel.SelectYesNo(tp,1103) then
+        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+        local g=Duel.SelectMatchingCard(tp,sendfilter,tp,LOCATION_DECK,0,1,1,nil)
+        if g:GetCount()>0 then
+            Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+            local g2=Duel.SelectMatchingCard(tp,sendfilter2,tp,LOCATION_DECK,0,1,1,g)
+            g:Merge(g2)
+            Duel.SendtoGrave(g,REASON_RULE)
+        end
+    end
+end
+standbyPhaseSkill(52159691, sendop, sendcon, false)
+
 
 local function initialize(e,_tp,eg,ep,ev,re,r,rp)
 	local skillCodes=getAllSkillCodes()
