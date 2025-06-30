@@ -1337,7 +1337,8 @@ function(e,tp)
 	local sg=g:Select(tp,1,1,nil)
 	local lv=sg:GetFirst():GetLevel()
 	if Duel.SendtoGrave(sg,REASON_RULE)>0 then
-		local spg=Duel.GetMatchingGroup(saspfilter,LOCATION_MZONE,0,nil,e,tp,lv)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local spg=Duel.SelectMatchingCard(tp,saspfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 		Duel.SpecialSummon(spg,0,tp,tp,false,false,POS_FACEUP)
 	end
 end,
