@@ -491,7 +491,7 @@ mainphaseSkill(48712195, hdchangeop, hdchangecon, false)
 --成金
 oneTimeSkill(70368879, function(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Draw(tp,1,REASON_RULE)
-	Duel.Draw(1-tp,1,REASON_RULE)
+	--Duel.Draw(1-tp,1,REASON_RULE)
 end)
 
 --天平
@@ -1395,7 +1395,7 @@ mainphaseSkillList(44874522,
 		return #g>0 and #sg>0
 	end,
 	count=1,
-	countid=44874522,	
+	countid=44874522,   
 	desc=1109
 },
 {
@@ -1543,7 +1543,7 @@ local function worldspfilter(c,e,tp)
 end
 mainphaseSkillEx(97345699,
 function(e,tp)
-	local cg=Duel.GetMatchingGroup(worldcostfilter,tp,LOCATION_HAND,0,nil)	
+	local cg=Duel.GetMatchingGroup(worldcostfilter,tp,LOCATION_HAND,0,nil)  
 	if Duel.SendtoGrave(cg:Select(tp,1,1,nil),REASON_RULE+REASON_DISCARD)>0 then
 		local g=Duel.GetMatchingGroup(worldspfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,nil,e,tp)
 		local sc=g:Select(tp,1,1,nil):GetFirst()
@@ -1573,81 +1573,112 @@ local function NotFtmCheck(c)
 	return not c:IsSetCard(0x10db,0xba) and c:IsType(TYPE_MONSTER) and not c:IsType(TYPE_XYZ|TYPE_SYNCHRO|TYPE_FUSION|TYPE_LINK)
 end
 local function ExtraCheck(c)
-    return not c:IsAttribute(ATTRIBUTE_DARK)
+	return not c:IsAttribute(ATTRIBUTE_DARK)
 end
 local function ActivateCon(e,tp)
-    return not Duel.IsExistingMatchingCard(NotFtmCheck,tp,0xff,0,1,nil) and not Duel.IsExistingMatchingCard(ExtraCheck,tp,LOCATION_EXTRA,0,1,nil)
+	return not Duel.IsExistingMatchingCard(NotFtmCheck,tp,0xff,0,1,nil) and not Duel.IsExistingMatchingCard(ExtraCheck,tp,LOCATION_EXTRA,0,1,nil)
 end
 oneTimeSkill(52159691, function(e,tp,eg,ep,ev,re,r,rp)
 	if ActivateCon(e,tp) then
-        local ac=Duel.CreateToken(tp,73347079)
-        local ac2=Duel.CreateToken(tp,73347079)
-        local bc=Duel.CreateToken(tp,8617563)
-        local cc=Duel.CreateToken(tp,96157835)
-        local dc=Duel.CreateToken(tp,86221741)
-        local ec=Duel.CreateToken(tp,71222868)
-        local g=Group.FromCards(ac,ac2,bc,cc,dc,ec)
-        Duel.SendtoDeck(g,tp,2,REASON_RULE)
-        Duel.RegisterFlagEffect(tp,52159693,0,0,0)
+		local ac=Duel.CreateToken(tp,73347079)
+		local ac2=Duel.CreateToken(tp,73347079)
+		local bc=Duel.CreateToken(tp,8617563)
+		local cc=Duel.CreateToken(tp,96157835)
+		local dc=Duel.CreateToken(tp,86221741)
+		local ec=Duel.CreateToken(tp,71222868)
+		local g=Group.FromCards(ac,ac2,bc,cc,dc,ec)
+		Duel.SendtoDeck(g,tp,2,REASON_RULE)
+		Duel.RegisterFlagEffect(tp,52159693,0,0,0)
 	end
 end)
 local function tdcheck(c)
-    return c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToDeck()
+	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToDeck()
 end
 local function setfilter(c)
-    return c:IsSetCard(0x95) and c:IsType(TYPE_SPELL) and c:IsSSetable()
+	return c:IsSetCard(0x95) and c:IsType(TYPE_SPELL) and c:IsSSetable()
 end
 local function setcon(e,tp)
-    return Duel.GetFlagEffect(tp,52159693)>0 and Duel.GetFlagEffect(tp,52159692)==0 and Duel.IsExistingMatchingCard(tdcheck,tp,LOCATION_HAND,0,1,nil) and Duel.IsExistingMatchingCard(setfilter,tp,LOCATION_DECK,0,1,1,nil)
+	return Duel.GetFlagEffect(tp,52159693)>0 and Duel.GetFlagEffect(tp,52159692)==0 and Duel.IsExistingMatchingCard(tdcheck,tp,LOCATION_HAND,0,1,nil) and Duel.IsExistingMatchingCard(setfilter,tp,LOCATION_DECK,0,1,1,nil)
 end
 local function setop(e,tp)
-    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-    local g1=Duel.SelectMatchingCard(tp,tdcheck,tp,LOCATION_HAND,0,1,1,nil)
-    Duel.SendtoDeck(g1,nil,2,REASON_RULE)
-    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-    local g=Duel.SelectMatchingCard(tp,setfilter,tp,LOCATION_DECK,0,1,1,nil)
-    local tc=g:GetFirst()
-    if tc and Duel.SSet(tp,tc)~=0 then
-        if tc:IsType(TYPE_QUICKPLAY) then
-            local e1=Effect.CreateEffect(e:GetHandler())
-            e1:SetDescription(aux.Stringid(36429703,2))
-            e1:SetType(EFFECT_TYPE_SINGLE)
-            e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-            e1:SetCode(EFFECT_QP_ACT_IN_SET_TURN)
-            e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-            tc:RegisterEffect(e1)
-        end
-    end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g1=Duel.SelectMatchingCard(tp,tdcheck,tp,LOCATION_HAND,0,1,1,nil)
+	Duel.SendtoDeck(g1,nil,2,REASON_RULE)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+	local g=Duel.SelectMatchingCard(tp,setfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local tc=g:GetFirst()
+	if tc and Duel.SSet(tp,tc)~=0 then
+		if tc:IsType(TYPE_QUICKPLAY) then
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetDescription(aux.Stringid(36429703,2))
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+			e1:SetCode(EFFECT_QP_ACT_IN_SET_TURN)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+			tc:RegisterEffect(e1)
+		end
+	end
 	Duel.RegisterFlagEffect(tp,52159692,RESET_PHASE+PHASE_END,0,0)
 end
 mainphaseSkill(52159691, setop, setcon, false)
 local function tdcheck(c)
-    return c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToDeck()
+	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToDeck()
 end
 local function sendfilter(c)
-    return c:IsSetCard(0x10db) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave() and Duel.IsExistingMatchingCard(sendfilter2,tp,LOCATION_DECK,0,1,c)
+	return c:IsSetCard(0x10db) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave() and Duel.IsExistingMatchingCard(sendfilter2,tp,LOCATION_DECK,0,1,c)
 end
 local function sendfilter2(c)
-    return c:IsSetCard(0xba) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
+	return c:IsSetCard(0xba) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
 end
 local function sendcon(e,tp)
-    return Duel.GetFlagEffect(tp,52159693)>0 and Duel.GetFlagEffect(tp,52159691)==0 and Duel.GetTurnPlayer()==tp and Duel.IsExistingMatchingCard(sendfilter,tp,LOCATION_DECK,0,1,1,nil)
+	return Duel.GetFlagEffect(tp,52159693)>0 and Duel.GetFlagEffect(tp,52159691)==0 and Duel.GetTurnPlayer()==tp and Duel.IsExistingMatchingCard(sendfilter,tp,LOCATION_DECK,0,1,1,nil)
 end
 local function sendop(e,tp)
-    if Duel.SelectYesNo(tp,1103) then
-        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-        local g=Duel.SelectMatchingCard(tp,sendfilter,tp,LOCATION_DECK,0,1,1,nil)
-        if g:GetCount()>0 then
-            Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-            local g2=Duel.SelectMatchingCard(tp,sendfilter2,tp,LOCATION_DECK,0,1,1,g)
-            g:Merge(g2)
-            Duel.SendtoGrave(g,REASON_RULE)
-        end
+	if Duel.SelectYesNo(tp,1103) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		local g=Duel.SelectMatchingCard(tp,sendfilter,tp,LOCATION_DECK,0,1,1,nil)
+		if g:GetCount()>0 then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+			local g2=Duel.SelectMatchingCard(tp,sendfilter2,tp,LOCATION_DECK,0,1,1,g)
+			g:Merge(g2)
+			Duel.SendtoGrave(g,REASON_RULE)
+		end
 		Duel.RegisterFlagEffect(tp,52159691,0,0,0)
-    end
+	end
 end
 standbyPhaseSkill(52159691, sendop, sendcon, false)
 
+--复制猫
+local function cpdrcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_DRAW and eg:IsExists(Card.IsReason,1,nil,REASON_RULE)
+end
+local function cpdrop(e,tp,eg,ep,ev,re,r,rp)
+	local g=eg:Filter(Card.IsReason,nil,REASON_RULE)
+	Duel.ConfirmCards(1-tp,g)
+	local cg=Group.CreateGroup()
+	if g:IsExists(Card.IsType,1,nil,TYPE_MONSTER) then
+		cg:AddCard(Duel.CreateToken(tp,82385847))
+		cg:AddCard(Duel.CreateToken(tp,82385847))
+	end
+	if g:IsExists(Card.IsType,1,nil,TYPE_SPELL) then
+		cg:AddCard(Duel.CreateToken(tp,19230407))
+		cg:AddCard(Duel.CreateToken(tp,19230407))
+	end
+	if g:IsExists(Card.IsType,1,nil,TYPE_TRAP) then
+		cg:AddCard(Duel.CreateToken(tp,10045474))
+		cg:AddCard(Duel.CreateToken(tp,10045474))
+	end
+	Duel.SendtoHand(cg,tp,REASON_RULE)
+	Duel.ConfirmCards(1-tp,cg)
+end
+oneTimeSkill(88032456, function(e,tp,eg,ep,ev,re,r,rp)
+	local e1=Effect.GlobalEffect()
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_DRAW)
+	e1:SetCondition(cpdrcon)
+	e1:SetOperation(cpdrop)
+	Duel.RegisterEffect(e1,tp)
+end)
 
 local function initialize(e,_tp,eg,ep,ev,re,r,rp)
 	local skillCodes=getAllSkillCodes()
