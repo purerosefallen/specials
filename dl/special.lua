@@ -1711,6 +1711,86 @@ local function sendop(e,tp)
 	end
 end
 standbyPhaseSkill(52159691, sendop, sendcon, false)
+--天气
+local function tenkitdcheck(c)
+	return c:IsAbleToDeck()
+end
+local function tenkitdcheck2(c)
+	return c:IsAbleToDeck() and c:IsFaceupEx() and c:IsSetCard(0x109)
+end
+local function tenkitdcheck3(c,e,tp)
+	return c:IsAbleToDeck() and c:IsFaceup() and c:IsSetCard(0x109) --and Duel.IsExistingMatchingCard(tenkispcheck,tp,LOCATION_DECK+LOCATION_EXTRA,0,1,1,nil,e,tp,c)
+end
+local function tenkispcheck(c,e,tp,tc)
+	return c:IsCode(tc:GetCode()) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,tc,c)>0
+end
+local function tenkitfcheck(c,tp)
+	return c:IsType(TYPE_SPELL+TYPE_TRAP) and not c:IsType(TYPE_FIELD) and c:IsSetCard(0x109)
+		and not c:IsForbidden() and c:CheckUniqueOnField(tp)
+end
+mainphaseSkillList(74218258,
+{
+	op=function(e,tp)
+		local g=Duel.GetMatchingGroup(tenkitdcheck,tp,LOCATION_HAND,0,nil)
+		local dg=g:Select(tp,1,1,nil)
+		Duel.ConfirmCards(tp,dg)
+		if Duel.SendtoDeck(dg,tp,2,REASON_RULE)>0 then
+			Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_ATOHAND)
+			local sg=Duel.SelectMatchingCard(tp,function(ac) return ac:IsSetCard(0x109) and ac:IsFaceupEx() and ac:IsAbleToHand() end,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
+			Duel.SendtoHand(sg,tp,REASON_RULE)
+			Duel.ConfirmCards(1-tp,sg)
+		end
+	end,
+	con=function(e,tp) 
+		local g=Duel.GetMatchingGroup(tenkitdcheck,tp,LOCATION_HAND,0,nil)
+		local sg=Duel.GetMatchingGroup(function(ac) return ac:IsSetCard(0x109) and ac:IsFaceupEx() and ac:IsAbleToHand() end,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
+		return #g>0 and #sg>0
+	end,
+	count=1,
+	countid=74218258,   
+	desc=1190
+},
+{
+	op=function(e,tp)
+		local g=Duel.GetMatchingGroup(tenkitdcheck2,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
+		local dg=g:Select(tp,3,3,nil)
+		Duel.ConfirmCards(tp,dg)
+		if Duel.SendtoDeck(dg,tp,2,REASON_RULE)>0 then
+			Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_TOFIELD)
+			local sg=Duel.SelectMatchingCard(tp,tenkitfcheck,tp,LOCATION_DECK,0,1,1,nil,tp)
+			Duel.MoveToField(sg:GetFirst(),tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+		end
+	end,
+	con=function(e,tp) 
+		local g=Duel.GetMatchingGroup(tenkitdcheck2,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
+		local sg=Duel.GetMatchingGroup(tenkitfcheck,tp,LOCATION_DECK,0,nil,tp)
+		return #g>0 and #sg>0
+	end,
+	count=1,
+	countid=74218259,   
+	desc=aux.Stringid(91299846,0)
+},
+{
+	op=function(e,tp)
+		local g=Duel.GetMatchingGroup(tenkitdcheck3,tp,LOCATION_MZONE,0,nil,e,tp)
+		local dg=g:Select(tp,1,1,nil)
+		Duel.ConfirmCards(tp,dg)
+		local tc=dg:GetFirst()
+		if Duel.SendtoDeck(dg,tp,2,REASON_RULE)>0 and Duel.IsExistingMatchingCard(tenkispcheck,tp,LOCATION_DECK+LOCATION_EXTRA,0,1,nil,e,tp,tc) and Duel.SelectYesNo(tp,aux.Stringid(11302671,2)) then
+			Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_ATOHAND)
+			local sg=Duel.SelectMatchingCard(tp,tenkispcheck,tp,LOCATION_DECK+LOCATION_EXTRA,0,1,1,nil,e,tp,tc)
+			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
+		end
+	end,
+	con=function(e,tp) 
+		local g=Duel.GetMatchingGroup(tenkitdcheck3,tp,LOCATION_MZONE,0,nil,e,tp)
+		return #g>0
+	end,
+	count=1,
+	countid=74218260,   
+	desc=1193
+}
+)
 
 --复制猫
 local function drcheck(c,tp)
