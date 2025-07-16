@@ -1792,6 +1792,45 @@ mainphaseSkillList(74218258,
 }
 )
 
+--人鱼泪
+function tearcheck(c)
+	return c:IsCode(1845204) or c:IsSetCard(0x9d)
+end
+oneTimeSkill(77103950, function(e,tp,eg,ep,ev,re,r,rp)
+	if not Duel.IsExistingMatchingCard(tearcheck,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil) then
+		local ag=Group.CreateGroup()
+		local token=Duel.CreateToken(tp,74078255)
+		ag:AddCard(token)
+		token=Duel.CreateToken(tp,74078255)
+		ag:AddCard(token)
+		token=Duel.CreateToken(tp,37961969)
+		ag:AddCard(token)
+		token=Duel.CreateToken(tp,37961969)
+		ag:AddCard(token)
+		token=Duel.CreateToken(tp,572850)
+		ag:AddCard(token)
+		token=Duel.CreateToken(tp,572850)
+		ag:AddCard(token)
+		token=Duel.CreateToken(tp,73956664)
+		ag:AddCard(token)
+		token=Duel.CreateToken(tp,92731385)
+		ag:AddCard(token)
+		token=Duel.CreateToken(tp,92731385)
+		ag:AddCard(token)
+		token=Duel.CreateToken(tp,92731385)
+		ag:AddCard(token)
+		token=Duel.CreateToken(tp,84330567)
+		ag:AddCard(token)
+		token=Duel.CreateToken(tp,28226490)
+		ag:AddCard(token)
+		token=Duel.CreateToken(tp,54757758)
+		ag:AddCard(token)
+
+		Duel.SendtoDeck(ag,tp,0,REASON_RULE)
+		Duel.ShuffleExtra(tp)
+		Duel.ShuffleDeck(tp)
+	end
+end)
 --复制猫
 local function drcheck(c,tp)
 	return c:IsControler(tp) and c:IsReason(REASON_RULE)
