@@ -23,4 +23,10 @@ function c72405967.activate(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		Duel.SendtoGrave(g,REASON_EFFECT+REASON_DISCARD)
 	end
+	local g1=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
+	local g2=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
+	Duel.ConfirmCards(tp,g1)
+	Duel.ConfirmCards(1-tp,g2)
+	Duel.ShuffleHand(tp)
+	Duel.ShuffleHand(1-tp)
 end

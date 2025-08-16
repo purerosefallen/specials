@@ -121,7 +121,9 @@ function c15800838.operation(e,tp,eg,ep,ev,re,r,rp)
 		local ct=0
 		local og=Group.CreateGroup()
 		local xg=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_ONFIELD,nil,TYPE_XYZ)
-		xg:ForEach(function(xc) og:Merge(xc:GetOverlayGroup()) end)
+		if #xg>0 then 
+			xg:ForEach(function(xc) og:Merge(xc:GetOverlayGroup()) end)
+		end
 		ct=ct+og:FilterCount(c15800838.filter,nil,tc:GetCode())
 		ct=ct+Duel.GetMatchingGroupCount(c15800838.filter,tp,0,LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_ONFIELD,nil,tc:GetCode())
 		if not (limit[tc:GetCode()] or (semi[tc:GetCode()] and ct>1) or ct>2) then

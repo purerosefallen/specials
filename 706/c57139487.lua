@@ -132,7 +132,9 @@ function c57139487.activate(e,tp,eg,ep,ev,re,r,rp)
 			local ct=0
 			local og=Group.CreateGroup()
 			local xg=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_ONFIELD,nil,TYPE_XYZ)
-			xg:ForEach(function(xc) og:Merge(xc:GetOverlayGroup()) end)
+			if #xg>0 then
+				xg:ForEach(function(xc) og:Merge(xc:GetOverlayGroup()) end)
+			end
 			ct=og:FilterCount(c57139487.filter2,nil,tc:GetCode())
 			local g=Group.CreateGroup()
 			if tc:IsType(TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ) then
