@@ -1,6 +1,10 @@
 --遺言状
 local s,id,o=GetID()
 function s.initial_effect(c)
+    -- Flags Used:
+    -- - id: Tracks graveyard events per player.
+    -- - id+o: Tracks special summon events per player.
+    -- - id+o*2: Tracks how many times the continuous effect is registered.
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
