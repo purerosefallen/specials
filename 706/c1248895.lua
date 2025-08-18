@@ -1,29 +1,40 @@
---マインドクラッシュ
-function c15800838.initial_effect(c)
+--連鎖破壊
+---@param c Card
+function c1248895.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMING_TOHAND)
-	e1:SetCategory(CATEGORY_HANDES)
-	e1:SetTarget(c15800838.target)
-	e1:SetOperation(c15800838.operation)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCode(EVENT_SUMMON_SUCCESS)
+	e1:SetTarget(c1248895.target)
+	e1:SetOperation(c1248895.activate)
 	c:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	c:RegisterEffect(e2)
+	local e3=e1:Clone()
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e3)
 end
-function c15800838.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0
-		and Duel.IsExistingMatchingCard(nil,tp,LOCATION_HAND,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CODE)
-	getmetatable(e:GetHandler()).announce_filter={TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ+TYPE_LINK,OPCODE_ISTYPE,OPCODE_NOT}
-	local ac=Duel.AnnounceCard(tp,table.unpack(getmetatable(e:GetHandler()).announce_filter))
-	Duel.SetTargetParam(ac)
-	Duel.SetOperationInfo(0,CATEGORY_ANNOUNCE,nil,0,tp,0)
-	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,PLAYER_ALL,1)
+function c1248895.filter1(c,e)
+	return c:IsFaceup() and c:IsAttackBelow(2000) and c:IsCanBeEffectTarget(e)
 end
-function c15800838.filter(c,tc)
+function c1248895.filter2(c,tc)
 	return c:IsCode(tc) and c:IsFaceup()
 end
-function c15800838.operation(e,tp,eg,ep,ev,re,r,rp)
+function c1248895.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return eg:IsContains(chkc) end
+	if chk==0 then return eg:IsExists(c1248895.filter1,1,nil,e) end
+	if eg:GetCount()==1 then
+		Duel.SetTargetCard(eg)
+	else
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+		local g=eg:FilterSelect(tp,c1248895.filter1,1,1,nil,e)
+		Duel.SetTargetCard(g)
+	end
+end
+function c1248895.activate(e,tp,eg,ep,ev,re,r,rp)
 	local limit={
 		[40044918 ]=true, --E·HERO エアーマン
 		[37742478 ]=true, --オネスト
@@ -113,31 +124,43 @@ function c15800838.operation(e,tp,eg,ep,ev,re,r,rp)
 		[62279055 ]=true, --魔法の筒
 		[80604091 ]=true  --血の代償
 	}
-	local ac=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
-	local g=Duel.GetMatchingGroup(Card.IsCode,tp,0,LOCATION_HAND,nil,ac)
-	local hg=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
-	if g:GetCount()>0 then
-		Duel.SendtoGrave(g,REASON_EFFECT+REASON_DISCARD)
-		local tc=g:GetFirst()
-		local ct=0
-		local og=Group.CreateGroup()
-		local xg=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_ONFIELD,nil,TYPE_XYZ)
-		local xtc=xg:GetFirst()
-		while xtc do
-			og:Merge(xtc:GetOverlayGroup())
-			xtc=xg:GetNext()
-		end
-		ct=ct+og:FilterCount(c15800838.filter,nil,tc:GetCode())
-		ct=ct+Duel.GetMatchingGroupCount(c15800838.filter,tp,0,LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_ONFIELD,nil,tc:GetCode())
-		if not (limit[tc:GetCode()] or (semi[tc:GetCode()] and ct>1) or ct>2) then
-			Duel.ConfirmCards(tp,hg)
-			Duel.ShuffleHand(1-tp)
-		end
+	local tc=Duel.GetFirstTarget()
+	local tpe=tc:GetType()
+	if bit.band(tpe,TYPE_TOKEN)~=0 then return end
+	local f1=false
+	local f2=false
+	local ct=0
+	local og=Group.CreateGroup()
+	local xg=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_ONFIELD,nil,TYPE_XYZ)
+	local xtc=xg:GetFirst()
+	while xtc do
+		og:Merge(xtc:GetOverlayGroup())
+		xtc=xg:GetNext()
+	end
+	ct=og:FilterCount(c1248895.filter2,nil,tc:GetCode())
+	local g=Group.CreateGroup()
+	if tc:IsType(TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ) then
+		g=Duel.GetMatchingGroup(Card.IsCode,tp,0,LOCATION_EXTRA,nil,tc:GetCode())
+		ct=ct+g:GetCount()
+		ct=ct+Duel.GetMatchingGroupCount(c1248895.filter2,tp,0,LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_ONFIELD,nil,tc:GetCode())
+		if not (limit[tc:GetCode()] or (semi[tc:GetCode()] and ct>1) or ct>2) then f1=true end
 	else
-		Duel.ConfirmCards(tp,hg)
+		g=Duel.GetMatchingGroup(Card.IsCode,tp,0,LOCATION_DECK+LOCATION_HAND,nil,tc:GetCode())
+		ct=ct+g:GetCount()
+		ct=ct+Duel.GetMatchingGroupCount(c1248895.filter2,tp,0,LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_ONFIELD,nil,tc:GetCode())
+		if not (limit[tc:GetCode()] or (semi[tc:GetCode()] and ct>1) or ct>2) then f2=true end
+	end	
+	if g:GetCount()>0 then
+		Duel.Destroy(g,REASON_EFFECT)
+	end
+	if f1 then
+		Duel.ConfirmCards(tp,Duel.GetFieldGroup(tp,0,LOCATION_EXTRA))
+		Duel.ShuffleExtra(1-tp)
+	end
+	if f2 then
+		Duel.ConfirmCards(tp,Duel.GetFieldGroup(tp,0,LOCATION_HAND))
 		Duel.ShuffleHand(1-tp)
-		local sg=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
-		local dg=sg:RandomSelect(tp,1)
-		Duel.SendtoGrave(dg,REASON_EFFECT+REASON_DISCARD)
+		Duel.ConfirmCards(tp,Duel.GetFieldGroup(tp,0,LOCATION_DECK))
+		Duel.ShuffleDeck(1-tp)
 	end
 end
