@@ -132,8 +132,10 @@ function c57139487.activate(e,tp,eg,ep,ev,re,r,rp)
 			local ct=0
 			local og=Group.CreateGroup()
 			local xg=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_ONFIELD,nil,TYPE_XYZ)
-			if #xg>0 then
-				xg:ForEach(function(xc) og:Merge(xc:GetOverlayGroup()) end)
+			local xtc=xg:GetFirst()
+			while xtc do
+				og:Merge(xtc:GetOverlayGroup())
+				xtc=xg:GetNext()
 			end
 			ct=og:FilterCount(c57139487.filter2,nil,tc:GetCode())
 			local g=Group.CreateGroup()
