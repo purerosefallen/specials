@@ -95,7 +95,6 @@ function c39261576.activate(e,tp,eg,ep,ev,re,r,rp)
             not Duel.IsPlayerAffectedByEffect(tp, EFFECT_CANNOT_SPECIAL_SUMMON) then
             Duel.ConfirmCards(1 - tp, cg1)
             Duel.ConfirmCards(1 - tp, cg2)
-            Duel.ShuffleHand(tp)
         end
 	end
 end
