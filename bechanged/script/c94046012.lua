@@ -18,15 +18,66 @@ function c94046012.initial_effect(c)
 	e2:SetHintTiming(0,TIMING_END_PHASE)
 	e2:SetCondition(c94046012.spcon2)
 	c:RegisterEffect(e2)
+	--hand link
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(94046012,1))
-	e3:SetCategory(CATEGORY_HANDES+CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetCode(EFFECT_EXTRA_LINK_MATERIAL)
 	e3:SetRange(LOCATION_HAND)
-	e3:SetCountLimit(1,94046013)
-	e3:SetTarget(c94046012.tgtg)
-	e3:SetOperation(c94046012.tgop)
+	e3:SetValue(c94046012.matval)
 	c:RegisterEffect(e3)
+	--hand synchro
+	local e4=e3:Clone()
+	e4:SetCode(EFFECT_EXTRA_SYNCHRO_MATERIAL)
+	e4:SetValue(c94046012.matval2)
+	c:RegisterEffect(e4)
+	--synchro effect
+	local e5=Effect.CreateEffect(c)
+	e5:SetDescription(aux.Stringid(94046012,1))
+	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e5:SetType(EFFECT_TYPE_QUICK_O)
+	e5:SetCode(EVENT_FREE_CHAIN)
+	e5:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
+	e5:SetRange(LOCATION_HAND)
+	e5:SetCountLimit(1,94046012)
+	e5:SetCondition(c94046012.sccon)
+	e5:SetTarget(c94046012.sctarg)
+	e5:SetOperation(c94046012.scop)
+	c:RegisterEffect(e5)
+end
+function c94046012.sccon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsMainPhase() or Duel.IsBattlePhase()
+end
+function c94046012.sctarg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsSynchroSummonable,tp,LOCATION_EXTRA,0,1,nil,c) 
+		or Duel.IsExistingMatchingCard(Card.IsLinkSummonable,tp,LOCATION_EXTRA,0,1,nil,nil,c) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+end
+function c94046012.scfilter(c,mc)
+	return c:IsSynchroSummonable(mc) or c:IsLinkSummonable(nil,mc)
+end
+function c94046012.scop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsControler(1-tp) or not c:IsRelateToEffect(e) then return end
+	local g=Duel.GetMatchingGroup(c94046012.scfilter,tp,LOCATION_EXTRA,0,nil,c)
+	if g:GetCount()>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local tc=g:Select(tp,1,1,nil):GetFirst()
+		if tc:IsType(TYPE_SYNCHRO) then	
+			Duel.SynchroSummon(tp,tc,c)
+		else
+			Duel.LinkSummon(tp,tc,nil,c)
+		end
+	end
+end
+function c94046012.matval(e,lc,mg,c,tp)
+	if not lc:IsRace(RACE_SPELLCASTER+RACE_WARRIOR+RACE_PSYCHO) or
+		not lc:IsAttribute(0x7) then return false,nil end
+	return true,true
+end
+function c94046012.matval2(e,c)
+	return c:IsRace(RACE_SPELLCASTER+RACE_WARRIOR+RACE_PSYCHO) and c:IsAttribute(0x7)
 end
 function c94046012.spcon1(e,tp,eg,ep,ev,re,r,rp)
 	return not aux.IsCanBeQuickEffect(e:GetHandler(),tp,90351981)
@@ -61,42 +112,4 @@ function c94046012.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c94046012.splimit(e,c)
 	return not c:IsAttribute(ATTRIBUTE_DARK)
-end
-function c94046012.tgfilter(c)
-	return c:IsSetCard(0x11b,0xfe) and c:IsAbleToGrave() and c:IsType(TYPE_MONSTER)
-end
-function c94046012.sfilter(c,e,tp,mc,g)
-	return c:IsType(TYPE_SYNCHRO) and c:IsAttribute(ATTRIBUTE_WATER)
-		and c:IsRace(RACE_SPELLCASTER)
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0
-		and (not g or c:GetLevel()-mc:GetLevel()>0 and g:CheckWithSumEqual(Card.GetLevel,c:GetLevel()-mc:GetLevel(),1,1))
-end
-function c94046012.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	local clv=c:GetLevel()
-	local g=Duel.GetMatchingGroup(c94046012.tgfilter,tp,LOCATION_HAND,0,nil)
-	if chk==0 then return clv>0
-		and Duel.IsExistingMatchingCard(c94046012.sfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,g) end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_HAND)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
-end
-function c94046012.tgop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local clv=c:GetLevel()
-	if c:IsRelateToEffect(e) and clv>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sg=Duel.SelectMatchingCard(tp,c94046012.sfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,nil)
-		if sg:GetCount()>0 then
-			local lv=sg:GetFirst():GetLevel()-clv
-			local g=Duel.GetMatchingGroup(c94046012.tgfilter,tp,LOCATION_HAND,0,nil)
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-			local tg=g:SelectWithSumEqual(tp,Card.GetLevel,lv,1,1)
-			if #tg>0 then
-				tg:AddCard(c)
-				if Duel.SendtoGrave(tg,REASON_EFFECT)>1 and tg:IsExists(Card.IsLocation,1,nil,LOCATION_GRAVE) then
-					Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
-				end
-			end
-		end
-	end
 end
