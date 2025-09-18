@@ -210,7 +210,6 @@ local function endPhaseSkill(code, op, con, both)
 end
 
 --重新开始
---[[
 oneTimeSkill(85852291, function(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.SelectYesNo(tp,aux.Stringid(43227,0)) then return end
 	local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
@@ -218,9 +217,12 @@ oneTimeSkill(85852291, function(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoDeck(g,nil,0,REASON_RULE)
 	Duel.ShuffleDeck(tp)
 	Duel.Draw(tp,ct,REASON_RULE)
+	Duel.SetLP(tp,2000)
+	Duel.SetLP(1-tp,Duel.GetLP(1-tp)+4000)
 end)
 
 --青眼白龙
+--[[
 local function lvcheck(c)
 	return c:IsFaceup() and c:IsLevelAbove(5)
 end
@@ -1792,7 +1794,7 @@ oneTimeSkill(77103950, function(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ShuffleExtra(tp)
 		Duel.ShuffleDeck(tp)
 	end
-end)
+end,true)
 --复制猫
 local function drcheck(c,tp)
 	return c:IsControler(tp) and c:IsReason(REASON_RULE)
