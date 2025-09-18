@@ -49,7 +49,7 @@ function c37343995.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c37343995.splimit(e,c)
-	return not c:IsSetCard(0x172) and c:IsLocation(LOCATION_EXTRA)
+	return not c:IsType(TYPE_XYZ) and c:IsLocation(LOCATION_EXTRA)
 end
 function c37343995.spfilter(c,e,tp)
 	return c:IsCode(16474916) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

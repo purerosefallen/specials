@@ -1,3 +1,4 @@
+--[[
 function aux.PreloadUds()
   local e1=Effect.GlobalEffect()
 	e1:SetDescription(aux.Stringid(58600555,2))
@@ -127,3 +128,4 @@ RITUAL = {
     c:RegisterEffect(e)
   end
 }
+]]--

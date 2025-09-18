@@ -67,8 +67,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			local sg=g:RandomSelect(tp,1)
 			Duel.SendtoGrave(sg,REASON_EFFECT+REASON_DISCARD)
 			g:RemoveCard(sg:GetFirst())
-			if g:GetCount()>0 and Duel.IsExistingMatchingCard(s.filter1,tp,LOCATION_MZONE,0,1,nil)
-			and Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_MZONE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+			if g:GetCount()>0 and (Duel.IsExistingMatchingCard(s.filter1,tp,LOCATION_MZONE,0,1,nil)
+			or Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_MZONE,0,1,nil)) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 				sg=g:Select(tp,1,1,nil)
 				Duel.SendtoGrave(sg,REASON_EFFECT+REASON_DISCARD)
