@@ -78,15 +78,16 @@ function s.GetLinkMaterials(tp,f,lc,e)
 	if mg2:GetCount()>0 then mg:Merge(mg2) end
 	return mg
 end
-function s.cfilter(c,tp)
-	return c:IsSetCard(0xdc) and c:IsType(TYPE_XYZ)
+function s.cfilter(c,lg,tp)
+	return c:IsSetCard(0xdc) and c:IsType(TYPE_XYZ) and lg:IsContains(c)
 		and not Duel.IsExistingMatchingCard(s.drfilter,tp,LOCATION_MZONE,0,1,c,c:GetCode())
 end
 function s.drfilter(c,code)
 	return c:IsFaceup() and c:IsCode(code)
 end
 function s.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.cfilter,1,nil,tp)
+	local lg=e:GetHandler():GetLinkedGroup()
+	return eg:IsExists(s.cfilter,1,nil,lg,tp)
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

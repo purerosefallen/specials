@@ -12,6 +12,31 @@ function c4408198.initial_effect(c)
 	e1:SetTarget(c4408198.target)
 	e1:SetOperation(c4408198.activate)
 	c:RegisterEffect(e1)
+	if not c4408198.global_check then
+		c4408198.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
+		ge1:SetCondition(c4408198.checkcon)
+		ge1:SetOperation(c4408198.checkop)
+		Duel.RegisterEffect(ge1,0)
+	end
+end
+function c4408198.checkcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(Card.IsSummonType,1,nil,SUMMON_TYPE_XYZ)
+end
+function c4408198.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local g=eg:Filter(Card.IsSummonType,nil,SUMMON_TYPE_XYZ)
+	local tc=g:GetFirst()
+	while tc do
+		if tc:IsSetCard(0x172) then
+			Duel.RegisterFlagEffect(tc:GetSummonPlayer(),4408198,RESET_PHASE+PHASE_END,0,1)
+		end
+		if Duel.GetFlagEffect(0,4408198)>1 and Duel.GetFlagEffect(1,4408198)>1 then
+			break
+		end
+		tc=g:GetNext()
+	end
 end
 function c4408198.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,800) end
@@ -37,6 +62,9 @@ function c4408198.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SelectTarget(tp,c4408198.spfilter1,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
+function c4408198.xyzfilter(c)
+	return c:IsSetCard(0x172) and c:IsXyzSummonable(nil)
+end
 function c4408198.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not aux.MustMaterialCheck(tc,tp,EFFECT_MUST_BE_XMATERIAL) then return end
@@ -53,5 +81,27 @@ function c4408198.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Overlay(sc,Group.FromCards(tc))
 		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		sc:CompleteProcedure()
+		Duel.AdjustAll()
+		if not Duel.CheckLPCost(tp,800) then return end
+		local b1=Duel.IsExistingMatchingCard(c4408198.xyzfilter,tp,LOCATION_EXTRA,0,1,nil)
+		local b2=Duel.GetFlagEffect(tp,4408198)>1 and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,nil)
+		local op=aux.SelectFromOptions(tp,
+			{b1,aux.Stringid(4408198,1)},
+			{b2,aux.Stringid(4408198,2)},
+			{true,aux.Stringid(4408198,3)})
+		if op==1 then
+			Duel.BreakEffect()
+			Duel.PayLPCost(tp,800)
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+			local g=Duel.SelectMatchingCard(tp,c4408198.xyzfilter,tp,LOCATION_EXTRA,0,1,1,nil)
+			Duel.XyzSummon(tp,g:GetFirst(),nil)
+		elseif op==2 then
+			Duel.BreakEffect()
+			Duel.PayLPCost(tp,800)
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+			local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,1,nil)
+			Duel.HintSelection(g)
+			Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+		end
 	end
 end

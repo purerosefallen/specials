@@ -39,10 +39,21 @@ function c98884569.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,c98884569.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
+function c98884569.syncfilter(c)
+	return c:IsType(TYPE_SYNCHRO) and c:IsSynchroSummonable(nil)
+end
 function c98884569.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+		Duel.AdjustAll()
+		if Duel.IsExistingMatchingCard(c98884569.syncfilter,tp,LOCATION_EXTRA,0,1,nil)
+			and Duel.SelectYesNo(tp,aux.Stringid(98884569,2)) then
+			Duel.BreakEffect()
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+			local sg=Duel.SelectMatchingCard(tp,c98884569.syncfilter,tp,LOCATION_EXTRA,0,1,1,nil,tp)
+			Duel.SynchroSummon(tp,sg:GetFirst(),nil)
+		end
 	end
 end
 function c98884569.spcon(e,tp,eg,ep,ev,re,r,rp)
