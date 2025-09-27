@@ -51,7 +51,7 @@ function c35209994.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c35209994.thfilter(c)
-	return c:IsSetCard(0x100a) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(0xa) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c35209994.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c35209994.thfilter,tp,LOCATION_DECK,0,1,nil) end

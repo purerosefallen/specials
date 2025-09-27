@@ -7,6 +7,7 @@ function c72429240.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,72429240)
 	e1:SetCost(c72429240.cost)
 	e1:SetTarget(c72429240.target)
 	e1:SetOperation(c72429240.operation)
@@ -51,7 +52,7 @@ function c72429240.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c72429240.costfilter(c)
-	return c:IsSetCard(0x100a) and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()
+	return c:IsSetCard(0xa) and c:IsType(TYPE_NORMAL) and c:IsAbleToGraveAsCost()
 end
 function c72429240.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c72429240.costfilter,tp,LOCATION_DECK,0,1,nil) end
