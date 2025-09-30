@@ -10,7 +10,7 @@ function aux.PreloadUds()
 			if not Duel.GetRegistryValue(key) and Duel.SelectYesNo(tp,1297) then
 				local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 				Duel.SendtoDeck(g,nil,0,REASON_RULE)
-				local sg=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_DECK,0,3,3,nil)
+				local sg=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_DECK,0,4,4,nil)
 				Duel.SendtoHand(sg,nil,REASON_RULE)
 				Duel.ShuffleDeck(tp)
 				Duel.SetRegistryValue(key, '1')
