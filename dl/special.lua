@@ -1795,6 +1795,61 @@ oneTimeSkill(77103950, function(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ShuffleDeck(tp)
 	end
 end,true)
+--高速模式
+function handmatval(e,c)
+    return c:IsType(TYPE_TUNER)
+end
+oneTimeSkill(92450185, function(e,tp,eg,ep,ev,re,r,rp)
+	local fd1=Duel.CreateToken(tp,1003840)
+	local fd2=Duel.CreateToken(tp,36742774)
+	local ofd1=Duel.CreateToken(1-tp,1003840)
+	local ofd2=Duel.CreateToken(1-tp,36742774)
+	local ct = tp==0 and 3 or 4 
+	local tg=Group.FromCards(fd1,fd2)
+	local og=Group.FromCards(ofd1,ofd2)
+	local fc=Duel.GetFieldCard(tp,LOCATION_FZONE,0)
+	if fc then
+		Duel.SendtoGrave(fc,REASON_RULE)
+		Duel.BreakEffect()
+	end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
+	local tc=tg:Select(tp,1,1,nil):GetFirst()
+	Duel.MoveToField(tc,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
+
+	if tc:IsCode(36742774) then
+		tc:AddCounter(0x104d,ct)
+	end
+	local fc2=Duel.GetFieldCard(1-tp,LOCATION_FZONE,0)
+	if fc2 then
+		Duel.SendtoGrave(fc2,REASON_RULE)
+		Duel.BreakEffect()
+	end
+	local otc=og:Filter(Card.IsCode,nil,tc:GetCode()):GetFirst()
+	Duel.MoveToField(otc,tp,1-tp,LOCATION_FZONE,POS_FACEUP,true)
+	if otc:IsCode(36742774) then
+		otc:AddCounter(0x104d,ct)
+	end
+	local g=Duel.GetMatchingGroup(Card.IsType,tp,0xff,0xff,nil,TYPE_TUNER)
+	for dc in aux.Next(g) do
+		local e1=Effect.CreateEffect(dc)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_EXTRA_SYNCHRO_MATERIAL)
+		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e1:SetRange(LOCATION_HAND)
+		e1:SetValue(aux.TRUE)
+		dc:RegisterEffect(e1,true)
+	end
+end,true)
+
+local function counterop(e,tp)
+	local sg=Duel.GetFieldGroup(tp,LOCATION_FZONE,LOCATION_FZONE)
+	for tc in aux.Next(sg) do
+		if tc and tc:IsCanAddCounter(0x104d,1) then
+			tc:AddCounter(0x104d,1)
+		end
+	end
+end
+standbyPhaseSkill(92450185, counterop, nil, true)
 --复制猫
 local function drcheck(c,tp)
 	return c:IsControler(tp) and c:IsReason(REASON_RULE)
