@@ -64,7 +64,7 @@ function c48905154.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local og=c:GetOverlayGroup()
 	if chk==0 then return c:CheckRemoveOverlayCard(tp,1,REASON_COST) or (og and og:IsExists(Card.IsCode,1,nil,48905154)) end
-	if not (og and og:IsExists(Card.IsCode,1,nil,48905154) then
+	if not (og and og:IsExists(Card.IsCode,1,nil,48905154)) then
 		e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 	end
 	c:RegisterFlagEffect(48905154,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)

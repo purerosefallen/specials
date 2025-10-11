@@ -34,20 +34,17 @@ function c13073850.initial_effect(c)
 	e5:SetCode(EFFECT_SUMMON_COST)
 	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e5:SetOperation(c13073850.lvop)
-	c:RegisterEffect(e5)
 	local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_SINGLE)
 	e6:SetCode(EFFECT_SPSUMMON_COST)
 	e6:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e6:SetOperation(c13073850.lvop2)
-	c:RegisterEffect(e6)
 	--immune
 	local e7=Effect.CreateEffect(c)
 	e7:SetType(EFFECT_TYPE_SINGLE)
 	e7:SetCode(EFFECT_IMMUNE_EFFECT)
 	e7:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE)
 	e7:SetRange(LOCATION_MZONE)
-	e7:SetCondition(c13073850.immcon)
 	e7:SetValue(aux.qlifilter)
 	c:RegisterEffect(e7)
 	--tohand
@@ -134,7 +131,7 @@ function c13073850.immcon(e)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_NORMAL)
 end
 function c13073850.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_ADVANCE) and e:GetLabel()==1
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_ADVANCE)
 end
 function c13073850.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsAbleToHand() end
