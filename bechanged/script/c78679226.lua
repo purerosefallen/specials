@@ -26,11 +26,16 @@ end
 function s.mfilter(c)
 	return c:IsFaceup() and aux.IsCodeListed(c,79791878) and c:IsType(TYPE_MONSTER)
 end
+function s.lvfilter(c)
+	return c:IsFaceup() and c:IsSetCard(0x41) and c:IsType(TYPE_MONSTER)
+end
 function s.ndcon(e,tp,eg,ep,ev,re,r,rp)
 	return not s.dcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.dcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(s.sfilter,tp,LOCATION_ONFIELD,0,1,nil) and Duel.IsExistingMatchingCard(s.mfilter,tp,LOCATION_MZONE,0,1,nil)
+	return ((Duel.GetCurrentPhase()>=PHASE_BATTLE_START and Duel.GetCurrentPhase()<=PHASE_BATTLE)
+	and Duel.IsExistingMatchingCard(s.sfilter,tp,LOCATION_ONFIELD,0,1,nil) and Duel.IsExistingMatchingCard(s.mfilter,tp,LOCATION_MZONE,0,1,nil))
+	or (Duel.IsExistingMatchingCard(s.lvfilter,tp,LOCATION_MZONE,0,1,nil))
 end
 function s.filter(c)
 	return aux.IsCodeListed(c,79791878) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()

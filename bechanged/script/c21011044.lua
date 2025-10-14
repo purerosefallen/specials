@@ -30,7 +30,7 @@ function c21011044.initial_effect(c)
 	e2:SetCondition(c21011044.spcon)
 	e2:SetTarget(c21011044.sptg)
 	e2:SetOperation(c21011044.spop)
-	c:RegisterEffect(e2)
+	--c:RegisterEffect(e2)
 end
 c21011044.fusion_effect=true
 function c21011044.cfilter(c,tp)

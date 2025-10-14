@@ -58,7 +58,7 @@ function s.spcon(e,c)
 	if c==nil then return true end
 	if Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)<=0 then return false end
 	local g=Duel.GetMatchingGroup(s.spfilter,c:GetControler(),LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_EXTRA+LOCATION_REMOVED,0,nil)
-	return g:GetClassCount(Card.GetCode)==7
+	return g:GetClassCount(Card.GetCode)>=7
 end
 --search
 function s.filter(c)
