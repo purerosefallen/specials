@@ -15,8 +15,9 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
-	e2:SetCountLimit(1,id+1)
-	e2:SetOperation(s.regop)
+	e2:SetCountLimit(1,id)
+	e2:SetTarget(s.tgtg)
+	e2:SetOperation(s.tgop)
 	c:RegisterEffect(e2)
 	--spsummon condition
 	local e3=Effect.CreateEffect(c)
@@ -38,26 +39,34 @@ end
 
 
 --tograve
-function s.regop(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_PHASE+PHASE_END)
-	e1:SetCountLimit(1)
-	e1:SetOperation(s.tgop)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
+function s.tgfilter(c)
+	return c:IsSetCard(0x16) and c:IsRace(RACE_MACHINE) and c:IsAbleToGrave()
 end
-function s.filter(c)
-	return c:IsSetCard(0x16) and c:IsAbleToGrave()
+function s.tgfilter2(c)
+	return c:IsSetCard(0x16) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
+end
+function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK+LOCATION_HAND)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_CARD,0,id)
+	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil)
-	if #g>0 then
-		Duel.SendtoGrave(g,nil,REASON_EFFECT)
-	end
+	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil)
+	local tc=g:GetFirst()
+	if tc and Duel.SendtoGrave(tc,REASON_EFFECT)~=0 and tc:IsLocation(LOCATION_GRAVE) then
+		if re:IsActiveType(TYPE_SPELL) and c:IsSummonType(SUMMON_TYPE_FUSION) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) and Duel.IsExistingMatchingCard(s.tgfilter2,tp,LOCATION_DECK,0,1,nil) then
+			Duel.BreakEffect()
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+			local g1=Duel.SelectMatchingCard(tp,s.tgfilter2,tp,LOCATION_DECK,0,1,1,nil)
+			if g1:GetCount()>0 then
+			Duel.SendtoGrave(g1,REASON_EFFECT)  
+			end
+		end
+	 end
 end
+
 --spcon
 function s.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA) or aux.fuslimit(e,se,sp,st)

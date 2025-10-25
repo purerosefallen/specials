@@ -40,7 +40,7 @@ function c12678870.initial_effect(c)
 	e5:SetCost(c12678870.rmcost)
 	e5:SetTarget(c12678870.rmtg)
 	e5:SetOperation(c12678870.rmop)
-	c:RegisterEffect(e2e5)
+	c:RegisterEffect(e5)
 end
 function c12678870.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToExtraAsCost() end
