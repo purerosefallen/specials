@@ -1,18 +1,18 @@
 --卡车机人
 function c61538782.initial_effect(c)
-	--tohand
+	--tograve
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(61538782,0))
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e1:SetCode(EVENT_TO_HAND)
+   e1:SetCategory(CATEGORY_TOGRAVE)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_HAND+LOCATION_MZONE)
 	e1:SetCountLimit(1,61538782)
-	e1:SetCondition(c61538782.thcon)
-	e1:SetTarget(c61538782.thtg)
-	e1:SetOperation(c61538782.thop)
+	e1:SetCost(c61538782.tgcost)
+	e1:SetTarget(c61538782.tgtg)
+	e1:SetOperation(c61538782.tgop)
 	c:RegisterEffect(e1)
-	-----zhongkaizhuang
+	Duel.AddCustomActivityCounter(61538782,ACTIVITY_SPSUMMON,c61538782.counterfilter)
+	--armourxyz
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(61538782,1))
 	e2:SetCategory(CATEGORY_EQUIP)
@@ -24,43 +24,55 @@ function c61538782.initial_effect(c)
 	e2:SetOperation(c61538782.eqop)
 	c:RegisterEffect(e2)
 end
+function c61538782.counterfilter(c)
+	return not c:IsSummonLocation(LOCATION_EXTRA) or c:IsType(TYPE_FUSION)
+end
 
------------1
-function c61538782.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_DRAW)
-		and e:GetHandler():IsPreviousLocation(LOCATION_DECK+LOCATION_GRAVE)
+function c61538782.tgfilter(c)
+	return c:IsSetCard(0x16) and not  c:IsAttribute(ATTRIBUTE_WIND) and c:IsAbleToGrave()
 end
-function c61538782.filter(c)
-	return c:IsSetCard(0x16) and c:IsType(TYPE_MONSTER) and not c:IsCode(61538782) and c:IsAbleToHand()
+function c61538782.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetCustomActivityCount(61538782,tp,ACTIVITY_SPSUMMON)==0 and c:IsAbleToGraveAsCost() end
+	Duel.SendtoGrave(c,REASON_COST)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(c61538782.splimit)
+	Duel.RegisterEffect(e1,tp)
 end
-function c61538782.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c61538782.filter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+function c61538782.splimit(e,c,sump,sumtype,sumpos,targetp,se)
+	return not c:IsType(TYPE_FUSION) and c:IsLocation(LOCATION_EXTRA)
 end
-function c61538782.thop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c61538782.filter,tp,LOCATION_DECK,0,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
+function c61538782.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c61538782.tgfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK+LOCATION_HAND)
+end
+function c61538782.tgop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,c61538782.tgfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil)
+	if #g>0 then
+		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end
 
-----------2
 
-function c61538782.tgfilter(c,tp)
+function c61538782.targetfilter(c,tp)
 	return c:IsFaceup() and c:IsSetCard(0x16) and c:IsRace(RACE_MACHINE) and Duel.IsExistingMatchingCard(c61538782.eqfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,c)
 end
 function c61538782.eqfilter(c,tp)
 	return c:IsFaceup() and c:CheckUniqueOnField(tp) and not c:IsForbidden()
 end
 function c61538782.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c61538782.tgfilter(chkc,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c61538782.targetfilter(chkc,tp) end
 	if chk==0 then
 		local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
-		return ft>0 and Duel.IsExistingTarget(c61538782.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,tp) end
+		return ft>0 and Duel.IsExistingTarget(c61538782.targetfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,c61538782.tgfilter,tp,LOCATION_MZONE,0,1,1,nil,tp)
+	local g=Duel.SelectTarget(tp,c61538782.targetfilter,tp,LOCATION_MZONE,0,1,1,nil,tp)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
 end
 function c61538782.eqop(e,tp,eg,ep,ev,re,r,rp)
@@ -79,7 +91,6 @@ function c61538782.eqop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(c61538782.eqlimit)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		ec:RegisterEffect(e1)
-		--
 		local e2=Effect.CreateEffect(ec)
 		e2:SetType(EFFECT_TYPE_EQUIP)
 		e2:SetCode(EFFECT_UPDATE_ATTACK)

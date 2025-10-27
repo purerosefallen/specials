@@ -2,16 +2,8 @@
 function c63519819.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcCode2(c,64631466,27125110,true,true)
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_FIELD)
-	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e0:SetCode(EFFECT_SPSUMMON_PROC)
-	e0:SetRange(LOCATION_EXTRA)
-	e0:SetCondition(c63519819.hspcon)
-	e0:SetTarget(c63519819.hsptg)
-	e0:SetOperation(c63519819.hspop)
-	c:RegisterEffect(e0)
+	aux.AddMaterialCodeList(c,64631466,27125110)
+	aux.AddFusionProcFun2(c,c63519819.ffilter,aux.FilterBoolFunction(Card.IsRace,RACE_ILLUSION+RACE_FIEND+RACE_SPELLCASTER),true)
 	--equip
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(63519819,0))
@@ -52,29 +44,18 @@ function c63519819.initial_effect(c)
 	e5:SetCondition(c63519819.adcon)
 	e5:SetValue(c63519819.defval)
 	c:RegisterEffect(e5)
+	--
+	local e6=Effect.CreateEffect(c)
+	e6:SetType(EFFECT_TYPE_FIELD)
+	e6:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e6:SetRange(LOCATION_MZONE)
+	e6:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e6:SetTarget(c63519819.indtg)
+	e6:SetValue(1)
+	c:RegisterEffect(e6)
 end
-function c63519819.hspfilter(c,tp,sc)
-	return c:GetOriginalCode()==27125110
-		and c:IsControler(tp) and Duel.GetLocationCountFromEx(tp,tp,c,sc)>0
-		and c:IsCanBeFusionMaterial(sc,SUMMON_TYPE_SPECIAL)
-end
-function c63519819.hspcon(e,c)
-	if c==nil then return true end
-	return Duel.CheckReleaseGroupEx(c:GetControler(),c63519819.hspfilter,1,REASON_SPSUMMON,false,nil,c:GetControler(),c)
-end
-function c63519819.hsptg(e,tp,eg,ep,ev,re,r,rp,chk,c)
-	local g=Duel.GetReleaseGroup(tp,false,REASON_SPSUMMON):Filter(c63519819.hspfilter,nil,tp,c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local tc=g:SelectUnselect(nil,tp,false,true,1,1)
-	if tc then
-		e:SetLabelObject(tc)
-		return true
-	else return false end
-end
-function c63519819.hspop(e,tp,eg,ep,ev,re,r,rp,c)
-	local tc=e:GetLabelObject()
-	c:SetMaterial(Group.FromCards(tc))
-	Duel.Release(tc,REASON_SPSUMMON)
+function c63519819.ffilter(c)
+	return c:IsCode(64631466,27125110)
 end
 function c63519819.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -113,14 +94,6 @@ function c63519819.equip_monster(c,tp,tc)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	e1:SetValue(c63519819.eqlimit)
 	tc:RegisterEffect(e1)
-	--substitute
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_EQUIP)
-	e2:SetCode(EFFECT_DESTROY_SUBSTITUTE)
-	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-	e2:SetValue(c63519819.repval)
-	tc:RegisterEffect(e2)
 end
 function c63519819.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -159,4 +132,8 @@ function c63519819.defval(e,c)
 	else
 		return def
 	end
+end
+function c63519819.indtg(e,c)
+	local tc=e:GetHandler()
+	return c==tc or c==tc:GetBattleTarget()
 end
