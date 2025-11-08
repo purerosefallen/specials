@@ -74,7 +74,7 @@ function c4896788.drop1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
 function c4896788.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsCode(55144522)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and (re:GetHandler():IsCode(55144522) or re:GetHandler():IsCode(3972721))
 end
 function c4896788.drop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsPlayerCanDraw(rp,1) and Duel.SelectYesNo(rp,aux.Stringid(4896788,0)) then

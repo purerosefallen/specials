@@ -4,7 +4,7 @@ function c5352328.initial_effect(c)
 	--draw
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(5352328,0))
-	e1:SetCategory(CATEGORY_DRAW+CATEGORY_RECOVER)
+	e1:SetCategory(CATEGORY_DRAW+CATEGORY_RECOVER+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,5352328)
@@ -21,6 +21,7 @@ function c5352328.initial_effect(c)
 	e2:SetCode(EVENT_LEAVE_GRAVE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,5352329)
+	e2:SetCondition(c5352328.spcon)
 	e2:SetTarget(c5352328.sptg)
 	e2:SetOperation(c5352328.spop)
 	c:RegisterEffect(e2)
@@ -33,20 +34,26 @@ function c5352328.effcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c5352328.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
-	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function c5352328.cfilter1(c)
 	return c:IsFaceup() and c:IsCode(79858629)
 end
 function c5352328.effop(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	if Duel.Draw(p,d,REASON_EFFECT)>0
-		and Duel.IsExistingMatchingCard(c5352328.cfilter1,tp,LOCATION_ONFIELD,0,1,nil) then
+	if not Duel.Draw(tp,1,REASON_EFFECT) then return end
+	local dg=Duel.GetOperatedGroup()
+		local dc=dg:GetFirst()
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and dc:IsCanBeSpecialSummoned(e,0,tp,false,false)
+			and Duel.SelectYesNo(tp,aux.Stringid(5352328,2)) then
+			Duel.SpecialSummon(dc,0,tp,tp,false,false,POS_FACEUP)
+		end
+		if Duel.IsExistingMatchingCard(c5352328.cfilter1,tp,LOCATION_ONFIELD,0,1,nil) then
 		Duel.BreakEffect()
 		Duel.Recover(tp,800,REASON_EFFECT)
-	end
+		end
+end
+function c5352328.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return rp==1-tp
 end
 function c5352328.spfilter(c,e,tp,mc)
 	return c:IsSetCard(0x172) and c:IsType(TYPE_XYZ) and mc:IsCanBeXyzMaterial(c)

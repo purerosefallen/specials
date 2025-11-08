@@ -15,6 +15,9 @@ function s.spfilter(c,e,tp)
 	return c:IsAttack(1500) and c:IsDefense(2100) and c:IsType(TYPE_MONSTER)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
+function s.spfilter2(c,e,tp)
+	return c:IsCode(56099748) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
 function s.tdfilter1(c)
 	return c:IsCode(56099748)
 end
@@ -37,50 +40,46 @@ end
 function s.tdfilter(c)
 	return (s.tdfilter1(c) or s.tdfilter2(c)) and c:IsFaceupEx() and c:IsAbleToDeck()
 end
-function s.sspfilter(c,e,tp)
-	return c:IsCode(56099748) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
 	if chk==0 and b1 then return true end
-	local b3=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.sspfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp)
-	if chk==0 and b3 then return true end
+	local b2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp)
 	local g=Duel.GetMatchingGroup(s.tdfilter,tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
 	aux.GCheckAdditional=s.gcheck
-	local b2=Duel.IsExistingMatchingCard(s.synfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,nil)
+	local b3=Duel.IsExistingMatchingCard(s.synfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,nil)
 		and g:CheckSubGroup(s.tdcheck,5,5,e,tp)
 	aux.GCheckAdditional=nil
 	if chk==0 then return b1 or b2 or b3 end
-	local op=0
-	if b1 or b2 then
-		op=aux.SelectFromOptions(tp,
-			{b1,aux.Stringid(id,0),0},
-			{b2,aux.Stringid(id,1),1},
-			{b3,aux.Stringid(id,2),2})
-	end
+	local op=aux.SelectFromOptions(tp,{b1,aux.Stringid(id,0)},{b2,aux.Stringid(id,1)},{b3,aux.Stringid(id,2)})
 	e:SetLabel(op)
-	if op==0 then
+	if op==1 then
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
-	elseif op==1 then
-		e:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TODECK)
-		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
-		Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,5,tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_REMOVED)
 	elseif op==2 then
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
+	else
+		e:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TODECK)
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+		Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,5,tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_REMOVED)
 	end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetLabel()==0 then
+	if e:GetLabel()==1 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 		if g:GetCount()>0 then
 			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		end
-	elseif e:GetLabel()==1 then
+	elseif e:GetLabel()==2 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter2),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
+		if g:GetCount()>0 then
+			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+		end
+	else
 		local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.tdfilter),tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local sg=g:SelectSubGroup(tp,s.tdcheck,false,5,5,e,tp)
@@ -95,13 +94,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 					tc:CompleteProcedure()
 				end
 			end
-		end
-	else
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,s.sspfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-		if g:GetCount()>0 then
-			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
 end

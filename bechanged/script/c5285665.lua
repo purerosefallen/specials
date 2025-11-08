@@ -1,13 +1,19 @@
 --E・HERO バブルマン・ネオ
 ---@param c Card
 function c5285665.initial_effect(c)
-	local e0=Effect.CreateEffect(c)
-	e0:SetDescription(aux.Stringid(5285665,0))
-	e0:SetType(EFFECT_TYPE_FIELD)
-	e0:SetCode(EFFECT_SPSUMMON_PROC)
-	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e0:SetRange(LOCATION_HAND)
-	c:RegisterEffect(e0)
+	aux.AddCodeList(c,46411259)
+	c:EnableReviveLimit()
+	--special summon
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_SPSUMMON_PROC)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e1:SetRange(LOCATION_HAND+LOCATION_DECK)
+	e1:SetCondition(c5285665.spcon)
+	e1:SetTarget(c5285665.sptg)
+	e1:SetOperation(c5285665.spop)
+	e1:SetValue(SUMMON_VALUE_SELF)
+	c:RegisterEffect(e1)
 	--destroy
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DESTROY)
@@ -34,12 +40,39 @@ function c5285665.initial_effect(c)
 	e3:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
 	e3:SetValue(1)
 	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(5285665,1))
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e4:SetOperation(c5285665.setop)
-	c:RegisterEffect(e4)
+	--set
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e5:SetCountLimit(1,5285665)
+	e5:SetTarget(c5285665.settg)
+	e5:SetOperation(c5285665.setop)
+	c:RegisterEffect(e5)
+end
+function c5285665.spfilter(c,tp,f)
+	return f(c) and (c:IsType(TYPE_MONSTER) and c:IsSetCard(0x3008) or aux.IsSetNameMonsterListed(c,0x3008)) and not c:IsCode(5285665) and c:IsControler(tp) and Duel.GetMZoneCount(tp,c)>0
+end
+function c5285665.spcon(e,c)
+	if c==nil then return true end
+	local tp=c:GetControler()
+	return c:IsLocation(LOCATION_HAND) or Duel.IsExistingMatchingCard(c5285665.spfilter,tp,LOCATION_ONFIELD,0,1,c,tp,Card.IsAbleToGraveAsCost)
+end
+function c5285665.sptg(e,tp,eg,ep,ev,re,r,rp,chk,c)
+	if c:IsLocation(LOCATION_DECK) then
+		local g=Duel.GetMatchingGroup(c5285665.spfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,c,tp,Card.IsAbleToGraveAsCost)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		local tc=g:SelectUnselect(nil,tp,false,true,1,1)
+		if tc then
+			e:SetLabelObject(tc)
+			return true
+		else return false end
+	elseif c:IsLocation(LOCATION_HAND) then return true end
+end
+function c5285665.spop(e,tp,eg,ep,ev,re,r,rp,c)
+	if c:IsLocation(LOCATION_DECK) then
+		local g=e:GetLabelObject()
+		Duel.Release(g,REASON_SPSUMMON)
+	else return true end
 end
 function c5285665.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local bc=e:GetHandler():GetBattleTarget()
@@ -53,13 +86,13 @@ function c5285665.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c5285665.setfilter(c)
-	return (c:IsType(TYPE_SPELL+TYPE_TRAP) and aux.IsSetNameMonsterListed(c,0x3008) or c:IsCode(24094653)) and c:IsSSetable()
+	return (aux.IsSetNameMonsterListed(c,0x3008) and c:IsType(TYPE_SPELL+TYPE_TRAP) or c:IsCode(46411259)) and c:IsSSetable()
+end
+function c5285665.settg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c5285665.setfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
 end
 function c5285665.setop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectMatchingCard(tp,c5285665.setfilter,tp,LOCATION_DECK,0,1,1,nil)
-	local tc=g:GetFirst()
-	if tc then
-		Duel.SSet(tp,tc)
-	end
+	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c5285665.setfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil):GetFirst()
+	if tc then Duel.SSet(tp,tc) end
 end

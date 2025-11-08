@@ -21,7 +21,7 @@ function c88619463.initial_effect(c)
 	--negate
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(88619463,0))
-	e3:SetCategory(CATEGORY_NEGATE)
+	e3:SetCategory(CATEGORY_TODECK+CATEGORY_NEGATE+CATEGORY_DRAW)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_CHAINING)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
@@ -30,14 +30,17 @@ function c88619463.initial_effect(c)
 	e3:SetTarget(c88619463.distg)
 	e3:SetOperation(c88619463.disop)
 	c:RegisterEffect(e3)
+	--手坑
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(29436665,0))
-	e5:SetCategory(CATEGORY_TODECK+CATEGORY_NEGATE+CATEGORY_DRAW)
+	e5:SetCategory(CATEGORY_DECKDES+CATEGORY_NEGATE+CATEGORY_SPECIAL_SUMMON)
 	e5:SetType(EFFECT_TYPE_QUICK_O)
 	e5:SetRange(LOCATION_HAND)
 	e5:SetCode(EVENT_CHAINING)
+	e5:SetCountLimit(1,EFFECT_COUNT_CODE_CHAIN)
 	e5:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e5:SetCondition(c88619463.condition)
+	e5:SetCost(c88619463.cost)
 	e5:SetTarget(c88619463.target)
 	e5:SetOperation(c88619463.operation)
 	c:RegisterEffect(e5)
@@ -72,7 +75,7 @@ function c88619463.spop(e,tp,eg,ep,ev,re,r,rp,c)
 end
 function c88619463.discon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
-		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_TRAP) and Duel.IsChainNegatable(ev)
+		and re:IsActiveType(TYPE_TRAP+TYPE_SPELL) and Duel.IsChainNegatable(ev)
 end
 function c88619463.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -88,18 +91,46 @@ function c88619463.disop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c88619463.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceupEx,Card.IsCode),tp,LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil,46986414)
-		and ep~=tp and re:IsActiveType(TYPE_TRAP) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE)
+		and re:IsActiveType(TYPE_TRAP+TYPE_SPELL) and Duel.IsChainNegatable(ev)
+end
+function c88619463.costfilter(c)
+	return c:IsRace(RACE_SPELLCASTER) and c:IsAbleToGraveAsCost()
+end
+function c88619463.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToGraveAsCost() and
+		Duel.IsExistingMatchingCard(c88619463.costfilter,tp,LOCATION_HAND,0,1,c) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,c88619463.costfilter,tp,LOCATION_HAND,0,1,1,c)
+	g:AddCard(c)
+	Duel.SendtoGrave(g,REASON_COST)
 end
 function c88619463.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToDeck()
 		and Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
+function c88619463.heimoshu(c,e,tp)
+	return c:IsCode(46986414) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
+end
 function c88619463.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.SendtoDeck(e:GetHandler(),nil,SEQ_DECKSHUFFLE,REASON_EFFECT)~=0 and e:GetHandler():IsLocation(LOCATION_DECK)
-		and Duel.NegateActivation(ev) then
-		Duel.BreakEffect()
-		Duel.Draw(tp,1,REASON_EFFECT)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,c88619463.heimoshu,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+	local tc=g:GetFirst()
+	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_DEFENSE) then
+		local c=e:GetHandler()
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e3:SetReset(RESET_EVENT+RESETS_REDIRECT)
+		e3:SetValue(LOCATION_REMOVED)
+		tc:RegisterEffect(e3,true)
+		if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
+		Duel.Destroy(eg,REASON_EFFECT)
+		end
 	end
+	Duel.SpecialSummonComplete()
 end

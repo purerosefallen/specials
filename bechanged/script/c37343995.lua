@@ -13,6 +13,7 @@ function c37343995.initial_effect(c)
 	e1:SetTarget(c37343995.sptg)
 	e1:SetOperation(c37343995.spop)
 	c:RegisterEffect(e1)
+	Duel.AddCustomActivityCounter(37343995,ACTIVITY_SPSUMMON,c37343995.counterfilter)
 	--special summon
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(37343995,1))
@@ -25,10 +26,9 @@ function c37343995.initial_effect(c)
 	e2:SetTarget(c37343995.xyztg)
 	e2:SetOperation(c37343995.xyzop)
 	c:RegisterEffect(e2)
-	Duel.AddCustomActivityCounter(37343995,ACTIVITY_SPSUMMON,c37343995.counterfilter)
 end
 function c37343995.counterfilter(c)
-	return not c:IsSummonLocation(LOCATION_EXTRA) or c:IsType(TYPE_XYZ)
+	return not c:IsSummonLocation(LOCATION_EXTRA) or c:IsSetCard(0x172)
 end
 function c37343995.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
@@ -49,7 +49,7 @@ function c37343995.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c37343995.splimit(e,c)
-	return not c:IsType(TYPE_XYZ) and c:IsLocation(LOCATION_EXTRA)
+	return not c:IsSetCard(0x172) and c:IsLocation(LOCATION_EXTRA)
 end
 function c37343995.spfilter(c,e,tp)
 	return c:IsCode(16474916) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

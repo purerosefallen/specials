@@ -21,17 +21,14 @@ function c52020510.initial_effect(c)
 	e2:SetCost(aux.bfgcost)
 	e2:SetOperation(c52020510.cdop)
 	c:RegisterEffect(e2)
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(52020510,2))
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
-	e4:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e4:SetCost(c52020510.actcost)
-	c:RegisterEffect(e4)
-end
-function c52020510.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
+	--act in set turn
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e3:SetCost(c52020510.cost)
+	e3:SetDescription(aux.Stringid(52020510,0))
+	c:RegisterEffect(e3)
 end
 function c52020510.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

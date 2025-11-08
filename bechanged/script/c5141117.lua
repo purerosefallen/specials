@@ -9,7 +9,7 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetValue(s.splimit)
 	c:RegisterEffect(e1)
-    --hand synchro
+	--hand synchro
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_EXTRA_SYNCHRO_MATERIAL)
@@ -18,7 +18,7 @@ function s.initial_effect(c)
 	e0:SetCountLimit(1,id)
 	e0:SetValue(s.matval)
 	c:RegisterEffect(e0)
-    --register HOpT
+	--register HOpT
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e4:SetCode(EVENT_BE_PRE_MATERIAL)
@@ -91,23 +91,23 @@ function s.gcheck(sg)
 	return sg:FilterCount(Card.IsLocation,nil,LOCATION_FZONE)==1
 end
 function s.rmfilter(c)
-	return c:IsAbleToRemove() and  c:IsType(TYPE_MONSTER)
+	return c:IsAbleToRemove() and c:IsType(TYPE_MONSTER)
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE+LOCATION_GRAVE) and chkc:IsAbleToRemove() and chkc:IsControler(1-tp) end
 	if chk==0 then return Duel.IsExistingTarget(s.rmfilter,tp,0,LOCATION_MZONE+LOCATION_GRAVE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local sg=g:SelectTarget(tp,s.rmfilter,tp,0,LOCATION_MZONE,1,1,nil)
+	local sg=Duel.SelectTarget(tp,s.rmfilter,tp,0,LOCATION_MZONE+LOCATION_GRAVE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,sg,#sg,0,0)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	if #g>0 and Duel.Remove(g,POS_FACEUP,REASON_EFFECT)~=0 then
 		if Duel.GetFieldGroupCount(tp,LOCATION_FZONE,LOCATION_FZONE)~=0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
-            Duel.BreakEffect()
-            Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-            local tg=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,LOCATION_FZONE,LOCATION_FZONE,1,1,nil)
-            Duel.Remove(tg,POS_FACEUP,REASON_EFFECT)
-        else return end
+			Duel.BreakEffect()
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+			local tg=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,LOCATION_FZONE,LOCATION_FZONE,1,1,nil)
+			Duel.Remove(tg,POS_FACEUP,REASON_EFFECT)
+		else return end
 	end
 end

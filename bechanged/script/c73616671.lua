@@ -17,9 +17,9 @@ function c73616671.cosfilter(c)
 	return (c:IsRace(RACE_SPELLCASTER) or (aux.IsCodeListed(c,46986414) and c:IsType(TYPE_SPELL+TYPE_TRAP))) and c:IsAbleToGraveAsCost()
 end
 function c73616671.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c73616671.cosfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,e:GetHandler()) end
-	local g=Duel.SelectMatchingCard(tp,c73616671.cosfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,1,e:GetHandler())
-	Duel.SendtoGrave(g,REASON_COST)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsRace,1,nil,RACE_SPELLCASTER) end
+	local g=Duel.SelectReleaseGroup(tp,Card.IsRace,1,1,nil,RACE_SPELLCASTER)
+	Duel.Release(g,REASON_COST)
 end
 function c73616671.filter(c)
 	return (c:IsCode(46986414) or aux.IsCodeListed(c,46986414)) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()

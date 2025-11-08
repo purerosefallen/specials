@@ -18,7 +18,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_HAND)
 	e2:SetCost(s.discost)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetCountLimit(1,EFFECT_COUNT_CODE_DUEL)
+	e2:SetCountLimit(1,id+EFFECT_COUNT_CODE_DUEL)
 	c:RegisterEffect(e2)
 end
 function s.filter(c)

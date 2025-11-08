@@ -29,7 +29,7 @@ function c93854893.initial_effect(c)
 	e3:SetCost(c93854893.cost)
 	e3:SetTarget(c93854893.target)
 	e3:SetOperation(c93854893.operation)
-	c:RegisterEffect(e3)
+	--c:RegisterEffect(e3)
 end
 function c93854893.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -57,7 +57,7 @@ function c93854893.ovfilter(c)
 		(c:IsSetCard(0x11b) and c:IsType(TYPE_LINK) or c:IsAttribute(ATTRIBUTE_WATER) and c:IsRace(RACE_SPELLCASTER) and c:IsType(TYPE_SYNCHRO))
 end
 function c93854893.ofilter(c)
-	return c:IsFaceup() and c:IsRace(RACE_MACHINE) and c:IsType(TYPE_MONSTER) and c:IsCanOverlay()
+	return c:IsFaceup() and (c:IsRace(RACE_MACHINE) or c:IsSetCard(0xfe)) and c:IsType(TYPE_MONSTER) and c:IsCanOverlay()
 end
 function c93854893.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b1=Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,0,LOCATION_ONFIELD,1,nil)

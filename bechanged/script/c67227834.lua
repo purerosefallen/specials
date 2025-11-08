@@ -3,13 +3,12 @@ function c67227834.initial_effect(c)
 	aux.AddCodeList(c,46986414,38033121)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(67227834,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,67227834)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_CONTINUOUS_TARGET)
 	e1:SetTarget(c67227834.target)
-	e1:SetOperation(c67227834.activate)
+	e1:SetOperation(c67227834.operation)
 	c:RegisterEffect(e1)
 	--Atk up
 	local e2=Effect.CreateEffect(c)
@@ -17,49 +16,67 @@ function c67227834.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetValue(700)
 	c:RegisterEffect(e2)
-	--recover
+	--威风抗性
+	local e31=Effect.CreateEffect(c)
+	e31:SetType(EFFECT_TYPE_EQUIP)
+	e31:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e31:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e31:SetValue(aux.tgoval)
+	c:RegisterEffect(e31)
+	local e32=Effect.CreateEffect(c)
+	e32:SetType(EFFECT_TYPE_EQUIP)
+	e32:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e32:SetValue(1)
+	c:RegisterEffect(e32)
+	--Equip limit
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_EQUIP_LIMIT)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e3:SetValue(c67227834.eqlimit)
+	c:RegisterEffect(e3)
+	--自己回合墓效
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(67227834,0))
 	e4:SetCategory(CATEGORY_RECOVER)
 	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_TO_GRAVE)
-	e4:SetCondition(c67227834.reccon)
+	e4:SetCondition(c67227834.reccon1)
 	e4:SetTarget(c67227834.rectg)
-	e4:SetOperation(c67227834.recop)
+	e4:SetOperation(c67227834.recop1)
 	c:RegisterEffect(e4)
-end
-function c67227834.spfilter(c,e,tp)
-	return c:IsCode(46986414,38033121) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-function c67227834.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c67227834.spfilter,tp,LOCATION_GRAVE+LOCATION_DECK,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE+LOCATION_DECK)
-	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
-end
-function c67227834.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	local c=e:GetHandler()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c67227834.spfilter),tp,LOCATION_GRAVE+LOCATION_DECK,0,1,1,nil,e,tp)
-	local tc=g:GetFirst()
-	if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 and Duel.Equip(tp,c,tc) then
-		--Add Equip limit
-		local e1=Effect.CreateEffect(tc)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_EQUIP_LIMIT)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		e1:SetValue(c67227834.eqlimit)
-		c:RegisterEffect(e1)
-	end
+	--对面回合墓效
+	local e5=e4:Clone()
+	e5:SetCategory(CATEGORY_RECOVER+CATEGORY_SPECIAL_SUMMON)
+	e5:SetCondition(c67227834.reccon2)
+	e4:SetOperation(c67227834.recop2)
+	c:RegisterEffect(e5)
 end
 function c67227834.eqlimit(e,c)
-	return e:GetOwner()==c
+	return c:IsCode(46986414,38033121)
 end
-function c67227834.reccon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
+function c67227834.filter(c)
+	return c:IsFaceup() and c:IsCode(46986414,38033121)
+end
+function c67227834.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c67227834.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c67227834.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+	Duel.SelectTarget(tp,c67227834.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
+end
+function c67227834.operation(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if e:GetHandler():IsRelateToEffect(e) and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+		Duel.Equip(tp,e:GetHandler(),tc)
+	end
+end
+function c67227834.reccon1(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) and Duel.GetTurnPlayer()==tp
+end
+function c67227834.reccon2(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) and Duel.GetTurnPlayer()==1-tp
 end
 function c67227834.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -67,26 +84,20 @@ function c67227834.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetParam(1000)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,1000)
 end
-function c67227834.recop(e,tp,eg,ep,ev,re,r,rp)
+function c67227834.recop1(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Recover(p,d,REASON_EFFECT)
 end
-function c67227834.thfilter(c)
-	return c:IsCode(46986414,38033121) and c:IsAbleToDeck()
+function c67227834.spf(c,e,tp)
+	return aux.IsCodeListed(c,46986414) and c:IsLevelAbove(6) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function c67227834.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c67227834.thfilter(chkc) end
-	if chk==0 then return e:GetHandler():IsAbleToHand()
-		and Duel.IsExistingTarget(c67227834.thfilter,tp,LOCATION_GRAVE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,c67227834.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
-end
-function c67227834.thop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and Duel.SendtoHand(c,nil,REASON_EFFECT)~=0 and c:IsLocation(LOCATION_HAND)
-		and tc:IsRelateToEffect(e) then
-		Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
+function c67227834.recop2(e,tp,eg,ep,ev,re,r,rp)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	if Duel.Recover(p,d,REASON_EFFECT)>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(c67227834.spf,tp,LOCATION_DECK,0,1,nil,e,tp)>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local g=Duel.SelectMatchingCard(tp,c67227834.spf,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+		if g:GetCount()>0 then
+			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+		end
 	end
 end
