@@ -18,17 +18,10 @@ function s.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_GRAVE)
 	e4:SetCountLimit(1,id)
-	e4:SetCondition(s.spcon)
 	e4:SetCost(aux.bfgcost)
 	e4:SetTarget(s.sptg)
 	e4:SetOperation(s.spop)
 	c:RegisterEffect(e4)
-end
-function s.ccfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9c)
-end
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(s.ccfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.sspfilter(c,e,tp)
 	return c:IsSetCard(0x9c) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -47,6 +47,17 @@ function s.initial_effect(c)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
+	--to hand
+	local e5=Effect.CreateEffect(c)
+	e5:SetDescription(aux.Stringid(56863746,2))
+	e5:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SPECIAL_SUMMON)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e5:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e5:SetCode(EVENT_RELEASE)
+	e5:SetCountLimit(1,56863746)
+	e5:SetTarget(c56863746.thtg)
+	e5:SetOperation(c56863746.thop)
+	c:RegisterEffect(e5)
 end
 function s.indtg(e,c)
 	return c~=e:GetHandler() and c:IsSetCard(0x154)
@@ -113,5 +124,34 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		tc:SetMaterial(nil)
 		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
 		tc:CompleteProcedure()
+	end
+end
+function c56863746.thfilter(c)
+	return not c:IsCode(56863746) and c:IsSetCard(0x154) and c:IsAbleToHand()
+end
+function c56863746.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c56863746.thfilter,tp,LOCATION_DECK,0,1,nil) end
+	if e:GetActivateLocation()==LOCATION_GRAVE then
+		e:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SPECIAL_SUMMON+CATEGORY_GRAVE_SPSUMMON)
+	else
+		e:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SPECIAL_SUMMON)
+	end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+end
+function c56863746.thop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,c56863746.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+			and c:IsRelateToChain()
+			and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+			and aux.NecroValleyFilter()(c)
+			and Duel.SelectYesNo(tp,aux.Stringid(56863746,3)) then
+			Duel.BreakEffect()
+			Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+		end
 	end
 end

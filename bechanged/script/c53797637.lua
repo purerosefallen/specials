@@ -58,6 +58,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.spcon2(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.attfilter,tp,LOCATION_MZONE,0,1,nil,e:GetHandler())
+	or re:GetHandler():IsAttribute(e:GetHandler():GetAttribute())
 end
 
 function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)

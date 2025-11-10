@@ -45,17 +45,14 @@ function c28292031.initial_effect(c)
 	e0:SetCost(aux.bfgcost)
 	e0:SetOperation(c28292031.damop)
 	c:RegisterEffect(e0)
-	local e9=Effect.CreateEffect(c)
-	e9:SetDescription(aux.Stringid(28292031,2))
-	e9:SetType(EFFECT_TYPE_SINGLE)
-	e9:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
-	e9:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e9:SetCost(c28292031.actcost)
-	c:RegisterEffect(e9)
-end
-function c28292031.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
+	--act in set turn
+	local e8=Effect.CreateEffect(c)
+	e8:SetType(EFFECT_TYPE_SINGLE)
+	e8:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+	e8:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e8:SetCost(c28292031.stcost)
+	e8:SetDescription(aux.Stringid(28292031,1))
+	c:RegisterEffect(e8)
 end
 function c28292031.cfilter(c)
 	return c:IsSetCard(0x173)  and c:IsFaceup()
@@ -69,7 +66,7 @@ function c28292031.filter(c,event)
 	return te and te:GetCode()==event
 end
 function c28292031.target(event)
-	return  function(e,tp,eg,ep,ev,re,r,rp,chk)
+	return 	function(e,tp,eg,ep,ev,re,r,rp,chk)
 			if chk==0 then return Duel.IsExistingMatchingCard(c28292031.filter,tp,LOCATION_GRAVE,0,1,nil,event)
 			end
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
@@ -108,4 +105,8 @@ function c28292031.damop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTargetRange(1,0)
 	e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
 	Duel.RegisterEffect(e1,tp)
+end
+function c28292031.stcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
 end

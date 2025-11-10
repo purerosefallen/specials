@@ -1,21 +1,15 @@
 --伝説の剣闘士 カオス・ソルジャー
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:EnableReviveLimit()
 	aux.AddCodeList(c,21082832,14094090)
-	--Special Summon Condition
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(aux.ritlimit)
-	c:RegisterEffect(e1)
+	c:EnableReviveLimit()
 	--Deck Search
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_HAND)
+	e2:SetCountLimit(1,id)
 	e2:SetCost(s.thcost)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)

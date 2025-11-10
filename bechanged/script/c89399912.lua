@@ -22,20 +22,18 @@ function s.initial_effect(c)
 	e2:SetTarget(s.sttg)
 	e2:SetOperation(s.stop)
 	c:RegisterEffect(e2)
-	--tograve
+	--手卡找龙族
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
-	e3:SetCategory(CATEGORY_TOGRAVE)
+	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_HAND)
 	e3:SetCountLimit(1,id+2)
-	e3:SetCost(s.tgcost)
-	e3:SetTarget(s.tgtg)
-	e3:SetOperation(s.tgop)
+	e3:SetCost(s.shcost)
+	e3:SetTarget(s.shtg)
+	e3:SetOperation(s.shop)
 	c:RegisterEffect(e3)
-	s.Dragon_Ruler_handes_effect=e3
-
-	--search
+	--被除外效果
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,3))
 	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -89,7 +87,7 @@ end
 function s.dfilter(c)
 	return (c:IsAttribute(ATTRIBUTE_WIND) or c:IsRace(RACE_DRAGON)) and c:IsDiscardable() and c:IsAbleToGraveAsCost()
 end
-function s.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.shcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsDiscardable() and e:GetHandler():IsAbleToGraveAsCost()
 		and Duel.IsExistingMatchingCard(s.dfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
@@ -97,18 +95,19 @@ function s.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	g:AddCard(e:GetHandler())
 	Duel.SendtoGrave(g,REASON_COST+REASON_DISCARD)
 end
-function s.tgfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToHand() and c:IsRace(RACE_DRAGON)
+function s.shfilter(c)
+	return c:IsRace(RACE_DRAGON) and c:IsAbleToHand()
 end
-function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+function s.shtg(e,tp,eg,ep,ev,re,r,rp,chk,_,exc)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.shfilter,tp,LOCATION_DECK,0,1,exc) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function s.tgop(e,tp,eg,ep,ev,re,r,rp)
+function s.shop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.shfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
 	end
 end
 function s.thfilter(c)

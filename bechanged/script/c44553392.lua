@@ -8,15 +8,15 @@ function c44553392.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
-	e1:SetCondition(c44553392.condition)
 	e1:SetTarget(c44553392.target)
 	e1:SetOperation(c44553392.activate)
 	c:RegisterEffect(e1)
+	--act in hand
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(44553392,0))
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e2:SetCondition(c44553392.handcon)
+	e2:SetCondition(c44553392.condition)
+	e2:SetDescription(aux.Stringid(44553392,2))
 	c:RegisterEffect(e2)
 end
 function c44553392.condition(e,tp,eg,ep,ev,re,r,rp)
@@ -58,10 +58,4 @@ function c44553392.activate(e,tp,eg,ep,ev,re,r,rp)
 			ag1:GetFirst():RegisterEffect(e1)
 		end
 	end
-end
-function c44553392.filter(c)
-	return c:IsFaceup() and c:IsCode(65815684)
-end
-function c44553392.handcon(e)
-	return Duel.IsExistingMatchingCard(c44553392.filter,e:GetHandlerPlayer(),LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 end

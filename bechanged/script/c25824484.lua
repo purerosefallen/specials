@@ -25,6 +25,7 @@ function s.initial_effect(c)
 	e3:SetCategory(CATEGORY_DECKDES+CATEGORY_SPECIAL_SUMMON+CATEGORY_DRAW)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_HAND)
+	e3:SetCountLimit(1,id)
 	e3:SetCost(s.spcost)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
@@ -67,12 +68,12 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,2) and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false)
-        and Duel.GetFlagEffect(tp,id)==0 and Duel.IsPlayerCanDraw(tp,1) end
-    Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,tp,0)
-    Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,1,tp,0)
+		and Duel.GetFlagEffect(tp,id)==0 and Duel.IsPlayerCanDraw(tp,1) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,tp,0)
+	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,1,tp,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-    local c=e:GetHandler()
+	local c=e:GetHandler()
 	if not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
 	Duel.ConfirmDecktop(tp,1)
 	local g=Duel.GetDecktopGroup(tp,1)
@@ -80,10 +81,10 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRace(RACE_PLANT) then
 		Duel.DisableShuffleCheck()
 		if Duel.SendtoGrave(tc,REASON_EFFECT+REASON_REVEAL)~=0 and c:IsLocation(LOCATION_HAND) and c:IsRelateToEffect(e) then
-            Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-            Duel.RegisterFlagEffect(tp,id,RESET_PHASE+TIMING_END_PHASE,0,1)
+			Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+			Duel.RegisterFlagEffect(tp,id,RESET_PHASE+TIMING_END_PHASE,0,1)
 			Duel.Draw(tp,1,REASON_EFFECT)
-        end
+		end
 	else
 		Duel.MoveSequence(tc,SEQ_DECKBOTTOM)
 	end

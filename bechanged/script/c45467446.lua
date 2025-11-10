@@ -115,8 +115,8 @@ function c45467446.rmop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c45467446.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToDeckAsCost() end
-	Duel.SendtoDeck(e:GetHandler(),nil,2,REASON_COST)
+	if chk==0 then return e:GetHandler():IsReleasable() end
+	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c45467446.filter(c,e,tp)
 	if not (c:IsType(TYPE_MONSTER) and c:IsSetCard(0xdd)) then return false end

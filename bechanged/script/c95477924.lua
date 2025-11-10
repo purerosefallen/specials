@@ -1,6 +1,7 @@
 --マジシャンズ・サルベーション
 ---@param c Card
-function c95477924.initial_effect(c)
+local s,id,o=GetID()
+function s.initial_effect(c)
 	aux.AddCodeList(c,46986414,38033121,48680970)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -13,8 +14,8 @@ function c95477924.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetCountLimit(1,95477926)
-	e2:SetTarget(c95477924.target)
-	e2:SetOperation(c95477924.activate)
+	e2:SetTarget(s.target)
+	e2:SetOperation(s.activate)
 	c:RegisterEffect(e2)
 	--spsummon
 	local e3=Effect.CreateEffect(c)
@@ -25,66 +26,69 @@ function c95477924.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetRange(LOCATION_FZONE)
 	e3:SetCountLimit(1,95477925)
-	e3:SetCondition(c95477924.spcon)
-	e3:SetTarget(c95477924.sptg)
-	e3:SetOperation(c95477924.spop)
+	e3:SetCondition(s.spcon)
+	e3:SetTarget(s.sptg)
+	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
 	local e4=e3:Clone()
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e4)
 end
-function c95477924.setfilter(c)
-	return aux.IsCodeListed(c,46986414,38033121) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable()
+function s.filter1(c)
+	return c:IsFaceup() and c:IsCode(48680970)
 end
-function c95477924.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(c95477924.setfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
+function s.thfilter(c,check)
+	local b1=c:IsCode(48680970)
+	local b2=check and c:IsType(TYPE_SPELL+TYPE_TRAP) and aux.IsCodeListed(c,46986414)
+	return not c:IsCode(id) and (b1 or b2) and c:IsAbleToHand()
 end
-function c95477924.activate(e,tp,eg,ep,ev,re,r,rp)
-	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
-	if ft<=0 then return end
-	if not Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceupEx,Card.IsCode),tp,LOCATION_ONFIELD,0,1,nil,48680970) then ft=1 end
-	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(c95477924.setfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,nil)
-	if g:GetCount()>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-		local sg=g:SelectSubGroup(tp,aux.dncheck,false,1,ft)
-		if sg:GetCount()>0 then
-			Duel.SSet(tp,sg)
-		end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local check=Duel.IsExistingMatchingCard(s.filter1,tp,LOCATION_ONFIELD,0,1,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,check) end
+end
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	local check=Duel.IsExistingMatchingCard(s.filter1,tp,LOCATION_ONFIELD,0,1,nil)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,check)
+	if #g==0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local tg=g:Select(tp,1,1,nil)
+	if #tg>0 then
+	Duel.SSet(tg,nil,tp,true)
+	Duel.ConfirmCards(1-tp,g)
 	end
 end
-function c95477924.cfilter(c,tp)
+function s.cfilter(c,tp)
 	return c:IsFaceup() and c:IsCode(46986414,38033121) and c:IsSummonPlayer(tp)
 end
-function c95477924.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c95477924.cfilter,1,nil,tp)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(s.cfilter,1,nil,tp)
 end
-function c95477924.tgfilter(c,e,tp,g)
-	return g:IsContains(c) and Duel.IsExistingMatchingCard(c95477924.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,c:GetCode())
+function s.tgfilter(c,e,tp,g)
+	return g:IsContains(c) and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,c:GetCode())
 end
-function c95477924.spfilter(c,e,tp,code)
+function s.spfilter(c,e,tp,code)
 	return c:IsCode(46986414,38033121) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(code)
 end
-function c95477924.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local g=eg:Filter(c95477924.cfilter,nil,tp)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c95477924.tgfilter(chkc,e,tp,g) end
-	if chk==0 then return Duel.IsExistingTarget(c95477924.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e,tp,g)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local g=eg:Filter(s.cfilter,nil,tp)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.tgfilter(chkc,e,tp,g) end
+	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e,tp,g)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
 	if g:GetCount()==1 then
 		Duel.SetTargetCard(g)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-		Duel.SelectTarget(tp,c95477924.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e,tp,g)
+		Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e,tp,g)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 end
-function c95477924.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		local code=tc:GetCode()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,c95477924.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,code)
+		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,code)
 		if g:GetCount()>0 then
 			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		end

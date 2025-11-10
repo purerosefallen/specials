@@ -9,6 +9,7 @@ function c99284890.initial_effect(c)
 	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,99284890)
+	e1:SetCondition(c99284890.con)
 	e1:SetCost(c99284890.cost1)
 	e1:SetOperation(c99284890.operation1)
 	c:RegisterEffect(e1)
@@ -32,6 +33,9 @@ function c99284890.initial_effect(c)
 	e3:SetTarget(c99284890.sptg)
 	e3:SetOperation(c99284890.spop)
 	c:RegisterEffect(e3)
+end
+function c99284890.con(e,tp)
+return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 function c99284890.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
@@ -90,7 +94,7 @@ function c99284890.drop2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterFlagEffect(tp,99284890+1,0,0,0)
 end
 function c99284890.filter(c)
-	return c:IsCode(55144522) and c:IsAbleToGraveAsCost()
+	return (c:IsCode(55144522) or c:IsCode(3972721)) and c:IsAbleToGraveAsCost()
 end
 function c99284890.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c99284890.filter,tp,LOCATION_HAND,0,1,nil) end
@@ -110,7 +114,7 @@ function c99284890.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterFlagEffect(tp,99284890+1,0,0,0)
 end
 function c99284890.rfilter(c)
-	return c:IsCode(55144522) and c:IsAbleToRemoveAsCost()
+	return (c:IsCode(55144522) or c:IsCode(3972721)) and c:IsAbleToRemoveAsCost()
 end
 function c99284890.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFlagEffect(tp,99284890+1)>=3
