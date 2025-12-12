@@ -1,5 +1,5 @@
---[[
 function aux.PreloadUds()
+--[[
   local e1=Effect.GlobalEffect()
 	e1:SetDescription(aux.Stringid(58600555,2))
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -40,6 +40,7 @@ function aux.PreloadUds()
   e2:SetLabelObject(e1)
   e2:SetValue(1)
   Duel.RegisterEffect(e2,0)
+]]
 
   local e = Effect.GlobalEffect()
   e:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -48,6 +49,7 @@ function aux.PreloadUds()
   e:SetOperation(function (this_e)
     for tp = 0, 1, 1 do
       for c in aux.Next(Duel.GetFieldGroup(tp, LOCATION_ALL, 0)) do
+--[[
         RITUAL.SP(c)
         if c:IsType(TYPE_RITUAL) then
           if c:IsType(TYPE_MONSTER) then
@@ -56,6 +58,7 @@ function aux.PreloadUds()
             RITUAL.CHK_LIST[tp][TYPE_SPELL] = RITUAL.CHK_LIST[tp][TYPE_SPELL] + 1
           end
         end
+]]
         if c:IsCode(38445524) then
           c_38445524.CannotActivate(c)
           c_38445524.ATK(c)
@@ -88,6 +91,7 @@ c_38445524 = {
   end
 }
 
+--[[
 RITUAL = {
   CHK_LIST = {
     [0] = {
@@ -128,4 +132,4 @@ RITUAL = {
     c:RegisterEffect(e)
   end
 }
-]]--
+]]
