@@ -30,19 +30,37 @@ function c45215453.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and e:GetHandler():IsDefensePos()
 end
 function c45215453.filter(c)
+	return c:IsType(TYPE_EQUIP) and ((c:IsAbleToHand()) or (c:CheckEquipTarget(e:GetHandler()) and c:CheckUniqueOnField(tp,LOCATION_SZONE) and not c:IsForbidden()))
+end
+function c45215453.filter1(c)
+	return c:IsType(TYPE_EQUIP) and (c:CheckEquipTarget(e:GetHandler()) and c:CheckUniqueOnField(tp,LOCATION_SZONE) and not c:IsForbidden())
+end
+function c45215453.filter2(c)
 	return c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
 end
 function c45215453.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c45215453.filter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	if chk==0 then return Duel.IsExistingMatchingCard(c45215453.filter,tp,LOCATION_DECK,0,1,nil,e:GetHandler()) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND+CATEGORY_EQUIP,nil,1,tp,LOCATION_DECK)
 end
 function c45215453.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsFacedown() or c:IsAttackPos() or not c:IsRelateToEffect(e) then return end
+	local b1=not (c:IsFacedown() or c:IsAttackPos() or not c:IsRelateToEffect(e)) and Duel.IsExistingMatchingCard(c45215453.filter1,tp,LOCATION_DECK,0,1,nil,e:GetHandler())
+	local b2=Duel.IsExistingMatchingCard(c45215453.filter2,tp,LOCATION_DECK,0,1,nil,e:GetHandler())
+	if not b1 or b2 then return end
+	local op=aux.SelectFromOptions(tp,{b1,aux.Stringid(id,1),1},{b2,aux.Stringid(id,2),2})
+	if op==1 then
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+	tg=Duel.SelectMatchingCard(tp,c45215453.filter1,tp,LOCATION_DECK,0,1,1,nil,e:GetHandler())
+	if tg:GetCount()>0 then
+	tc=tg:GetFirst()
+		Duel.Equip(tp,tc,c,true,false)
+		end
+	elseif op==2 then
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c45215453.filter,tp,LOCATION_DECK,0,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
+	local tg=Duel.SelectMatchingCard(tp,c45215453.filter2,tp,LOCATION_DECK,0,1,1,nil,e:GetHandler())
+	if tg:GetCount()>0 then
+		Duel.SendtoHand(tg,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,tg)
+	end
 	end
 end
