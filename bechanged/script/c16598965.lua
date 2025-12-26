@@ -1,43 +1,58 @@
 --聖邪のステンドグラス
 ---@param c Card
-function c16598965.initial_effect(c)
+local s,id,o=GetID()
+function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(16598965,0))
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DRAW+CATEGORY_TODECK+CATEGORY_HANDES)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,16598965)
-	e1:SetTarget(c16598965.target)
-	e1:SetOperation(c16598965.activate)
+	e1:SetCountLimit(1,id)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	--act in hand
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(16598965,3))
+	e2:SetDescription(aux.Stringid(id,3))
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e2:SetCondition(c16598965.handcon)
+	e2:SetCondition(s.handcon)
 	c:RegisterEffect(e2)
 end
-function c16598965.handcon(e)
-	return Duel.IsExistingMatchingCard(c16598965.hdfilter,e:GetHandlerPlayer(),LOCATION_MZONE,LOCATION_MZONE,1,nil)
+function s.handcon(e)
+	return Duel.IsExistingMatchingCard(s.hdfilter,e:GetHandlerPlayer(),LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
-function c16598965.hdfilter(c)
+function s.hdfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_FAIRY+RACE_FIEND)
 end
-function c16598965.filter(c,race)
+function s.filter(c,race)
 	return c:IsRace(race) and c:IsType(TYPE_EFFECT) and c:IsFaceup()
 end
-function c16598965.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local f1=Duel.IsExistingMatchingCard(c16598965.filter,tp,0x14,0x14,1,nil,RACE_FAIRY) and Duel.IsPlayerCanDraw(tp,3)
-	local f2=Duel.IsExistingMatchingCard(c16598965.filter,tp,0x14,0x14,1,nil,RACE_FIEND) and Duel.IsPlayerCanDraw(1-tp,1)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	e:SetLabel(0)
+	local f1=Duel.IsExistingMatchingCard(s.filter,tp,0x14,0x14,1,nil,RACE_FAIRY) and Duel.IsPlayerCanDraw(tp,3)
+	local f2=Duel.IsExistingMatchingCard(s.filter,tp,0x14,0x14,1,nil,RACE_FIEND) and Duel.IsPlayerCanDraw(1-tp,1)
 	if chk==0 then return f1 or f2 end
+	if e:GetHandler():IsStatus(STATUS_ACT_FROM_HAND) then
+		e:SetLabel(100)
+	end
 end
-function c16598965.activate(e,tp,eg,ep,ev,re,r,rp)
-	local f1=Duel.IsExistingMatchingCard(c16598965.filter,tp,0x14,0x14,1,nil,RACE_FAIRY) and Duel.IsPlayerCanDraw(tp,3)
-	local f2=Duel.IsExistingMatchingCard(c16598965.filter,tp,0x14,0x14,1,nil,RACE_FIEND) and Duel.IsPlayerCanDraw(1-tp,1)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	local f1=Duel.IsExistingMatchingCard(s.filter,tp,0x14,0x14,1,nil,RACE_FAIRY) and Duel.IsPlayerCanDraw(tp,3)
+	local f2=Duel.IsExistingMatchingCard(s.filter,tp,0x14,0x14,1,nil,RACE_FIEND) and Duel.IsPlayerCanDraw(1-tp,1)
 	local res=false
-	if f1 and (not f2 or Duel.SelectYesNo(tp,aux.Stringid(16598965,1))) and Duel.Draw(tp,3,REASON_EFFECT)==3 then
+		if e:GetLabel()==100 then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetDescription(aux.Stringid(id,4))
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT+EFFECT_FLAG_PLAYER_TARGET)
+		e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+		e1:SetTargetRange(1,0)
+		e1:SetValue(s.aclimit)
+		Duel.RegisterEffect(e1,tp)
+	end
+	if f1 and (not f2 or Duel.SelectYesNo(tp,aux.Stringid(id,1))) and Duel.Draw(tp,3,REASON_EFFECT)==3 then
 		res=true
 		local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,LOCATION_HAND,0,nil)
 		if g:GetCount()<2 then return end
@@ -47,7 +62,7 @@ function c16598965.activate(e,tp,eg,ep,ev,re,r,rp)
 		local sg=g:Select(tp,2,2,nil)
 		aux.PlaceCardsOnDeckBottom(tp,sg)
 	end
-	if f2 and (not res or Duel.SelectYesNo(tp,aux.Stringid(16598965,2))) and Duel.Draw(1-tp,1,REASON_EFFECT)==1 then
+	if f2 and (not res or Duel.SelectYesNo(tp,aux.Stringid(id,2))) and Duel.Draw(1-tp,1,REASON_EFFECT)==1 then
 		Duel.ShuffleHand(1-tp)
 		Duel.BreakEffect()
 		local g=Duel.GetFieldGroup(1-tp,LOCATION_HAND,0)
@@ -59,4 +74,7 @@ function c16598965.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.DiscardHand(1-tp,aux.TRUE,1,1,REASON_EFFECT+REASON_DISCARD)
 	end
+end
+function s.aclimit(e,re,tp)
+	return re:IsActiveType(TYPE_MONSTER) and not re:GetHandler():IsRace(RACE_FAIRY+RACE_FIEND)
 end
