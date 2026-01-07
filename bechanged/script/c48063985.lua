@@ -13,10 +13,17 @@ function c48063985.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e2:SetCondition(c48063985.jiecon)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
+	local e22=Effect.CreateEffect(c)
+	e22:SetType(EFFECT_TYPE_SINGLE)
+	e22:SetCode(EFFECT_MATERIAL_CHECK)
+	e22:SetValue(c48063985.valcheck)
+	e22:SetLabelObject(e1)
+	c:RegisterEffect(e22)
 	--search
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(48063985,0))
@@ -41,6 +48,18 @@ function c48063985.initial_effect(c)
 	e4:SetTarget(c48063985.sptg)
 	e4:SetOperation(c48063985.spop)
 	c:RegisterEffect(e4)
+end
+function c48063985.jiecon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:GetSummonType()==SUMMON_TYPE_SPECIAL+SUMMON_VALUE_SELF and e:GetLabel()==1
+end
+function c48063985.valcheck(e,c)
+	local g=c:GetMaterial()
+	if g:IsExists(Card.IsFusionCode,1,nil,49885567) then
+		e:GetLabelObject():SetLabel(1)
+	else
+		e:GetLabelObject():SetLabel(0)
+	end
 end
 function c48063985.tgfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xb5)

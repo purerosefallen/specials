@@ -13,11 +13,10 @@ function c87118301.initial_effect(c)
 	c:RegisterEffect(e1)
 	--to hand
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(95457011,1))
-	e3:SetCategory(CATEGORY_TOHAND)
+	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_GRAVE_ACTION)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e3:SetCode(EVENT_TO_GRAVE)
+	e3:SetCode(EVENT_REMOVE)
 	e3:SetCountLimit(1,95457012)
 	e3:SetTarget(c87118301.thtg)
 	e3:SetOperation(c87118301.thop)
@@ -44,10 +43,10 @@ function c87118301.thfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xb5) and c:IsAbleToHand()
 end
 function c87118301.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_REMOVED) and c87118301.thfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c87118301.thfilter,tp,LOCATION_REMOVED,0,1,nil) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c87118301.thfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c87118301.thfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectTarget(tp,c87118301.thfilter,tp,LOCATION_REMOVED,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,c87118301.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
 function c87118301.thop(e,tp,eg,ep,ev,re,r,rp)
