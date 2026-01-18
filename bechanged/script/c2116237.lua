@@ -33,7 +33,7 @@ function c2116237.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e3:SetValue(2116237)
 	e3:SetCondition(c2116237.setcon)
-	e3:SetDescription(aux.Stringid(2116237,0))
+	e3:SetDescription(aux.Stringid(2116237,2))
 	c:RegisterEffect(e3)
 end
 function c2116237.costfilter(c,e,tp)
