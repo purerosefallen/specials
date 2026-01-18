@@ -1,11 +1,12 @@
 --スピリッツ・オブ・ファラオ
 function c25343280.initial_effect(c)
 	c:EnableReviveLimit()
-	--cannot special summon
+	--splimit
 	local e1=Effect.CreateEffect(c)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e1:SetValue(c25343280.splimit)
 	c:RegisterEffect(e1)
 	--Negate
 	local e2=Effect.CreateEffect(c)
@@ -21,10 +22,17 @@ function c25343280.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_DELAY)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCondition(c25343280.condition)
 	e4:SetOperation(c25343280.winop)
 	c:RegisterEffect(e4)
 end
-	function c25343280.winop(e,tp,eg,ep,ev,re,r,rp)
+function c25343280.splimit(e,se,sp,st)
+	return se:IsHasType(EFFECT_TYPE_ACTIONS)
+end
+function c25343280.condition(e,tp,eg,ep,ev,re,r,rp)
+	return re and re:GetHandler():IsCode(31076103)
+end
+function c25343280.winop(e,tp,eg,ep,ev,re,r,rp)
 	local WIN_REASON_CREATORGOD=0x13
 	local p=e:GetHandler():GetSummonPlayer()
 	Duel.Win(p,WIN_REASON_CREATORGOD)

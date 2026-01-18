@@ -33,6 +33,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.shtg)
 	e3:SetOperation(s.shop)
 	c:RegisterEffect(e3)
+	s.Dragon_Ruler_handes_effect=e3
 	--被除外效果
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,3))

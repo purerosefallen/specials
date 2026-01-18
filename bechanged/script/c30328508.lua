@@ -1,48 +1,54 @@
 --シャドール・リザード
 ---@param c Card
-function c30328508.initial_effect(c)
+local s,id,o=GetID()
+function s.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(30328508,0))
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e1:SetCountLimit(1,30328508)
-	e1:SetTarget(c30328508.target)
-	e1:SetOperation(c30328508.operation)
+	e1:SetCountLimit(1,id)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
+	local e11=e1:Clone()
+	e11:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e11:SetCode(EVENT_SUMMON_SUCCESS)
+	c:RegisterEffect(e11)
 	--tograve
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(30328508,1))
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetCountLimit(1,30328508+1)
-	e2:SetCondition(c30328508.tgcon)
-	e2:SetTarget(c30328508.tgtg)
-	e2:SetOperation(c30328508.tgop)
+	e2:SetCountLimit(1,id+1)
+	e2:SetCondition(s.tgcon)
+	e2:SetTarget(s.tgtg)
+	e2:SetOperation(s.tgop)
 	c:RegisterEffect(e2)
+	s.shadoll_flip_effect=e1
 end
-function c30328508.ccfilter(c)
+function s.ccfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:IsSetCard(0x9d)
 end
-function c30328508.con1(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(c30328508.ccfilter,tp,LOCATION_MZONE,0,1,nil)
+function s.con1(e,tp,eg,ep,ev,re,r,rp)
+	return not Duel.IsExistingMatchingCard(s.ccfilter,tp,LOCATION_MZONE,0,1,nil)
 end
-function c30328508.con2(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c30328508.ccfilter,tp,LOCATION_MZONE,0,1,nil)
+function s.con2(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(s.ccfilter,tp,LOCATION_MZONE,0,1,nil)
 end
-function c30328508.tarfilter(c,e,tp,ec)
+function s.tarfilter(c,e,tp,ec)
 	return (c:IsFaceup() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and ec:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE))
 		or (c:IsFacedown() and c:IsCanChangePosition() and ec:IsAbleToGrave())
 end
-function c30328508.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c30328508.tarfilter(chkc,tp,c) end
-	if chk==0 then return Duel.IsExistingTarget(c30328508.tarfilter,tp,LOCATION_MZONE,0,1,nil,e,tp,c) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.tarfilter(chkc,tp,c) end
+	if chk==0 then return Duel.IsExistingTarget(s.tarfilter,tp,LOCATION_MZONE,0,1,nil,e,tp,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local tc=Duel.SelectTarget(tp,c30328508.tarfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e,tp,c):GetFirst()
+	local tc=Duel.SelectTarget(tp,s.tarfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e,tp,c):GetFirst()
 	if tc:IsFaceup() then
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 	end
@@ -51,7 +57,7 @@ function c30328508.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		Duel.SetOperationInfo(0,CATEGORY_POSITION,tc,1,0,0)
 	end
 end
-function c30328508.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
@@ -64,32 +70,32 @@ function c30328508.op(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function c30328508.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) end
 	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
-function c30328508.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
-function c30328508.tgcon(e,tp,eg,ep,ev,re,r,rp)
+function s.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_EFFECT)
 end
-function c30328508.filter(c)
-	return c:IsSetCard(0x9d) and not c:IsCode(30328508) and c:IsAbleToGrave()
+function s.filter(c)
+	return c:IsSetCard(0x9d) and not c:IsCode(id) and c:IsAbleToGrave()
 end
-function c30328508.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c30328508.filter,tp,LOCATION_DECK,0,1,nil) end
+function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
-function c30328508.tgop(e,tp,eg,ep,ev,re,r,rp)
+function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c30328508.filter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end

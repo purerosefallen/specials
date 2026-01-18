@@ -37,10 +37,17 @@ function c12678870.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e5:SetProperty(EFFECT_FLAG_DELAY)
+	e5:SetCondition(c12678870.remcon)
 	e5:SetCost(c12678870.rmcost)
 	e5:SetTarget(c12678870.rmtg)
 	e5:SetOperation(c12678870.rmop)
 	c:RegisterEffect(e5)
+	local e22=Effect.CreateEffect(c)
+	e22:SetType(EFFECT_TYPE_SINGLE)
+	e22:SetCode(EFFECT_MATERIAL_CHECK)
+	e22:SetValue(c12678870.valcheck)
+	e22:SetLabelObject(e1)
+	c:RegisterEffect(e22)
 end
 function c12678870.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToExtraAsCost() end
@@ -80,6 +87,10 @@ function c12678870.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(g,REASON_RULE)
 	end
 end
+function c12678870.remcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:GetSummonType()==SUMMON_TYPE_SPECIAL+SUMMON_VALUE_SELF and Duel.GetFlagEffect(c,12678870)==1
+end
 function c12678870.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
@@ -110,6 +121,12 @@ function c12678870.rmop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 	tc:RegisterFlagEffect(12678870,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
+end
+function c12678870.valcheck(e,c)
+	local g=c:GetMaterial()
+	if g:IsExists(Card.IsFusionCode,1,nil,13890468) then
+		Duel.RegisterFlagEffect(c,12678870,0,0,1)
+	end
 end
 function c12678870.retcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
