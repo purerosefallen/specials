@@ -36,14 +36,6 @@ function c86938484.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 c86938484.fusion_effect=true
-function c86938484.valcheck(e,c)
-	local mg=c:GetMaterial()
-	if mg:IsExists(Card.IsSetCard,1,nil,0x9d) then
-		e:GetLabelObject():SetLabel(1)
-	else
-		e:GetLabelObject():SetLabel(0)
-	end
-end
 function c86938484.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetLabel()==1 and e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
 end

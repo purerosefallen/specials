@@ -29,16 +29,21 @@ function c86274272.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCode(EVENT_BATTLE_START)
 	e5:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-	e4:SetCondition(c86274272.changecon)
+	e5:SetCondition(c86274272.changecon)
 	e5:SetTarget(c86274272.changetg)
 	e5:SetOperation(c86274272.changeop)
 	c:RegisterEffect(e5)
+	local e22=Effect.CreateEffect(c)
+	e22:SetType(EFFECT_TYPE_SINGLE)
+	e22:SetCode(EFFECT_MATERIAL_CHECK)
+	e22:SetValue(c86274272.valcheck)
+	e22:SetLabelObject(e5)
+	c:RegisterEffect(e22)
 	local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_SINGLE)
 	e6:SetCode(EFFECT_IMMUNE_EFFECT)
 	e6:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e6:SetRange(LOCATION_MZONE)
-	e6:SetCondition(c86274272.imcon)
 	e6:SetValue(c86274272.efilter)
 	c:RegisterEffect(e6)
 end
@@ -83,7 +88,15 @@ end
 function c86274272.changecon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	return bc
+	return bc and e:GetLabel()==1
+end
+function c86274272.valcheck(e,c)
+	local g=c:GetMaterial()
+	if g~=0 and g:IsExists(Card.IsFusionCode,1,nil,86396750) then
+		e:GetLabelObject():SetLabel(1)
+	else
+		e:GetLabelObject():SetLabel(0)
+	end
 end
 function c86274272.changetg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -94,9 +107,6 @@ function c86274272.changeop(e,tp,eg,ep,ev,re,r,rp)
 	if bc:IsRelateToEffect(e) then
 		Duel.ChangePosition(bc,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 	end
-end
-function c86274272.imcon(e)
-	return c:IsOnField() and c:IsFaceup()
 end
 function c86274272.efilter(e,te)
 	return not te:GetOwner():IsSetCard(0xb5)
