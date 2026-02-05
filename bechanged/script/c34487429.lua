@@ -74,7 +74,7 @@ function s.initial_effect(c)
 	e7:SetCode(EFFECT_CHANGE_DAMAGE)
 	e7:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e7:SetTargetRange(1,0)
-    e7:SetCondition(s.rdcon)
+	e7:SetCondition(s.rdcon)
 	e7:SetValue(s.val)
 	c:RegisterEffect(e7)
 end
@@ -87,37 +87,37 @@ function s.penfilter(c)
 end
 function s.tstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return (Duel.IsExistingMatchingCard(s.tsfilter,tp,LOCATION_DECK,0,1,nil) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0)
-    or (Duel.IsExistingMatchingCard(s.penfilter,tp,LOCATION_DECK,0,1,nil) and (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)))
-    end
+	or (Duel.IsExistingMatchingCard(s.penfilter,tp,LOCATION_DECK,0,1,nil) and (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)))
+	end
 end
 function s.tsop(e,tp,eg,ep,ev,re,r,rp)
-    local b1=Duel.IsExistingMatchingCard(s.tsfilter,tp,LOCATION_DECK,0,1,nil) and Duel.GetLocationCount(tp,LOCATION_SZONE)>=0
-    local b2=Duel.IsExistingMatchingCard(s.penfilter,tp,LOCATION_DECK,0,1,nil) and (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
-    if not b1 or not b2 then return false end
-    local op=aux.SelectFromOptions(tp,{b1,aux.Stringid(id,5)},{b2,aux.Stringid(id,6)})
-    if op==1 then
-        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-        local g=Duel.SelectMatchingCard(tp,s.tsfilter,tp,LOCATION_DECK,0,1,1,nil)
-        local tc=g:GetFirst()
-        if tc then
-            Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-            local e1=Effect.CreateEffect(e:GetHandler())
-            e1:SetCode(EFFECT_CHANGE_TYPE)
-            e1:SetType(EFFECT_TYPE_SINGLE)
-            e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-            e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
-            e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
-            tc:RegisterEffect(e1)
-        end
-    end
-    if op==2 then
-        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
+	local b1=Duel.IsExistingMatchingCard(s.tsfilter,tp,LOCATION_DECK,0,1,nil) and Duel.GetLocationCount(tp,LOCATION_SZONE)>=0
+	local b2=Duel.IsExistingMatchingCard(s.penfilter,tp,LOCATION_DECK,0,1,nil) and (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
+	if not b1 and not b2 then return false end
+	local op=aux.SelectFromOptions(tp,{b1,aux.Stringid(id,5)},{b2,aux.Stringid(id,6)})
+	if op==1 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
+		local g=Duel.SelectMatchingCard(tp,s.tsfilter,tp,LOCATION_DECK,0,1,1,nil)
+		local tc=g:GetFirst()
+		if tc then
+			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetCode(EFFECT_CHANGE_TYPE)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
+			e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
+			tc:RegisterEffect(e1)
+		end
+	end
+	if op==2 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 		local g=Duel.SelectMatchingCard(tp,s.penfilter,tp,LOCATION_DECK,0,1,1,nil)
 		local tc=g:GetFirst()
 		if tc then
 			Duel.MoveToField(tc,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 		end
-    end
+	end
 end
 --disable
 function s.filter1(c)
@@ -170,20 +170,20 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.filter1,tp,LOCATION_SZONE,0,5,nil)
 end
 function s.filter3(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(0x1034) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsCanBeEffectTarget(e)
+	return c:IsFaceup() and c:IsSetCard(0x1034) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-    local ct=Duel.GetMatchingGroupCount(s.filter3,tp,LOCATION_SZONE,0,nil)
+	local ct=Duel.GetMatchingGroupCount(s.filter3,tp,LOCATION_SZONE,0,nil,e,tp)
 	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(tp) and s.filter3(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(s.filter3,tp,LOCATION_SZONE,0,1,nil,e,tp) end
-    local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ft<=0 then return end
 	if ft>=ct then ft=ct end
 	if Duel.IsPlayerAffectedByEffect(tp,59822133) then ft=1 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,s.filter3,tp,LOCATION_SZONE,0,1,ft,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)

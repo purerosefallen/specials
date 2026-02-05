@@ -1,4 +1,4 @@
---邪炎帝王 泰斯塔罗斯
+--邪炎帝王テスタロス
 local s,id,o=GetID()
 function s.initial_effect(c)
 	--tribute from each field for advance summon
@@ -34,22 +34,27 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function s.tfilter(c,tp)
-	return c:IsSummonType(SUMMON_TYPE_ADVANCE) and c:IsControler(tp) or c:IsControler(1-tp)
+	return c:IsControler(tp)
+end
+function s.tcheck(g,tp)
+	return g:IsExists(s.tfilter,1,nil,tp) and g:IsExists(Card.IsControler,1,nil,1-tp)
+		and Duel.GetMZoneCount(tp,g)>0
 end
 function s.otcon(e,c,minc)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local mg=Duel.GetMatchingGroup(s.tfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	return c:IsLevelAbove(7) and minc<=1 and Duel.CheckTribute(c,1,1,mg)
+	local g=Duel.GetMatchingGroup(Card.IsReleasable,tp,LOCATION_MZONE,LOCATION_MZONE,nil,REASON_SUMMON)
+	return c:IsLevelAbove(7) and minc<=2 and g:CheckSubGroup(s.tcheck,2,2,tp)
 end
 function s.otop(e,tp,eg,ep,ev,re,r,rp,c)
-	local mg=Duel.GetMatchingGroup(s.tfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil)
-	local sg=Duel.SelectTribute(tp,c,1,1,mg)
+	local g=Duel.GetMatchingGroup(Card.IsReleasable,tp,LOCATION_MZONE,LOCATION_MZONE,nil,REASON_SUMMON)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+	local sg=g:SelectSubGroup(tp,s.tcheck,false,2,2,tp)
 	c:SetMaterial(sg)
-	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
+	Duel.Release(sg,REASON_MATERIAL+REASON_SUMMON)
 end
 function s.mfilter(c)
-	return c:IsLevelAbove(8) or c:IsAttribute(ATTRIBUTE_DARK+ATTRIBUTE_FIRE)
+	return c:IsLevelAbove(8) and c:IsSummonType(SUMMON_TYPE_ADVANCE)
 end
 function s.mchk(e,c)
 	if c:GetMaterial():IsExists(s.mfilter,1,nil) then

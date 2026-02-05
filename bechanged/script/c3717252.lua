@@ -31,6 +31,16 @@ function s.initial_effect(c)
 	e2:SetOperation(s.drop)
 	c:RegisterEffect(e2)
 	s.shadoll_flip_effect=e1
+	--shaddoll
+	local e3=Effect.CreateEffect(c)
+	e3:SetCategory(CATEGORY_TOGRAVE)
+	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetRange(LOCATION_HAND)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetCountLimit(1,id+2)
+	e3:SetTarget(s.tg)
+	e3:SetOperation(s.op)
+	c:RegisterEffect(e3)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -57,4 +67,30 @@ function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Draw(tp,1,REASON_EFFECT)
+end
+function s.tarfilter(c,e,tp,ec)
+	return c:IsFacedown() and c:IsCanChangePosition() and ec:IsAbleToGrave()
+end
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local c=e:GetHandler()
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.tarfilter(chkc,tp,c) end
+	if chk==0 then return Duel.IsExistingTarget(s.tarfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e,tp,c) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	local tc=Duel.SelectTarget(tp,s.tarfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e,tp,c):GetFirst()
+		Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,c,1,0,0)
+		Duel.SetOperationInfo(0,CATEGORY_POSITION,tc,1,0,0)
+end
+function s.op(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+			if tc:IsSetCard(0x9d) and
+			Duel.ChangePosition(tc,POS_FACEUP_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)~=0
+			and c:IsRelateToEffect(e)
+			then Duel.SendtoGrave(c,REASON_EFFECT)
+			elseif Duel.ChangePosition(tc,POS_FACEUP_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK,true)~=0
+			and c:IsRelateToEffect(e)
+			then Duel.SendtoGrave(c,REASON_EFFECT)
+		end
+	end
 end

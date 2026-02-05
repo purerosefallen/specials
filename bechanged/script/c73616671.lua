@@ -25,7 +25,7 @@ function s.initial_effect(c)
 	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,s.counterfilter)
 end
 function s.counterfilter(c)
-	return aux.IsCodeListed(c,46986414) and c:IsLocation(LOCATION_DECK)
+	return not c:IsSummonLocation(LOCATION_DECK) or aux.IsCodeListed(c,46986414)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsRace,1,nil,RACE_SPELLCASTER) end
@@ -66,10 +66,12 @@ function s.mdcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetTarget(s.zslimit)
 	Duel.RegisterEffect(e1,tp)
 	local ct=1
-	if Duel.IsExistingMatchingCard(s.jsfilter,tp,LOCATION_DECK,0,2,nil) then ct=2 end
+	if Duel.IsExistingMatchingCard(s.jsfilter,tp,LOCATION_DECK,0,2,nil)
+	and Duel.IsExistingMatchingCard(s.hdfilter,tp,LOCATION_HAND,0,2,nil)
+	then ct=2 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectMatchingCard(tp,s.hdfilter,tp,LOCATION_HAND,0,1,ct,nil)
-	e:SetLabel(Duel.SendtoDeck(g,REASON_COST))
+	e:SetLabel(Duel.SendtoDeck(g,nil,2,REASON_COST))
 end
 function s.zslimit(e,c)
 	return not aux.IsCodeListed(c,46986414) and c:IsLocation(LOCATION_DECK)
@@ -83,9 +85,10 @@ function s.jstg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.jsop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	if not Duel.IsExistingMatchingCard(s.jsfilter,tp,LOCATION_DECK,0,d,nil)
+	then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	if Duel.IsExistingMatchingCard(s.jsfilter,tp,LOCATION_DECK,0,1,nil)<d then return end
-	local g=Duel.SelectMatchingCard(tp,s.jsfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,d,d,nil)
+	local g=Duel.SelectMatchingCard(tp,s.jsfilter,tp,LOCATION_DECK,0,d,d,nil)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
