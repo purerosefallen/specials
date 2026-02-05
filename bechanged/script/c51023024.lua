@@ -29,28 +29,22 @@ function s.initial_effect(c)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 	s.shadoll_flip_effect=e1
-	--
+	--shaddoll
 	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOGRAVE+CATEGORY_TOGRAVE)
-	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
+	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_HAND)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCountLimit(1,id+2)
-	e3:SetCost(s.zisu)
-	e3:SetCondition(s.con1)
+	e3:SetCondition(s.con)
 	e3:SetTarget(s.tg)
 	e3:SetOperation(s.op)
 	c:RegisterEffect(e3)
-	local e33=e3:Clone()
-	e33:SetType(EFFECT_TYPE_QUICK_O)
-	e33:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
-	e33:SetCode(EVENT_FREE_CHAIN)
-	e33:SetCondition(s.con2)
-	c:RegisterEffect(e33)
-	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,s.counterfilter)
 end
 function s.counterfilter(c)
-	return c:IsSetCard(0x9d) and c:IsLocation(LOCATION_EXTRA)
+	return not c:IsSummonLocation(LOCATION_EXTRA) or c:IsSetCard(0x9d) and c:IsFaceup()
 end
 function s.zisu(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
@@ -64,7 +58,7 @@ function s.zisu(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.zslimit(e,c)
-	return not c:IsSetCard(0x9d) and c:IsLocation(LOCATION_EXTRA)
+	return  c:IsSetCard(0x9d) and c:IsLocation(LOCATION_EXTRA)
 end
 function s.ccfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:IsSetCard(0x9d)
@@ -141,5 +135,30 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if tc then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEDOWN_DEFENSE)
 		Duel.ConfirmCards(1-tp,tc)
+	end
+end
+function s.con(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==1-tp
+end
+function s.tarfilter(c,e,tp,ec)
+	return c:IsFaceup() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and ec:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE)
+end
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local c=e:GetHandler()
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.tarfilter(chkc,tp,c) end
+	if chk==0 then return Duel.IsExistingTarget(s.tarfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e,tp,c) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	local tc=Duel.SelectTarget(tp,s.tarfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e,tp,c):GetFirst()
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+end
+function s.op(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
+	if Duel.ChangePosition(tc,POS_FACEUP_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)~=0
+	and c:IsRelateToEffect(e)
+		then
+			Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEDOWN_DEFENSE)
+		end
 	end
 end

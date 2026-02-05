@@ -1,4 +1,5 @@
 --No.36 先史遗产-超机关 叉丘
+local s,id,o=GetID()
 function s.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x70),4,2)
@@ -43,10 +44,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 aux.xyz_number[id]=36
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-end
+
 function s.filter(c)
 	return c:IsFaceup() and c:GetAttack()>0
 end
@@ -92,7 +90,7 @@ end
 function s.cefilter(c,tc,ct,e,tp)
 	if not c:IsType(TYPE_XYZ) then return false end
 	local r=c:GetRank()-tc:GetRank()
-	return not c:IsSetCard(0x70)
+	return c:IsSetCard(0x70)
 		and tc:IsCanBeXyzMaterial(c) and r>0 and r<=3 and ct>=r
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 		and Duel.GetLocationCountFromEx(tp,tp,tc,c)>0
@@ -104,14 +102,14 @@ end
 function s.tgefilter(c,tc,e,tp,rank)
 	if not c:IsType(TYPE_XYZ) then return false end
 	local r=c:GetRank()-tc:GetRank()
-	return not c:IsSetCard(0x70)
+	return c:IsSetCard(0x70)
 		and tc:IsCanBeXyzMaterial(c) and r==rank
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 		and Duel.GetLocationCountFromEx(tp,tp,tc,c)>0
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-    local c=e:GetHandler()
-    local ct=c:GetOverlayCount()
+	local c=e:GetHandler()
+	local ct=c:GetOverlayCount()
 	if chk==0 then
 		if e:GetLabel()==0 then return false end
 		e:SetLabel(0)

@@ -38,7 +38,7 @@ function c67227834.initial_effect(c)
 	--自己回合墓效
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(67227834,0))
-	e4:SetCategory(CATEGORY_RECOVER)
+	e4:SetCategory(CATEGORY_RECOVER+CATEGORY_SPECIAL_SUMMON)
 	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_TO_GRAVE)
@@ -48,9 +48,8 @@ function c67227834.initial_effect(c)
 	c:RegisterEffect(e4)
 	--对面回合墓效
 	local e5=e4:Clone()
-	e5:SetCategory(CATEGORY_RECOVER+CATEGORY_SPECIAL_SUMMON)
 	e5:SetCondition(c67227834.reccon2)
-	e4:SetOperation(c67227834.recop2)
+	e5:SetOperation(c67227834.recop2)
 	c:RegisterEffect(e5)
 end
 function c67227834.eqlimit(e,c)
@@ -80,20 +79,19 @@ function c67227834.reccon2(e,tp,eg,ep,ev,re,r,rp)
 end
 function c67227834.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(1000)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,1000)
 end
 function c67227834.recop1(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.Recover(p,d,REASON_EFFECT)
+	Duel.Recover(tp,1000,REASON_EFFECT)
 end
 function c67227834.spf(c,e,tp)
-	return aux.IsCodeListed(c,46986414) and c:IsLevelAbove(6) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return aux.IsCodeListed(c,46986414) and c:IsLevelAbove(7) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c67227834.recop2(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	if Duel.Recover(p,d,REASON_EFFECT)>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(c67227834.spf,tp,LOCATION_DECK,0,1,nil,e,tp)>0 then
+	if Duel.Recover(tp,1000,REASON_EFFECT)>0
+	and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	and Duel.IsExistingMatchingCard(c67227834.spf,tp,LOCATION_DECK,0,1,nil,e,tp)
+	then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,c67227834.spf,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 		if g:GetCount()>0 then

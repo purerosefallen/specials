@@ -9,11 +9,11 @@ function c43509019.initial_effect(c)
 	c:RegisterEffect(e1)
 	--change battle target
 	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_NEGATE)
-	e3:SetType(EFFECT_TYPE_QUICK_O)
-	e3:SetCode(EVENT_CHAINING)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e3:SetDescription(aux.Stringid(43509019,0))
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e3:SetRange(LOCATION_SZONE)
+	e3:SetCategory(CATEGORY_CONTROL)
 	e3:SetCountLimit(1)
 	e3:SetCondition(c43509019.discon)
 	e3:SetTarget(c43509019.distg)
@@ -33,17 +33,20 @@ function c43509019.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+function c43509019.ktcon(e)
+	return c:IsType(TYPE_TOON) and c:IsType(TYPE_MONSTER)
+end
 function c43509019.discon(e,tp,eg,ep,ev,re,r,rp)
 	local a,d=Duel.GetBattleMonster(1-tp)
-	return Duel.GetAttacker()==a
+	return Duel.GetAttacker()==a and Duel.IsExistingMatchingCard(c43509019.ktcon,tp,LOCATION_MZONE,0,1,nil)
 end
 function c43509019.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local a,d=Duel.GetBattleMonster(1-tp)
-	if chk==0 then return a end
+	if chk==0 then return a and a:IsAbleToChangeControler() end
 end
 function c43509019.disop(e,tp,eg,ep,ev,re,r,rp)
 	local a,d=Duel.GetBattleMonster(1-tp)
-	if a and a:IsRelateToBattle() then
-		Duel.GetControl(a,tp)
+	if a and a:IsRelateToBattle() and a:IsAbleToChangeControler()
+	then Duel.GetControl(a,tp)
 	end
 end

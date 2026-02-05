@@ -2,7 +2,7 @@
 function c29884951.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(29884951,0))
+	e1:SetDescription(aux.Stringid(29884951,1))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -16,7 +16,7 @@ function c29884951.initial_effect(c)
 	c:RegisterEffect(e1)
 	--des
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(29884951,1))
+	e2:SetDescription(aux.Stringid(29884951,5))
 	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_BATTLE_CONFIRM)
@@ -37,18 +37,6 @@ function c29884951.initial_effect(c)
 	e3:SetTarget(c29884951.remtg)
 	e3:SetOperation(c29884951.remop)
 	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_EXTRA_SYNCHRO_MATERIAL)
-	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e4:SetRange(LOCATION_HAND)
-	e4:SetValue(c29884951.matval)
-	c:RegisterEffect(e4)
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetCode(EFFECT_TUNER)
-	e5:SetValue(c29884951.tnval)
-	c:RegisterEffect(e5)
 end
 function c29884951.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
@@ -57,11 +45,19 @@ end
 function c29884951.rfilter(c,tp)
 	return c:IsType(TYPE_MONSTER) and Duel.GetMZoneCount(tp,c)>0
 end
+function c29884951.jxfilter(c)
+	return c:IsSetCard(0x16b) and c:IsType(TYPE_SYNCHRO) and c:IsPosition(POS_FACEUP)
+end
 function c29884951.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c29884951.rfilter,1,nil,tp) end
+	local b1=Duel.CheckReleaseGroup(tp,c29884951.rfilter,1,nil,tp)
+	local b2=Duel.IsExistingMatchingCard(c29884951.jxfilter,tp,LOCATION_MZONE,0,1,nil)
+	if chk==0 then return b1 or b2 end
+	if b1 then
+	if b2 and not Duel.SelectYesNo(tp,aux.Stringid(id,0)) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
 	local g=Duel.SelectReleaseGroup(tp,c29884951.rfilter,1,1,nil,tp)
 	Duel.Release(g,REASON_COST)
+	end
 end
 function c29884951.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
@@ -69,9 +65,28 @@ function c29884951.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c29884951.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
+		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+		if ft>0 and Duel.IsPlayerCanSpecialSummonMonster(tp,29884952,0x16b,TYPES_TOKEN_MONSTER+TYPE_TUNER,0,0,4,RACE_WYRM,ATTRIBUTE_WATER)
+			and Duel.SelectYesNo(tp,aux.Stringid(29884951,2)) then
+				Duel.BreakEffect()
+				local token=Duel.CreateToken(tp,29884952)
+				Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
+				local e1=Effect.CreateEffect(c)
+				e1:SetType(EFFECT_TYPE_FIELD)
+				e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+				e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+				e1:SetRange(LOCATION_MZONE)
+				e1:SetAbsoluteRange(tp,1,0)
+				e1:SetTarget(c29884951.splimit)
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+				token:RegisterEffect(e1,true)
+				Duel.SpecialSummonComplete()
+		end
 	end
+end
+function c29884951.splimit(e,c)
+	return not c:IsType(TYPE_SYNCHRO) and c:IsLocation(LOCATION_EXTRA)
 end
 function c29884951.descon(e,tp,eg,ep,ev,re,r,rp)
 	local a,d=Duel.GetBattleMonster(tp)
@@ -110,10 +125,4 @@ function c29884951.remop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
 	end
-end
-function c29884951.matval(e,c)
-	return c:IsType(TYPE_SYNCHRO) and (c:IsSetCard(0x16b) or c:IsRace(RACE_WYRM))
-end
-function c29884951.tnval(e,c)
-	return e:GetHandler():IsControler(c:GetControler())
 end

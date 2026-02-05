@@ -1,5 +1,4 @@
---No.6 先史遺産アトランタル
----@param c Card
+--No.6 先史遗产 大西洲巨人
 function c9161357.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,6,2)
@@ -10,7 +9,7 @@ function c9161357.initial_effect(c)
 	e1:SetCategory(CATEGORY_LEAVE_GRAVE+CATEGORY_EQUIP)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e1:SetCondition(c9161357.eqcon)
 	e1:SetTarget(c9161357.eqtg)
 	e1:SetOperation(c9161357.eqop)
@@ -24,29 +23,21 @@ function c9161357.initial_effect(c)
 	e2:SetCost(c9161357.lpcost)
 	e2:SetOperation(c9161357.lpop)
 	c:RegisterEffect(e2)
-	--lp2
+	--equip
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e3:SetDescription(aux.Stringid(9161357,2))
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1)
-	e3:SetCondition(c9161357.lvcon)
-	e3:SetTarget(c9161357.lvtg)
-	e3:SetOperation(c9161357.lvop)
+	e3:SetCountLimit(1,9161357)
+	e3:SetCondition(c9161357.eqcon2)
+	e3:SetTarget(c9161357.eqtg2)
+	e3:SetOperation(c9161357.eqop2)
 	c:RegisterEffect(e3)
-	--battle indes
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetValue(c9161357.indes)
-	c:RegisterEffect(e4)
 end
 aux.xyz_number[9161357]=6
-function c9161357.indes(e,c)
-	return not c:IsSetCard(0x48)
-end
+
+--eq1
 function c9161357.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ)
 end
@@ -66,30 +57,22 @@ function c9161357.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
-		if not Duel.Equip(tp,tc,c,false) then return end
+	if not Duel.Equip(tp,tc,c,false) then return end
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
 		e1:SetCode(EFFECT_EQUIP_LIMIT)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		e1:SetValue(c9161357.eqlimit)
+		e1:SetValue(c9161357.eqlimit1)
 		tc:RegisterEffect(e1)
-		local atk=math.ceil(tc:GetBaseAttack()/2)
-		if atk>0 then
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_EQUIP)
-			e2:SetProperty(EFFECT_FLAG_OWNER_RELATE+EFFECT_FLAG_IGNORE_IMMUNE)
-			e2:SetCode(EFFECT_UPDATE_ATTACK)
-			e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-			e2:SetValue(atk)
-			tc:RegisterEffect(e2)
-		end
 		tc:RegisterFlagEffect(9161357,RESET_EVENT+RESETS_STANDARD,0,1)
 	end
 end
-function c9161357.eqlimit(e,c)
+function c9161357.eqlimit1(e,c)
 	return e:GetOwner()==c
 end
+
+--lp
 function c9161357.lpfilter(c,tp)
 	return c:GetFlagEffect(9161357)~=0 and c:IsControler(tp) and c:IsLocation(LOCATION_SZONE) and c:IsAbleToGraveAsCost()
 end
@@ -99,6 +82,7 @@ function c9161357.lpcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetCurrentPhase()==PHASE_MAIN1 and eqg:IsExists(c9161357.lpfilter,1,nil,tp)
 		and c:CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	c:RemoveOverlayCard(tp,1,1,REASON_COST)
+	Duel.RegisterFlagEffect(tp,9161358,0,0,0)
 	local ec=eqg:FilterSelect(tp,c9161357.lpfilter,1,1,nil,tp)
 	Duel.SendtoGrave(ec,REASON_COST)
 	local e1=Effect.CreateEffect(e:GetHandler())
@@ -112,30 +96,59 @@ end
 function c9161357.lpop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SetLP(1-tp,math.ceil(Duel.GetLP(1-tp)/2))
 end
-function c9161357.lvcon(e,tp,eg,ep,ev,re,r,rp)
-	return tp==Duel.GetTurnPlayer() and e:GetHandler():GetOverlayCount()==0
+
+--eqquick
+function c9161357.eqcon2(e,c)
+	local c=e:GetHandler()
+	local tp=c:GetControler()
+	return Duel.GetFlagEffect(tp,9161358)>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 end
-function c9161357.lvtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+function c9161357.eqfilter2(c,tp)
+	return c:IsType(TYPE_MONSTER) and (c:IsControler(tp) or c:IsAbleToChangeControler())
 end
-function c9161357.lvop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.SetLP(1-tp,math.ceil(Duel.GetLP(1-tp)/2))
-	Duel.SetLP(tp,math.ceil(Duel.GetLP(tp)/2))
-	if Duel.GetLP(tp)<=1000 then
-		local e1=Effect.CreateEffect(e:GetHandler())
+function c9161357.eqtg2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+		and Duel.IsExistingMatchingCard(c9161357.eqfilter,tp,0,LOCATION_MZONE,1,nil,tp) end
+	local g=Duel.GetFieldGroup(tp,0,LOCATION_MZONE)
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
+end
+function c9161357.eqop2(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not (c:IsFaceup() and c:IsRelateToEffect(e)) then return end
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+	local g=Duel.SelectMatchingCard(tp,c9161357.eqfilter,tp,0,LOCATION_MZONE,1,1,nil,tp)
+	local tc=g:GetFirst()
+	if tc then
+		if not Duel.Equip(tp,tc,c) then return end
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-		e1:SetValue(1)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		c:RegisterEffect(e1)
-		local e3=Effect.CreateEffect(e:GetHandler())
-		e3:SetType(EFFECT_TYPE_FIELD)
+		e1:SetCode(EFFECT_EQUIP_LIMIT)
+		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
+		e1:SetLabelObject(c)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetValue(c9161357.eqlimit)
+		tc:RegisterEffect(e1)
+		Duel.RegisterFlagEffect(tp,9161357,RESET_EVENT+RESETS_STANDARD,0,1)
+		Duel.BreakEffect()
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+		e2:SetRange(LOCATION_MZONE)
+		e2:SetValue(1)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		c:RegisterEffect(e2)
+		local e3=e2:Clone()
 		e3:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
-		e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-		e3:SetTargetRange(1,0)
-		e3:SetValue(1)
-		e3:SetReset(RESET_PHASE+PHASE_END)
-		Duel.RegisterEffect(e3,tp)
+		c:RegisterEffect(e3)
+		local e5=e2:Clone()
+		e5:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+		c:RegisterEffect(e5)
+		c:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(9161357,3))
+		tc:RegisterFlagEffect(9161357,RESET_EVENT+RESETS_STANDARD,0,1)
 	end
+end
+function c9161357.eqlimit(e,c)
+	return c==e:GetLabelObject()
 end

@@ -7,7 +7,6 @@ function c27699122.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,27699122+EFFECT_COUNT_CODE_OATH)
-	e1:SetCondition(c27699122.con)
 	e1:SetTarget(c27699122.tg)
 	e1:SetOperation(c27699122.op)
 	c:RegisterEffect(e1)
@@ -20,12 +19,6 @@ function c27699122.initial_effect(c)
 	e4:SetTarget(c27699122.sptg)
 	e4:SetOperation(c27699122.spop)
 	c:RegisterEffect(e4)
-end
-function c27699122.ffilter(c)
-	return c:IsFaceup() and c:IsCode(15259703)
-end
-function c27699122.con(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c27699122.ffilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c27699122.filter(c,e,tp)
 	return c:IsSetCard(0x62,0x110) and c:IsAbleToHand()
@@ -49,16 +42,20 @@ function c27699122.op(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c27699122.spfilter(c,e,tp)
-	return c:IsSetCard(0x110) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and (c:IsLocation(LOCATION_DECK) and Duel.GetMZoneCount(tp)>0
-			or c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0)
+	return c:IsSetCard(0x110) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+		and 
+		(
+		(c:IsLocation(LOCATION_DECK) and Duel.GetMZoneCount(tp)>0)
+		or
+		(c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCountFromEx(tp)>0)
+		)
 end
 function c27699122.setfilter(c,tp)
-	return c:IsCode(15259703) and c:IsType(TYPE_FIELD) and not c:IsForbidden() and c:CheckUniqueOnField(tp)
+	return c:IsCode(15259703) and not c:IsForbidden()
 end
 function c27699122.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		if Duel.IsEnvironment(15259703) then
+		if Duel.IsExistingMatchingCard(c27699122.dirfilter1,tp,LOCATION_ONFIELD,0,1,nil) then
 			return Duel.IsExistingMatchingCard(c27699122.spfilter,tp,LOCATION_DECK+LOCATION_EXTRA,0,1,nil,e,tp)
 		else
 			return Duel.IsExistingMatchingCard(c27699122.setfilter,tp,LOCATION_DECK,0,1,nil,tp)
@@ -66,25 +63,23 @@ function c27699122.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
+function c27699122.dirfilter1(c)
+	return c:IsFaceup() and c:IsCode(15259703)
+end
 function c27699122.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsEnvironment(15259703) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	if Duel.IsExistingMatchingCard(c27699122.dirfilter1,tp,LOCATION_ONFIELD,0,1,nil)
+	then Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,c27699122.spfilter,tp,LOCATION_DECK+LOCATION_EXTRA,0,1,1,nil,e,tp)
 		local tc=g:GetFirst()
-		if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
+		if tc and Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP)>0 and tc:GetAttack()>0 then
 			Duel.BreakEffect()
 			Duel.Damage(tp,tc:GetAttack(),REASON_EFFECT)
 		end
-	else
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
+	else if Duel.GetLocationCount(tp,LOCATION_SZONE)>0 
+	and Duel.IsExistingMatchingCard(c27699122.setfilter,tp,LOCATION_DECK,0,1,nil,tp)
+		then Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 		local tc=Duel.SelectMatchingCard(tp,c27699122.setfilter,tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
-		if tc then
-			local fc=Duel.GetFieldCard(tp,LOCATION_SZONE,5)
-			if fc then
-				Duel.SendtoGrave(fc,REASON_RULE)
-				Duel.BreakEffect()
-			end
-			Duel.MoveToField(tc,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
+		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		end
 	end
 end

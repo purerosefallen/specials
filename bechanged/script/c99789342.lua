@@ -12,18 +12,21 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	--仪式召唤
-	local e2=e1:Clone()
+	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(99789342,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_RELEASE)
+	e2:SetType(EFFECT_TYPE_ACTIVATE)
+	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetCost(s.cost2)
 	e2:SetTarget(s.target2)
 	e2:SetOperation(s.activate2)
-	c:RegisterEffect(e2)--]
+	c:RegisterEffect(e2)
 	--destroy replace
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_DESTROY_REPLACE)
 	e3:SetRange(LOCATION_GRAVE)
+	e3:SetCondition(s.desrepcon)
 	e3:SetTarget(s.desreptg)
 	e3:SetValue(s.desrepval)
 	e3:SetOperation(s.desrepop)
@@ -37,10 +40,11 @@ function s.filter(c,e,tp)
 	return c:IsCode(46986414) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.filter2(c,e,tp)
-	return c:IsCode(46986414)
+	return c:IsCode(46986414) and Duel.IsPlayerCanRelease(tp,c)
 end
 function s.filter22(c,e,tp)
-	return c:IsSetCard(0xcf) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,false) and c:IsType(TYPE_RITUAL) and c:IsRace(RACE_SPELLCASTER+RACE_WARRIOR)
+	return c:IsSetCard(0xcf) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true)
+	and c:IsType(TYPE_RITUAL) and c:IsRace(RACE_SPELLCASTER+RACE_WARRIOR)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and 
@@ -50,9 +54,11 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return 
-		Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_MZONE,0,1,nil,e,tp) and Duel.IsExistingMatchingCard(s.filter22,tp,LOCATION_DECK,0,1,nil,e,tp)
+		Duel.CheckReleaseGroup(tp,s.filter2,1,nil,e,tp)
+		and Duel.IsExistingMatchingCard(s.filter22,tp,LOCATION_DECK,0,1,nil,e,tp)
 	end
-	Duel.SetOperationInfo(0,CATEGORY_RELEASE+CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_RELEASE,nil,1,tp,LOCATION_ONFIELD)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
@@ -63,24 +69,20 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.activate2(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_ONFIELD,0,1,1,nil,e,tp)
-	if not g:GetCount()>0 then return end
-	local g2=Duel.SelectMatchingCard(tp,s.filter22,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	if not g2:GetCount()>0 then return end
+	if not Duel.CheckReleaseGroup(tp,s.filter2,1,nil,e,tp) then return end
+	if not Duel.IsExistingMatchingCard(s.filter22,tp,LOCATION_DECK,0,1,nil,e,tp) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_ONFIELD,0,1,1,nil,e,tp)
 		local tc=g:GetFirst()
-		if tc then
-			if Duel.Release(tc,REASON_EFFECT)~=0 then
-			Duel.BreakEffect()
+		if tc and Duel.Release(tc,REASON_RITUAL)~=0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local g2=Duel.SelectMatchingCard(tp,s.filter22,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-				local tcc=g2:GetFirst()
-				if tcc then
-					tcc:SetMaterial(nil)
-					Duel.SpecialSummon(tcc,SUMMON_TYPE_RITUAL,tp,tp,true,true,POS_FACEUP)
-					tcc:CompleteProcedure()
-				end
+			local tcc=g2:GetFirst()
+			if tcc then
+				Duel.BreakEffect()
+				tcc:SetMaterial(nil)
+				Duel.SpecialSummon(tcc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
+				tcc:CompleteProcedure()
 			end
 		end
 end
@@ -89,11 +91,13 @@ function s.repfilter(c,tp)
 		and c:IsReason(REASON_EFFECT) and not c:IsReason(REASON_REPLACE)
 end
 function s.confilter(c)
-	return c:IsType(TYPE_SYNCHRO) and c:IsFaceup() and c:IsCode(c,46986414)
+	return c:IsFaceup() and c:IsCode(c,46986414) and c:IsFaceup()
+end
+function s.desrepcon(e,tp,eg,ep,ev,re,r,rp,chk)
+	return Duel.IsExistingMatchingCard(s.confilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function s.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToRemove() and eg:IsExists(s.repfilter,1,nil,tp)
-		and Duel.IsExistingMatchingCard(s.confilter,tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return e:GetHandler():IsAbleToRemove() and eg:IsExists(s.repfilter,1,nil,tp) end
 	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
 end
 function s.desrepval(e,c)
