@@ -89,7 +89,11 @@ function OptUI.AddHook(effect, effect_key, desc)
 	local orig_cost = effect:GetCost()
 	local function new_cost(e, tp, eg, ep, ev, re, r, rp, chk)
 		if chk == 0 then
-			return orig_cost and orig_cost(e, tp, eg, ep, ev, re, r, rp, 0) or true
+			if orig_cost then
+				return orig_cost(e, tp, eg, ep, ev, re, r, rp, 0)
+			else
+				return true
+			end
 		end
 		local card_id = e:GetHandler():GetOriginalCode()
 		OptUI.MarkUsed(effect_key, desc, card_id, tp)
