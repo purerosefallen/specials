@@ -1,7 +1,7 @@
 --深渊之相剑龙
 local s,id,o=GetID()
 function s.initial_effect(c)
-	local e11=aux.AddThisCardInGraveAlreadyCheck(c)
+	local e0=aux.AddThisCardInGraveAlreadyCheck(c)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -9,24 +9,6 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetValue(s.splimit)
 	c:RegisterEffect(e1)
-	--hand synchro
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetCode(EFFECT_EXTRA_SYNCHRO_MATERIAL)
-	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e0:SetRange(LOCATION_HAND)
-	e0:SetCountLimit(1,id)
-	e0:SetValue(s.matval)
-	c:RegisterEffect(e0)
-	--register HOpT
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_BE_PRE_MATERIAL)
-	e4:SetProperty(EFFECT_FLAG_EVENT_PLAYER+EFFECT_FLAG_CANNOT_DISABLE)
-	e4:SetLabelObject(e11)
-	e4:SetCondition(s.hsyncon)
-	e4:SetOperation(s.hsynreg)
-	c:RegisterEffect(e4)
 	--spsummon itself
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
@@ -52,16 +34,23 @@ function s.initial_effect(c)
 	e3:SetTarget(s.rmtg)
 	e3:SetOperation(s.rmop)
 	c:RegisterEffect(e3)
-end
-function s.matval(e,c)
-	return c:IsType(TYPE_SYNCHRO) and c:IsSetCard(0x16b,0x16c)
-end
-function s.hsyncon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return r==REASON_SYNCHRO and s.matval(nil,c:GetReasonCard()) and c:IsPreviousLocation(LOCATION_HAND)
-end
-function s.hsynreg(e,tp,eg,ep,ev,re,r,rp)
-	e:GetLabelObject():UseCountLimit(tp)
+	--手坑效果
+	local e11=Effect.CreateEffect(c)
+	e11:SetCategory(CATEGORY_REMOVE+CATEGORY_DAMAGE)
+	e11:SetType(EFFECT_TYPE_IGNITION)
+	e11:SetRange(LOCATION_HAND)
+	e11:SetCountLimit(1,id)
+	e11:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e11:SetCondition(s.jxcon1)
+	e11:SetTarget(s.jxtg)
+	e11:SetOperation(s.xjop)
+	c:RegisterEffect(e11)
+	local e21=e11:Clone()
+	e21:SetType(EFFECT_TYPE_QUICK_O)
+	e21:SetCode(EVENT_FREE_CHAIN)
+	e21:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
+	e21:SetCondition(s.jxcon2)
+	c:RegisterEffect(e21)
 end
 function s.splimit(e,se,sp,st)
 	return se:IsActiveType(TYPE_MONSTER) and se:GetHandler():IsRace(RACE_WYRM)
@@ -87,27 +76,52 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.SpecialSummonComplete()
 end
-function s.gcheck(sg)
-	return sg:FilterCount(Card.IsLocation,nil,LOCATION_FZONE)==1
+function s.fselect(g)
+	return g:FilterCount(Card.IsType,nil,TYPE_FIELD)<=1 and g:FilterCount(Card.IsType,nil,TYPE_MONSTER)<=1
 end
-function s.rmfilter(c)
-	return c:IsAbleToRemove() and c:IsType(TYPE_MONSTER)
+function s.rmfilter(c,e)
+	if not c:IsCanBeEffectTarget(e) or not c:IsAbleToRemove() then return false end
+	return c:IsLocation(LOCATION_FZONE+LOCATION_MZONE) or c:IsType(TYPE_MONSTER)
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE+LOCATION_GRAVE) and chkc:IsAbleToRemove() and chkc:IsControler(1-tp) end
-	if chk==0 then return Duel.IsExistingTarget(s.rmfilter,tp,0,LOCATION_MZONE+LOCATION_GRAVE,1,nil) end
+	if chkc then return false end
+	local g=Duel.GetMatchingGroup(s.rmfilter,tp,LOCATION_FZONE,LOCATION_FZONE+LOCATION_MZONE+LOCATION_GRAVE,nil,e)
+	if chk==0 then return #g>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local sg=Duel.SelectTarget(tp,s.rmfilter,tp,0,LOCATION_MZONE+LOCATION_GRAVE,1,1,nil)
+	local sg=g:SelectSubGroup(tp,s.fselect,false,1,2)
+	Duel.SetTargetCard(sg)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,sg,#sg,0,0)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	if #g>0 and Duel.Remove(g,POS_FACEUP,REASON_EFFECT)~=0 then
-		if Duel.GetFieldGroupCount(tp,LOCATION_FZONE,LOCATION_FZONE)~=0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
-			Duel.BreakEffect()
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-			local tg=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,LOCATION_FZONE,LOCATION_FZONE,1,1,nil)
-			Duel.Remove(tg,POS_FACEUP,REASON_EFFECT)
-		else return end
+	if #g>0 then
+		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
+end
+function s.level(c)
+	return c:IsLevelAbove(8) end
+function s.jxcon1(e,tp,eg,ep,ev,re,r,rp)
+	return not Duel.IsExistingMatchingCard(s.level,tp,0,LOCATION_MZONE,1,nil)
+end
+function s.jxcon2(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(s.level,tp,0,LOCATION_MZONE,1,nil)
+end
+function s.jxfilter(c)
+	return (c:IsLevel(8) or c:IsLevel(4)) and c:IsAbleToRemove() and not c:IsCode(id)
+end
+function s.jxtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and s.jxfilter(chkc) end
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingTarget(s.jxfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local g=Duel.SelectTarget(tp,s.jxfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
+end
+function s.jxop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 and tc:IsAttribute(ATTRIBUTE_WATER)
+	then
+	Duel.BreakEffect()
+	Duel.Damage(1-tp,1200,REASON_EFFECT)
+end
 end
