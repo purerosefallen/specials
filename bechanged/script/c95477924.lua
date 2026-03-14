@@ -40,7 +40,7 @@ end
 function s.thfilter(c,check)
 	local b1=c:IsCode(48680970)
 	local b2=check and c:IsType(TYPE_SPELL+TYPE_TRAP) and aux.IsCodeListed(c,46986414)
-	return not c:IsCode(id) and (b1 or b2) and c:IsAbleToHand()
+	return not c:IsCode(id) and (b1 or b2) and not c:IsForbidden()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local check=Duel.IsExistingMatchingCard(s.filter1,tp,LOCATION_ONFIELD,0,1,nil)
@@ -49,13 +49,10 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local check=Duel.IsExistingMatchingCard(s.filter1,tp,LOCATION_ONFIELD,0,1,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,check)
-	if #g==0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local tg=g:Select(tp,1,1,nil)
+	if not Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,check) then return end
+	local tg=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,check)
 	if #tg>0 then
-	Duel.SSet(tg,nil,tp,true)
-	Duel.ConfirmCards(1-tp,g)
+	Duel.SSet(tp,tg,tp,true)
 	end
 end
 function s.cfilter(c,tp)

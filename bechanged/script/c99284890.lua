@@ -67,10 +67,10 @@ function c99284890.operation1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e3,tp)
 end
 function c99284890.cfilter(c,tp)
-	return c:IsControler(1-tp) and c:IsPreviousLocation(LOCATION_DECK)
+	return c:IsControler(1-tp) and c:IsPreviousLocation(LOCATION_DECK) and not c:IsReason(REASON_DRAW)
 end
 function c99284890.drcon1(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c99284890.cfilter,1,nil,tp) and not Duel.IsChainSolving() and re:IsActivated() and rp==1-tp
+	return eg:IsExists(c99284890.cfilter,1,nil,tp) and not Duel.IsChainSolving()
 end
 function c99284890.drop1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,99284890)
@@ -78,7 +78,7 @@ function c99284890.drop1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterFlagEffect(tp,99284890+1,0,0,0)
 end
 function c99284890.regcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c99284890.cfilter,1,nil,tp) and Duel.IsChainSolving() and re:IsActivated() and rp==1-tp
+	return eg:IsExists(c99284890.cfilter,1,nil,tp) and Duel.IsChainSolving()
 end
 function c99284890.regop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterFlagEffect(tp,99284890,RESET_CHAIN,0,1)

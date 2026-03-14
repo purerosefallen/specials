@@ -45,31 +45,31 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.IsExistingMatchingCard(s.cfilter1,tp,0,LOCATION_MZONE,1,nil) end
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0
+	and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_FIELD)
+			e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+			e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+			e1:SetTargetRange(1,0)
+			e1:SetTarget(s.splimit)
+			if Duel.GetTurnPlayer()==tp then
+			e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,2)
+			else
+			e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,1)
+			end
+			Duel.RegisterEffect(e1,tp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local sg=Duel.SelectMatchingCard(tp,s.cfilter1,tp,0,LOCATION_MZONE,1,1,nil)
 		if #sg>0 then
 			Duel.SendtoDeck(sg,nil,SEQ_DECKTOP,REASON_EFFECT)
 		end
 	end
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetTargetRange(1,0)
-	e1:SetTarget(s.splimit)
-	if Duel.GetTurnPlayer()==tp then
-		e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,2)
-	else
-		e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,1)
-	end
-	Duel.RegisterEffect(e1,tp)
 end
 function s.splimit(e,c)
 	return c:IsLocation(LOCATION_EXTRA)

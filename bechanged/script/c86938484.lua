@@ -27,13 +27,6 @@ function c86938484.initial_effect(c)
 	e2:SetTarget(c86938484.sptg2)
 	e2:SetOperation(c86938484.spop2)
 	c:RegisterEffect(e2)
-	--tohand
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetCode(EFFECT_MATERIAL_CHECK)
-	e5:SetValue(c86938484.valcheck)
-	e5:SetLabelObject(e3)
-	c:RegisterEffect(e5)
 end
 c86938484.fusion_effect=true
 function c86938484.thcon(e,tp,eg,ep,ev,re,r,rp)

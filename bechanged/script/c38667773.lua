@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	--sset
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,2))
-    e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_HAND)
 	e4:SetCountLimit(1,id)
@@ -60,9 +60,9 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,2,nil)
+	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
-    end
+	end
 end
