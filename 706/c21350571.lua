@@ -53,7 +53,6 @@ end
 function c21350571.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsLocation(LOCATION_SZONE) then return end
-	Debug.Message('STATUS_LEAVE_CONFIRMED'..tostring(c:IsStatus(STATUS_LEAVE_CONFIRMED)))
 	if not c:IsRelateToEffect(e) or c:IsStatus(STATUS_LEAVE_CONFIRMED) then return end
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
@@ -89,7 +88,6 @@ function c21350571.operation(e,tp,eg,ep,ev,re,r,rp)
 	else
 		c:CancelToGrave(false)
 	end
-	Debug.Message('STATUS_LEAVE_CONFIRMED'..tostring(c:IsStatus(STATUS_LEAVE_CONFIRMED)))
 end
 function c21350571.eqlimit(e,c)
 	return e:GetHandler():GetEquipTarget()==c
