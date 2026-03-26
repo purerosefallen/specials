@@ -1,5 +1,6 @@
 --氷結界の虎王ドゥローレン
 function c70583986.initial_effect(c)
+	local elast = nil
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsAttribute,ATTRIBUTE_WATER),1)
 	c:EnableReviveLimit()
@@ -13,6 +14,8 @@ function c70583986.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTarget(c70583986.target)
 	e1:SetOperation(c70583986.operation)
+	e1:SetLabelObject(elast)
+	elast=e1
 	c:RegisterEffect(e1)
 end
 function c70583986.filter(c)
@@ -26,6 +29,7 @@ function c70583986.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
 end
 function c70583986.operation(e,tp,eg,ep,ev,re,r,rp)
+	local elast = nil
 	local c=e:GetHandler()
 	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local rg=tg:Filter(Card.IsRelateToEffect,nil,e)
@@ -40,7 +44,35 @@ function c70583986.operation(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetCode(EFFECT_UPDATE_ATTACK)
 			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_DISABLE+RESET_PHASE+PHASE_END)
 			e1:SetValue(ct*500)
+			e1:SetLabelObject(elast)
+			elast=e1
 			c:RegisterEffect(e1)
+			if not c:IsImmuneToEffect(e) then
+				local e_reset=Effect.CreateEffect(e:GetHandler())
+				e_reset:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+				e_reset:SetCode(EVENT_PHASE+PHASE_END)
+				e_reset:SetReset(RESET_PHASE+PHASE_END)
+				e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+				e_reset:SetCountLimit(1)
+				e_reset:SetLabelObject(elast)
+				e_reset:SetOperation(c70583986.rstop)
+				Duel.RegisterEffect(e_reset,tp)
+			end
 		end
 	end
+end
+
+function c70583986.rstop(e,tp,eg,ep,ev,re,r,rp)
+    local c=e:GetHandler()
+	local ecur = e:GetLabelObject()
+	local tc = ecur:GetHandler()
+	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
+	local elast = nil
+	while ecur do
+		elast = ecur
+		ecur = ecur:GetLabelObject()
+		elast:Reset()
+	end
+    Duel.HintSelection(Group.FromCards(c))
+    Duel.Hint(HINT_OPSELECTED,1-tp,1162)
 end
