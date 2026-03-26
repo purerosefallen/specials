@@ -28,3 +28,21 @@ function c99214782.spcon(e,c)
 	local tp=c:GetControler()
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 end
+function c15983048.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return not e:GetHandler():IsPublic() end
+end
+function c15983048.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanSummon(tp) and Duel.IsPlayerCanAdditionalSummon(tp)
+		and Duel.GetFlagEffect(tp,15983048)==0 end
+end
+function c15983048.operation(e,tp,eg,ep,ev,re,r,rp)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetDescription(aux.Stringid(15983048,2))
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
+	e1:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xa))
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+	Duel.RegisterFlagEffect(tp,15983048,RESET_PHASE+PHASE_END,0,1)
+end

@@ -21,6 +21,7 @@ function c79858629.initial_effect(c)
 	e2:SetCode(EVENT_LEAVE_GRAVE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,79858630)
+	e2:SetCondition(c79858629.spcon)
 	e2:SetTarget(c79858629.sptg)
 	e2:SetOperation(c79858629.spop)
 	c:RegisterEffect(e2)
@@ -29,16 +30,17 @@ function c79858629.costfilter(c)
 	return c:IsSetCard(0x172) and c:IsAbleToDeckAsCost()
 end
 function c79858629.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c79858629.costfilter,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then
+	return Duel.IsExistingMatchingCard(c79858629.costfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectMatchingCard(tp,c79858629.costfilter,tp,LOCATION_HAND,0,1,1,nil)
 	Duel.ConfirmCards(1-tp,g)
 	Duel.SendtoDeck(g,nil,SEQ_DECKBOTTOM,REASON_COST)
 end
 function c79858629.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end
 	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(1)
+	Duel.SetTargetParam(2)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function c79858629.cfilter(c)
@@ -51,6 +53,9 @@ function c79858629.effop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.Recover(tp,800,REASON_EFFECT)
 	end
+end
+function c79858629.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return rp==1-tp
 end
 function c79858629.spfilter(c,e,tp,mc)
 	return c:IsSetCard(0x172) and c:IsType(TYPE_XYZ) and mc:IsCanBeXyzMaterial(c)

@@ -60,18 +60,23 @@ function c96223501.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c96223501.cdfilter(c)
-	return c:IsFaceup() and (c:IsSetCard(0x9c) or c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsType(TYPE_XYZ))
+	return c:IsFaceup() and ((c:IsSetCard(0x9c) or c:IsSetCard(0x53)) and c:IsType(TYPE_XYZ))
 end
 function c96223501.negcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return rp==1-tp and Duel.IsExistingMatchingCard(c96223501.cdfilter,tp,LOCATION_MZONE,0,1,nil)
 		and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainDisablable(ev)
+		and not Duel.IsChainDisabled(ev)
 		and c:GetFlagEffect(96223501)==0
+		and Duel.GetTurnPlayer()==tp
 end
 function c96223501.negop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.SelectYesNo(tp,aux.Stringid(96223501,1)) then
 		Duel.Hint(HINT_CARD,0,96223501)
-		Duel.NegateEffect(ev)
 		e:GetHandler():RegisterFlagEffect(96223501,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+		if Duel.NegateEffect(ev) then
+			Duel.BreakEffect()
+			Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+		end
 	end
 end

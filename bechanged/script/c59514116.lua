@@ -69,7 +69,7 @@ function c59514116.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	if s==1 then
 		if e:IsCostChecked() then
-			e:SetCategory(CATEGORY_SPECIAL_SUMMON)
+			e:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_GRAVE_SPSUMMON)
 		end
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_DECK)
 	end

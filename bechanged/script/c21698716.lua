@@ -1,5 +1,6 @@
 --宝玉獣 コバルト・イーグル
 function c21698716.initial_effect(c)
+	aux.AddCodeList(c,34487429)
 	--send replace
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -8,7 +9,7 @@ function c21698716.initial_effect(c)
 	e1:SetCondition(c21698716.repcon)
 	e1:SetOperation(c21698716.repop)
 	c:RegisterEffect(e1)
-	--move to field
+	--set
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
@@ -22,15 +23,14 @@ function c21698716.initial_effect(c)
 	local e4=e2:Clone()
 	e4:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
 	c:RegisterEffect(e4)
-	--remove self
+	--search
 	local e5=Effect.CreateEffect(c)
-	e5:SetCategory(CATEGORY_REMOVE)
-	e5:SetType(EFFECT_TYPE_QUICK_O)
-	e5:SetCode(EVENT_CHAINING)
-	e5:SetRange(LOCATION_MZONE)
-	e5:SetCondition(c21698716.rmcon)
-	e5:SetTarget(c21698716.rmtg)
-	e5:SetOperation(c21698716.rmop)
+	e5:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
+	e5:SetType(EFFECT_TYPE_IGNITION)
+	e5:SetRange(LOCATION_HAND)
+	e5:SetCost(c21698716.thcost)
+	e5:SetTarget(c21698716.thtg)
+	e5:SetOperation(c21698716.thop)
 	c:RegisterEffect(e5)
 end
 function c21698716.repcon(e)
@@ -48,46 +48,32 @@ function c21698716.repop(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e1)
 end
 function c21698716.filter(c)
-	return c:IsSetCard(0x34) and c:IsType(TYPE_SPELL+TYPE_TRAP)
-	and (not c:IsForbidden() and c:CheckUniqueOnField(tp) or c:IsSSetable())
+	return c:IsSetCard(0x34,0x187) and c:IsType(TYPE_TRAP) and c:IsSSetable()
 end
 function c21698716.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c21698716.filter,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND+LOCATION_REMOVED,0,1,nil)
-		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
+	if chk==0 then return Duel.IsExistingMatchingCard(c21698716.filter,tp,LOCATION_DECK,0,1,nil) end
 end
 function c21698716.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c21698716.filter),tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND+LOCATION_REMOVED,0,1,1,nil)
-	local tc=g:GetFirst()
-	if tc then
-		if tc:IsType(TYPE_CONTINUOUS+TYPE_FIELD) and Duel.SelectYesNo(tp,aux.Stringid(21698716,2)) then
-			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-		elseif tc:IsSSetable() then
-			Duel.SSet(tp,tc)
-		end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+	local tc=Duel.SelectMatchingCard(tp,c21698716.filter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
+	if tc then Duel.SSet(tp,tc) end
+end
+function c21698716.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() and e:GetHandler():IsDiscardable() end
+	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
+end
+function c21698716.thfilter(c)
+	return c:IsCode(34487429) and c:IsAbleToHand()
+end
+function c21698716.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c21698716.thfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+end
+function c21698716.thop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,c21698716.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
 	end
-end
-function c21698716.rmcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp==1-tp
-end
-function c21698716.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToRemove() end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,e:GetHandler(),1,0,0)
-end
-function c21698716.rmop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.Remove(c,0,REASON_EFFECT+REASON_TEMPORARY)~=0 and c:GetOriginalCode()==21698716 then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_PHASE+PHASE_END)
-		e1:SetReset(RESET_PHASE+PHASE_END)
-		e1:SetLabelObject(c)
-		e1:SetCountLimit(1)
-		e1:SetOperation(c21698716.retop)
-		Duel.RegisterEffect(e1,tp)
-	end
-end
-function c21698716.retop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ReturnToField(e:GetLabelObject())
 end

@@ -91,11 +91,14 @@ end
 function c62892347.cspfilter(c)
 	return c:IsFaceup() and c:IsLevel(10) and c:IsRace(RACE_FAIRY)
 end
+function c62892347.csfffilter(c)
+	return c:IsFaceup() and c:IsCode(73206827)
+end
 function c62892347.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)>0
-		and (Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_ONFIELD,0,1,nil,73206827)
+		and (Duel.IsExistingMatchingCard(c62892347.csfffilter,tp,LOCATION_ONFIELD,0,1,nil)
 		or Duel.IsExistingMatchingCard(c62892347.cspfilter,tp,LOCATION_MZONE,0,1,nil))
 end
 function c62892347.spop(e,tp,eg,ep,ev,re,r,rp,c)
@@ -115,7 +118,7 @@ function c62892347.disop1(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function c62892347.spcon(e,c)
+function c62892347.spcon3(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end

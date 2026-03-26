@@ -46,9 +46,10 @@ function c53388413.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,c53388413.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 		if g:GetCount()>0 then
-			Duel.SpecialSummon(g:GetFirst(),0,tp,tp,false,false,POS_FACEUP)
+			Duel.SpecialSummonStep(g:GetFirst(),0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
+	Duel.SpecialSummonComplete()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)

@@ -128,5 +128,5 @@ function c94160895.discon(e,c)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_ADVANCE)
 end
 function c94160895.distg(e,c)
-	return not c:IsSummonType(SUMMON_TYPE_ADVANCE)
+	return not c:IsSummonType(SUMMON_TYPE_ADVANCE) and c:IsAttribute(ATTRIBUTE_EARTH+ATTRIBUTE_FIRE+ATTRIBUTE_WATER) and c:IsLevelAbove(9)
 end

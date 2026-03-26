@@ -8,7 +8,6 @@ function c984114.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
-	e1:SetCountLimit(1,984114)
 	e1:SetTarget(c984114.target)
 	e1:SetOperation(c984114.activate)
 	c:RegisterEffect(e1)
@@ -21,19 +20,20 @@ function c984114.initial_effect(c)
 	--spsummon
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(984114,1))
-	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e4:SetType(EFFECT_TYPE_QUICK_O)
-	e4:SetCode(EVENT_FREE_CHAIN)
-	e4:SetRange(LOCATION_HAND+LOCATION_GRAVE)
-	e4:SetHintTiming(0,TIMING_END_PHASE)
+	e4:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOGRAVE)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_TO_GRAVE)
 	e4:SetCountLimit(1,984115)
 	e4:SetCost(c984114.spcost)
 	e4:SetTarget(c984114.sptg)
 	e4:SetOperation(c984114.spop)
 	c:RegisterEffect(e4)
+	Duel.AddCustomActivityCounter(984114,ACTIVITY_SPSUMMON,c984114.counterfilter)
+end
+function c984114.counterfilter(c)
+	return not c:IsSummonLocation(LOCATION_EXTRA) or c:IsType(TYPE_FUSION)
 end
 
---1
 function c984114.filter(c)
 	return c:IsSetCard(0x16) and not c:IsCode(984114) and c:IsAbleToHand()
 end
@@ -53,24 +53,40 @@ function c984114.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 
 
---2
-
-function c984114.cfilter(c,tp)
-	return c:IsSetCard(0x16) and c:IsType(TYPE_MONSTER) and Duel.GetMZoneCount(tp,c)>0 
-end
 function c984114.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c984114.cfilter,tp,LOCATION_MZONE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c984114.cfilter,tp,LOCATION_MZONE,0,1,1,nil)
-	Duel.SendtoGrave(g,REASON_COST)
+	if chk==0 then return Duel.GetCustomActivityCount(984114,tp,ACTIVITY_SPSUMMON)==0 end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(c984114.splimit)
+	Duel.RegisterEffect(e1,tp)
+end
+function c984114.splimit(e,c,sump,sumtype,sumpos,targetp,se)
+	return not c:IsType(TYPE_FUSION) and c:IsLocation(LOCATION_EXTRA)
+end
+function c984114.tgfilter2(c)
+	return c:IsCode(23299957) and c:IsAbleToGrave()
 end
 function c984114.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and Duel.IsExistingMatchingCard(c984114.tgfilter2,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
 end
 function c984114.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	if c:IsRelateToChain() and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		local g=Duel.SelectMatchingCard(tp,c984114.tgfilter2,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil)
+		if #g>0 then
+			Duel.SendtoGrave(g,REASON_EFFECT)
+		end
 	end
 end
+
+

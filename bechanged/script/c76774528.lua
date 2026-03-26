@@ -78,7 +78,7 @@ end
 function c76774528.tfilter(c,tp)
 	return c:IsFaceup() and Duel.GetMZoneCount(tp,c)>0 and c:IsSetCard(0x24)
 end
-function c76774528.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c76774528.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c76774528.tfilter(chkc,tp) end
 	if chk==0 then return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -88,7 +88,7 @@ function c76774528.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
-function c76774528.spop(e,tp,eg,ep,ev,re,r,rp)
+function c76774528.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 then
 		local c=e:GetHandler()

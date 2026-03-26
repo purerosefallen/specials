@@ -1,4 +1,5 @@
 --アルカナフォースEX－THE DARK RULER
+local s,id,o=GetID()
 function c69831560.initial_effect(c)
 	c:EnableReviveLimit()
 	--spsummon proc
@@ -6,11 +7,21 @@ function c69831560.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetRange(LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE)
+	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
 	e1:SetCondition(c69831560.spcon)
 	e1:SetTarget(c69831560.sptg)
 	e1:SetOperation(c69831560.spop)
 	c:RegisterEffect(e1)
+	--spsummon proc
+	local e11=Effect.CreateEffect(c)
+	e11:SetType(EFFECT_TYPE_FIELD)
+	e11:SetCode(EFFECT_SPSUMMON_PROC)
+	e11:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e11:SetRange(LOCATION_DECK)
+	e11:SetCondition(c69831560.spcon1)
+	e11:SetTarget(c69831560.sptg1)
+	e11:SetOperation(c69831560.spop1)
+	c:RegisterEffect(e11)
 	--cannot special summon
 	local e2=Effect.CreateEffect(c)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -48,19 +59,7 @@ function c69831560.initial_effect(c)
 	e6:SetCondition(c69831560.descon2)
 	e6:SetOperation(c69831560.desop2)
 	c:RegisterEffect(e6)
-	local e7=Effect.CreateEffect(c)
-	e7:SetDescription(aux.Stringid(69831560,1))
-	e7:SetCategory(CATEGORY_TOHAND)
-	e7:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e7:SetCode(EVENT_TO_HAND)
-	e7:SetRange(LOCATION_MZONE)
-	e7:SetProperty(EFFECT_FLAG_DELAY)
-	e7:SetCondition(c69831560.ddcon)
-	e7:SetTarget(c69831560.ddtg)
-	e7:SetOperation(c69831560.ddop)
-	c:RegisterEffect(e7)
 end
-c69831560.toss_coin=true
 function c69831560.spfilter(c)
 	return c:IsAbleToGraveAsCost()
 end
@@ -81,6 +80,33 @@ function c69831560.sptg(e,tp,eg,ep,ev,re,r,rp,chk,c)
 	else return false end
 end
 function c69831560.spop(e,tp,eg,ep,ev,re,r,rp,c)
+	local g=e:GetLabelObject()
+	Duel.SendtoGrave(g,REASON_SPSUMMON)
+	g:DeleteGroup()
+end
+function c69831560.rfilter(c,tp)
+	return c:IsSetCard(0x5)
+end
+function c69831560.fselect(g,tp)
+	return g:IsExists(c69831560.rfilter,1,nil,tp) and aux.mzctcheckrel(g,tp,REASON_SPSUMMON)
+end
+function c69831560.spcon1(e,c)
+	if c==nil then return true end
+	local tp=c:GetControler()
+	local mg=Duel.GetMatchingGroup(c69831560.spfilter,tp,LOCATION_MZONE,0,nil)
+	return mg:CheckSubGroup(c69831560.fselect,3,3,tp)
+end
+function c69831560.sptg1(e,tp,eg,ep,ev,re,r,rp,chk,c)
+	local mg=Duel.GetMatchingGroup(c69831560.spfilter,tp,LOCATION_MZONE,0,nil)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local sg=mg:SelectSubGroup(tp,c69831560.fselect,true,3,3,tp)
+	if sg then
+		sg:KeepAlive()
+		e:SetLabelObject(sg)
+		return true
+	else return false end
+end
+function c69831560.spop1(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=e:GetLabelObject()
 	Duel.SendtoGrave(g,REASON_SPSUMMON)
 	g:DeleteGroup()
@@ -120,21 +146,4 @@ function c69831560.desop2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)
 	Duel.Destroy(g,REASON_EFFECT)
 	c:ResetFlagEffect(id)
-end
-function c69831560.ddcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp
-end
-function c69831560.ddfilter(c,tp)
-	return c:IsControler(1-tp) 
-end
-function c69831560.ddtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=eg:Filter(c69831560.ddfilter,nil,tp)
-	if chk==0 then return g:GetCount()>0 end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
-end
-function c69831560.ddop(e,tp,eg,ep,ev,re,r,rp)
-	local g=eg:Filter(c69831560.ddfilter,nil,tp)
-	if g:GetCount()>0 then
-		Duel.SendtoHand(g,tp,REASON_EFFECT)
-	end
 end

@@ -1,6 +1,6 @@
 --カオス－黒魔術の儀式
 function c76792184.initial_effect(c)
-	aux.AddCodeList(c,46986414,12266229,30208479,47963370)
+	aux.AddCodeList(c,12266229,30208479,47963370)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

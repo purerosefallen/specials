@@ -73,7 +73,7 @@ function c4779823.tgcfilter1(c)
 	return c:IsSetCard(0x38) and c:IsFaceup()
 end
 function c4779823.tgcfilter2(c)
-	return c:IsSetCard(0x38) and c:IsFaceup() and c:IsAbleToDeckAsCost()
+	return c:IsSetCard(0x38) and c:IsFaceup() and (c:IsAbleToDeckAsCost() or c:IsAbleToExtraAsCost())
 end
 function c4779823.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g1=Duel.GetMatchingGroup(c4779823.tgcfilter1,tp,LOCATION_REMOVED,0,nil)
