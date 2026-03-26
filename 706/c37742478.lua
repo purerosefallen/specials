@@ -1,5 +1,6 @@
 --オネスト
 function c37742478.initial_effect(c)
+	local elast = nil
 	--to hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
@@ -8,6 +9,8 @@ function c37742478.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTarget(c37742478.target1)
 	e1:SetOperation(c37742478.operation1)
+	e1:SetLabelObject(elast)
+	elast=e1
 	c:RegisterEffect(e1)
 	--atkup
 	local e2=Effect.CreateEffect(c)
@@ -21,6 +24,8 @@ function c37742478.initial_effect(c)
 	e2:SetCondition(c37742478.condition2)
 	e2:SetCost(c37742478.cost2)
 	e2:SetOperation(c37742478.operation2)
+	e2:SetLabelObject(elast)
+	elast=e2
 	c:RegisterEffect(e2)
 end
 function c37742478.target1(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -46,6 +51,7 @@ function c37742478.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 end
 function c37742478.operation2(e,tp,eg,ep,ev,re,r,rp)
+	local elast = nil
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
 	if not a:IsRelateToBattle() or not d:IsRelateToBattle() then return end
@@ -56,9 +62,50 @@ function c37742478.operation2(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 	if a:IsControler(tp) then
 		e1:SetValue(d:GetAttack())
+		e1:SetLabelObject(elast)
+		elast=e1
 		a:RegisterEffect(e1)
+		if not a:IsImmuneToEffect(e) then
+			local e_reset=Effect.CreateEffect(e:GetHandler())
+			e_reset:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+			e_reset:SetCode(EVENT_PHASE+PHASE_END)
+			e_reset:SetReset(RESET_PHASE+PHASE_END)
+			e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e_reset:SetCountLimit(1)
+			e_reset:SetLabelObject(elast)
+			e_reset:SetOperation(c37742478.rstop)
+			Duel.RegisterEffect(e_reset,tp)
+		end
 	else
 		e1:SetValue(a:GetAttack())
+		e1:SetLabelObject(elast)
+		elast=e1
 		d:RegisterEffect(e1)
+		if not d:IsImmuneToEffect(e) then
+			local e_reset=Effect.CreateEffect(e:GetHandler())
+			e_reset:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+			e_reset:SetCode(EVENT_PHASE+PHASE_END)
+			e_reset:SetReset(RESET_PHASE+PHASE_END)
+			e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e_reset:SetCountLimit(1)
+			e_reset:SetLabelObject(elast)
+			e_reset:SetOperation(c37742478.rstop)
+			Duel.RegisterEffect(e_reset,tp)
+		end
 	end
+end
+
+function c37742478.rstop(e,tp,eg,ep,ev,re,r,rp)
+    local c=e:GetHandler()
+	local ecur = e:GetLabelObject()
+	local tc = ecur:GetHandler()
+	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
+	local elast = nil
+	while ecur do
+		elast = ecur
+		ecur = ecur:GetLabelObject()
+		elast:Reset()
+	end
+    Duel.HintSelection(Group.FromCards(c))
+    Duel.Hint(HINT_OPSELECTED,1-tp,1162)
 end

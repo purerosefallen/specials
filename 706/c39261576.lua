@@ -116,6 +116,7 @@ function c39261576.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetTargetCard(g)
 end
 function c39261576.atkop(e,tp,eg,ep,ev,re,r,rp)
+	local elast = nil
 	local sc=eg:GetFirst()
 	if not sc:IsRelateToEffect(e) or sc:IsFacedown() then return end
 	local tc=Duel.GetFirstTarget()
@@ -125,7 +126,20 @@ function c39261576.atkop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetValue(tc:GetAttack())
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	e1:SetLabelObject(elast)
+	elast=e1
 	sc:RegisterEffect(e1)
+	if not sc:IsImmuneToEffect(e) then
+		local e_reset=Effect.CreateEffect(e:GetHandler())
+		e_reset:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e_reset:SetCode(EVENT_PHASE+PHASE_END)
+		e_reset:SetReset(RESET_PHASE+PHASE_END)
+		e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e_reset:SetCountLimit(1)
+		e_reset:SetLabelObject(elast)
+		e_reset:SetOperation(c39261576.rstop)
+		Duel.RegisterEffect(e_reset,tp)
+	end
 end
 function c39261576.evop(e,tp,eg,ep,ev,re,r,rp)
 	local te=e:GetLabelObject()
@@ -133,4 +147,18 @@ function c39261576.evop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RaiseEvent(tc,EVENT_CUSTOM+39261576,te,0,tp,tp,0)
 	te:SetLabelObject(nil)
 	e:Reset()
+end
+function c39261576.rstop(e,tp,eg,ep,ev,re,r,rp)
+    local c=e:GetHandler()
+	local ecur = e:GetLabelObject()
+	local tc = ecur:GetHandler()
+	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
+	local elast = nil
+	while ecur do
+		elast = ecur
+		ecur = ecur:GetLabelObject()
+		elast:Reset()
+	end
+    Duel.HintSelection(Group.FromCards(c))
+    Duel.Hint(HINT_OPSELECTED,1-tp,1162)
 end

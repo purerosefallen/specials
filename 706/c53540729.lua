@@ -1,0 +1,73 @@
+--ゼンマイウォリア�?
+function c53540729.initial_effect(c)
+	--atk/lv up
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(53540729,0))
+	e1:SetProperty(EFFECT_FLAG_NO_TURN_RESET+EFFECT_FLAG_CARD_TARGET)
+	e1:SetCategory(CATEGORY_ATKCHANGE)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1)
+	e1:SetTarget(c53540729.target)
+	e1:SetOperation(c53540729.operation)
+	c:RegisterEffect(e1)
+end
+function c53540729.filter(c)
+	return c:IsFaceup() and c:IsSetCard(0x58) and c:IsLevelAbove(1)
+end
+function c53540729.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c53540729.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c53540729.filter,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local g=Duel.SelectTarget(tp,c53540729.filter,tp,LOCATION_MZONE,0,1,1,nil)
+end
+function c53540729.operation(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=Duel.GetFirstTarget()
+	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+		local elast = nil
+		local e1=Effect.CreateEffect(c)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e1:SetValue(600)
+		e1:SetLabelObject(elast)
+		elast=e1
+		tc:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(c)
+		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_UPDATE_LEVEL)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e2:SetValue(1)
+		e2:SetLabelObject(elast)
+		elast=e2
+		tc:RegisterEffect(e2)
+		if not tc:IsImmuneToEffect(e) then
+			local e_reset=Effect.CreateEffect(e:GetHandler())
+			e_reset:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+			e_reset:SetCode(EVENT_PHASE+PHASE_END)
+			e_reset:SetReset(RESET_PHASE+PHASE_END)
+			e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e_reset:SetCountLimit(1)
+			e_reset:SetLabelObject(elast)
+			e_reset:SetOperation(c12299841.rstop)
+			Duel.RegisterEffect(e_reset,tp)
+		end
+	end
+end
+function c53540729.rstop(e,tp,eg,ep,ev,re,r,rp)
+    local c=e:GetHandler()
+	local ecur = e:GetLabelObject()
+	local tc = ecur:GetHandler()
+	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
+	local elast = nil
+	while ecur do
+		elast = ecur
+		ecur = ecur:GetLabelObject()
+		elast:Reset()
+	end
+    Duel.HintSelection(Group.FromCards(c))
+    Duel.Hint(HINT_OPSELECTED,1-tp,1162)
+end
