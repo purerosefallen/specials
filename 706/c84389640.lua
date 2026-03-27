@@ -1,0 +1,96 @@
+--窮鼠の進撃
+---@param c Card
+function c84389640.initial_effect(c)
+	--activate
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	c:RegisterEffect(e1)
+	--atkup
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetDescription(aux.Stringid(84389640,0))
+	e2:SetCategory(CATEGORY_ATKCHANGE)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetHintTiming(TIMING_DAMAGE_STEP)
+	e2:SetRange(LOCATION_SZONE)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetCondition(c84389640.condition)
+	e2:SetCost(c84389640.cost)
+	e2:SetTarget(c84389640.target)
+	e2:SetOperation(c84389640.operation)
+	c:RegisterEffect(e2)
+end
+function c84389640.condition(e,tp,eg,ep,ev,re,r,rp)
+	local phase=Duel.GetCurrentPhase()
+	if phase~=PHASE_DAMAGE or Duel.IsDamageCalculated() then return false end
+	local a=Duel.GetAttacker()
+	local d=Duel.GetAttackTarget()
+	if not d then return false end
+	if d:IsControler(tp) then a,d=d,a end
+	e:SetLabelObject(d)
+	return a:IsFaceup() and a:IsLevelBelow(3) and a:IsType(TYPE_NORMAL) and a:IsRelateToBattle()
+		and d:IsFaceup() and d:IsRelateToBattle()
+end
+function c84389640.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():GetFlagEffect(84389640)==0 and Duel.CheckLPCost(tp,100,true)
+		and e:GetLabelObject():IsAttackAbove(100) end
+	local lp=Duel.GetLP(tp)
+	local atk=e:GetLabelObject():GetAttack()
+	local maxc=math.min(atk,lp,25500)
+	maxc=math.floor(maxc/100)*100
+	local t={}
+	for i=1,maxc/100 do
+		t[i]=i*100
+	end
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(84389640,1))
+	local pay=Duel.AnnounceNumber(tp,table.unpack(t))
+	Duel.PayLPCost(tp,pay,true)
+	e:SetLabel(pay)
+	e:GetHandler():RegisterFlagEffect(84389640,RESET_PHASE+PHASE_DAMAGE,0,1)
+end
+function c84389640.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local tc=e:GetLabelObject()
+	if chkc then return chkc==tc end
+	if chk==0 then return tc:IsCanBeEffectTarget(e) end
+	Duel.SetTargetCard(tc)
+end
+function c84389640.operation(e,tp,eg,ep,ev,re,r,rp)
+	local elast = nil
+	local bc=Duel.GetFirstTarget()
+	if not e:GetHandler():IsRelateToEffect(e) or not bc or not bc:IsRelateToEffect(e) or not bc:IsControler(1-tp) then return end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetOwnerPlayer(tp)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	e1:SetValue(e:GetLabel()*-1)
+	e1:SetLabelObject(elast)
+	elast=e1
+	bc:RegisterEffect(e1)
+	if not bc:IsImmuneToEffect(e) then
+		local e_reset=Effect.CreateEffect(e:GetHandler())
+		e_reset:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e_reset:SetCode(EVENT_PHASE+PHASE_END)
+		e_reset:SetReset(RESET_PHASE+PHASE_END)
+		e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e_reset:SetCountLimit(1)
+		e_reset:SetLabelObject(elast)
+		e_reset:SetOperation(c84389640.rstop)
+		Duel.RegisterEffect(e_reset,tp)
+	end
+end
+function c84389640.rstop(e,tp,eg,ep,ev,re,r,rp)
+    local c=e:GetHandler()
+	local ecur = e:GetLabelObject()
+	local tc = ecur:GetHandler()
+	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
+	local elast = nil
+	while ecur do
+		elast = ecur
+		ecur = ecur:GetLabelObject()
+		elast:Reset()
+	end
+    Duel.HintSelection(Group.FromCards(c))
+    Duel.Hint(HINT_OPSELECTED,1-tp,1162)
+end

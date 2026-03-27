@@ -1,0 +1,88 @@
+--マジック・ホール・ゴーレム
+---@param c Card
+function c82458280.initial_effect(c)
+	--direct attack
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(82458280,0))
+	e1:SetCategory(CATEGORY_ATKCHANGE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1)
+	e1:SetCondition(c82458280.condition)
+	e1:SetTarget(c82458280.target)
+	e1:SetOperation(c82458280.operation)
+	c:RegisterEffect(e1)
+end
+function c82458280.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()==PHASE_MAIN1
+end
+function c82458280.filter(c)
+	return c:IsFaceup()
+end
+function c82458280.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c82458280.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c82458280.filter,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local g=Duel.SelectTarget(tp,c82458280.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_ATTACK)
+	e1:SetProperty(EFFECT_FLAG_OATH)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(c82458280.ftarget)
+	e1:SetLabel(g:GetFirst():GetFieldID())
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+end
+function c82458280.ftarget(e,c)
+	return e:GetLabel()~=c:GetFieldID()
+end
+function c82458280.operation(e,tp,eg,ep,ev,re,r,rp)
+	local elast = nil
+	local tc=Duel.GetFirstTarget()
+	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e1:SetValue(math.ceil(tc:GetAttack()/2))
+		e1:SetLabelObject(elast)
+		elast=e1
+		tc:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(e:GetHandler())
+		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_DIRECT_ATTACK)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e2:SetLabelObject(elast)
+		elast=e2
+		tc:RegisterEffect(e2)
+		if not tc:IsImmuneToEffect(e) then
+			local e_reset=Effect.CreateEffect(e:GetHandler())
+			e_reset:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+			e_reset:SetCode(EVENT_PHASE+PHASE_END)
+			e_reset:SetReset(RESET_PHASE+PHASE_END)
+			e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e_reset:SetCountLimit(1)
+			e_reset:SetLabelObject(elast)
+			e_reset:SetOperation(c82458280.rstop)
+			Duel.RegisterEffect(e_reset,tp)
+		end
+	end
+end
+function c82458280.rstop(e,tp,eg,ep,ev,re,r,rp)
+    local c=e:GetHandler()
+	local ecur = e:GetLabelObject()
+	local tc = ecur:GetHandler()
+	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
+	local elast = nil
+	while ecur do
+		elast = ecur
+		ecur = ecur:GetLabelObject()
+		elast:Reset()
+	end
+    Duel.HintSelection(Group.FromCards(c))
+    Duel.Hint(HINT_OPSELECTED,1-tp,1162)
+end

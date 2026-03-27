@@ -1,0 +1,65 @@
+--きまぐれの女�?
+---@param c Card
+function c67959180.initial_effect(c)
+	local elast = nil
+	--dice
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(67959180,0))
+	e1:SetCategory(CATEGORY_COIN)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1)
+	e1:SetTarget(c67959180.target)
+	e1:SetOperation(c67959180.operation)
+	e1:SetLabelObject(elast)
+	elast=e1
+	c:RegisterEffect(e1)
+	if not c:IsImmuneToEffect(e) then
+		local e_reset=Effect.CreateEffect(e:GetHandler())
+		e_reset:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e_reset:SetCode(EVENT_PHASE+PHASE_END)
+		e_reset:SetReset(RESET_PHASE+PHASE_END)
+		e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e_reset:SetCountLimit(1)
+		e_reset:SetLabelObject(elast)
+		e_reset:SetOperation(c67959180.rstop)
+		Duel.RegisterEffect(e_reset,tp)
+	end
+end
+function c67959180.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,1)
+end
+function c67959180.operation(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) and c:IsFaceup() then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_COIN)
+		local opt=Duel.AnnounceCoin(tp)
+		local coin=Duel.TossCoin(tp,1)
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_DISABLE+RESET_PHASE+PHASE_END)
+		if opt==coin then
+			e1:SetValue(math.ceil(c:GetAttack()/2))
+		else
+			e1:SetValue(c:GetAttack()*2)
+		end
+		c:RegisterEffect(e1)
+	end
+end
+
+function c67959180.rstop(e,tp,eg,ep,ev,re,r,rp)
+    local c=e:GetHandler()
+	local ecur = e:GetLabelObject()
+	local tc = ecur:GetHandler()
+	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
+	local elast = nil
+	while ecur do
+		elast = ecur
+		ecur = ecur:GetLabelObject()
+		elast:Reset()
+	end
+    Duel.HintSelection(Group.FromCards(c))
+    Duel.Hint(HINT_OPSELECTED,1-tp,1162)
+end
