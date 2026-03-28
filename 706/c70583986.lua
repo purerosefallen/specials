@@ -1,4 +1,4 @@
---氷結界の虎王ドゥローレン
+--??????????????????
 function c70583986.initial_effect(c)
 	local elast = nil
 	--synchro summon
@@ -55,6 +55,7 @@ function c70583986.operation(e,tp,eg,ep,ev,re,r,rp)
 				e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 				e_reset:SetCountLimit(1)
 				e_reset:SetLabelObject(elast)
+				e_reset:SetCondition(c70583986.rstcon)
 				e_reset:SetOperation(c70583986.rstop)
 				Duel.RegisterEffect(e_reset,tp)
 			end
@@ -62,11 +63,15 @@ function c70583986.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
+function c70583986.rstcon(e,tp,eg,ep,ev,re,r,rp)
+    local ecur = e:GetLabelObject()
+    local tc = ecur:GetHandler()
+    return tc:GetLocation() == LOCATION_MZONE and tc:GetPosition()&POS_FACEUP ~= 0
+end
 function c70583986.rstop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
 	local ecur = e:GetLabelObject()
 	local tc = ecur:GetHandler()
-	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
 	local elast = nil
 	while ecur do
 		elast = ecur

@@ -55,6 +55,7 @@ function c75141056.activate(e, tp, eg, ep, ev, re, r, rp)
                 e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
                 e_reset:SetCountLimit(1)
                 e_reset:SetLabelObject(elast)
+                e_reset:SetCondition(c75141056.rstcon)
                 e_reset:SetOperation(c75141056.rstop)
                 Duel.RegisterEffect(e_reset,tp)
             end
@@ -66,12 +67,14 @@ function c75141056.activate(e, tp, eg, ep, ev, re, r, rp)
         Duel.ShuffleDeck(tp)
     end
 end
-
+function c75141056.rstcon(e,tp,eg,ep,ev,re,r,rp)
+    local ecur = e:GetLabelObject()
+    local tc = ecur:GetHandler()
+    return tc:GetLocation() == LOCATION_MZONE and tc:GetPosition()&POS_FACEUP ~= 0
+end
 function c75141056.rstop(e, tp, eg, ep, ev, re, r, rp)
     local c = e:GetHandler()
     local ecur = e:GetLabelObject()
-    local tc = ecur:GetHandler()
-    if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
     local elast = nil
     while ecur do
         elast = ecur

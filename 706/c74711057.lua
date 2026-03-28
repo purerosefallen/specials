@@ -1,4 +1,4 @@
---E・HERO ジ・アー�?
+--E??ERO ????????
 ---@param c Card
 function c74711057.initial_effect(c)
 	local elast = nil
@@ -53,16 +53,21 @@ function c74711057.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e_reset:SetCountLimit(1)
 		e_reset:SetLabelObject(elast)
+		e_reset:SetCondition(c74711057.rstcon)
 		e_reset:SetOperation(c74711057.rstop)
 		Duel.RegisterEffect(e_reset,tp)
 	end
 end
 
+function c74711057.rstcon(e,tp,eg,ep,ev,re,r,rp)
+    local ecur = e:GetLabelObject()
+    local tc = ecur:GetHandler()
+    return tc:GetLocation() == LOCATION_MZONE and tc:GetPosition()&POS_FACEUP ~= 0
+end
 function c74711057.rstop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
 	local ecur = e:GetLabelObject()
 	local tc = ecur:GetHandler()
-	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
 	local elast = nil
 	while ecur do
 		elast = ecur

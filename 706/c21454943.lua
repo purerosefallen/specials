@@ -1,4 +1,4 @@
---サイコ・コマンダ�?---@param c Card
+--??????????????---@param c Card
 function c21454943.initial_effect(c)
 	--atkdown
 	local e1=Effect.CreateEffect(c)
@@ -80,15 +80,20 @@ function c21454943.operation(e,tp,eg,ep,ev,re,r,rp)
 		e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e_reset:SetCountLimit(1)
 		e_reset:SetLabelObject(elast)
+		e_reset:SetCondition(c21454943.rstcon)
 		e_reset:SetOperation(c21454943.rstop)
 		Duel.RegisterEffect(e_reset,tp)
 	end
+end
+function c21454943.rstcon(e,tp,eg,ep,ev,re,r,rp)
+    local ecur = e:GetLabelObject()
+    local tc = ecur:GetHandler()
+    return tc:GetLocation() == LOCATION_MZONE and tc:GetPosition()&POS_FACEUP ~= 0
 end
 function c21454943.rstop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
 	local ecur = e:GetLabelObject()
 	local tc = ecur:GetHandler()
-	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
 	local elast = nil
 	while ecur do
 		elast = ecur

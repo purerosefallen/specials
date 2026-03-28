@@ -1,5 +1,4 @@
---BF－暁のシロッコ
----@param c Card
+--BF???????????---@param c Card
 function c75498415.initial_effect(c)
 	--summon & set with no tribute
 	local e1=Effect.CreateEffect(c)
@@ -77,6 +76,7 @@ function c75498415.operation(e,tp,eg,ep,ev,re,r,rp)
 			e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 			e_reset:SetCountLimit(1)
 			e_reset:SetLabelObject(elast)
+			e_reset:SetCondition(c75498415.rstcon)
 			e_reset:SetOperation(c75498415.rstop)
 			Duel.RegisterEffect(e_reset,tp)
 		end
@@ -85,11 +85,15 @@ end
 function c75498415.ftarget(e,c)
 	return e:GetLabel()~=c:GetFieldID()
 end
+function c75498415.rstcon(e,tp,eg,ep,ev,re,r,rp)
+    local ecur = e:GetLabelObject()
+    local tc = ecur:GetHandler()
+    return tc:GetLocation() == LOCATION_MZONE and tc:GetPosition()&POS_FACEUP ~= 0
+end
 function c75498415.rstop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
 	local ecur = e:GetLabelObject()
 	local tc = ecur:GetHandler()
-	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
 	local elast = nil
 	while ecur do
 		elast = ecur
