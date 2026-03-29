@@ -3,12 +3,13 @@
 function c36687247.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetCondition(c36687247.atcon)
-	e1:SetValue(c36687247.atkval)
+	e1:SetTarget(c36687247.atktg)
+	e1:SetValue(400)
 	c:RegisterEffect(e1)
 	--to grave
 	local e2=Effect.CreateEffect(c)
@@ -18,9 +19,8 @@ function c36687247.initial_effect(c)
 	e2:SetOperation(c36687247.regop)
 	c:RegisterEffect(e2)
 end
-function c36687247.atkval(e,c)
-	local atk=c:GetAttack()
-	return atk+400
+function c36687247.atktg(e,c)
+	return c==e:GetHandler()
 end
 function c36687247.atcon(e)
 	local ph=Duel.GetCurrentPhase()
