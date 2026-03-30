@@ -2,12 +2,13 @@
 ---@param c Card
 function c96235275.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(c96235275.atktg)
 	e1:SetCondition(c96235275.condtion)
-	e1:SetValue(c96235275.atkval)
+	e1:SetValue(300)
 	c:RegisterEffect(e1)
 	--discard deck
 	local e2=Effect.CreateEffect(c)
@@ -22,9 +23,8 @@ function c96235275.initial_effect(c)
 	e2:SetOperation(c96235275.disop)
 	c:RegisterEffect(e2)
 end
-function c96235275.atkval(e,c)
-	local atk=c:GetAttack()
-	return atk+300
+function c96235275.atktg(e,c)
+	return c==e:GetHandler()
 end
 function c96235275.condtion(e)
 	local ph=Duel.GetCurrentPhase()

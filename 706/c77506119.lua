@@ -1,5 +1,4 @@
---サンダー・ユニコーン
----@param c Card
+--????????????????---@param c Card
 function c77506119.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_BEAST),aux.NonTuner(nil),1)
@@ -47,6 +46,7 @@ function c77506119.atkop(e,tp,eg,ep,ev,re,r,rp)
 			e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 			e_reset:SetCountLimit(1)
 			e_reset:SetLabelObject(elast)
+			e_reset:SetCondition(c77506119.rstcon)
 			e_reset:SetOperation(c77506119.rstop)
 			Duel.RegisterEffect(e_reset,tp)
 		end
@@ -63,11 +63,15 @@ end
 function c77506119.atlimit(e,c)
 	return c~=e:GetOwner()
 end
+function c77506119.rstcon(e,tp,eg,ep,ev,re,r,rp)
+    local ecur = e:GetLabelObject()
+    local tc = ecur:GetHandler()
+    return tc:GetLocation() == LOCATION_MZONE and tc:GetPosition()&POS_FACEUP ~= 0
+end
 function c77506119.rstop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
 	local ecur = e:GetLabelObject()
 	local tc = ecur:GetHandler()
-	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
 	local elast = nil
 	while ecur do
 		elast = ecur

@@ -1,4 +1,4 @@
---奇跡の代行�?ジュピタ�?
+--??????????????????
 ---@param c Card
 function c28573958.initial_effect(c)
 	local elast = nil
@@ -72,6 +72,7 @@ function c28573958.atop(e,tp,eg,ep,ev,re,r,rp)
 			e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 			e_reset:SetCountLimit(1)
 			e_reset:SetLabelObject(elast)
+			e_reset:SetCondition(c28573958.rstcon)
 			e_reset:SetOperation(c28573958.rstop)
 			Duel.RegisterEffect(e_reset,tp)
 		end
@@ -106,11 +107,15 @@ function c28573958.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
+function c28573958.rstcon(e,tp,eg,ep,ev,re,r,rp)
+    local ecur = e:GetLabelObject()
+    local tc = ecur:GetHandler()
+    return tc:GetLocation() == LOCATION_MZONE and tc:GetPosition()&POS_FACEUP ~= 0
+end
 function c28573958.rstop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
 	local ecur = e:GetLabelObject()
 	local tc = ecur:GetHandler()
-	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
 	local elast = nil
 	while ecur do
 		elast = ecur

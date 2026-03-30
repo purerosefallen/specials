@@ -43,10 +43,16 @@ function c33972299.operation(e,tp,eg,ep,ev,re,r,rp)
 			e_reset:SetReset(RESET_PHASE+PHASE_END)
 			e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 			e_reset:SetCountLimit(1)
+			e_reset:SetCondition(c33972299.rstcon)
 			e_reset:SetOperation(c33972299.rstop)
 			Duel.RegisterEffect(e_reset,tp)
 		end
 	end
+end
+function c33972299.rstcon(e,tp,eg,ep,ev,re,r,rp)
+    local ecur = e:GetLabelObject()
+    local tc = ecur:GetHandler()
+    return tc:GetLocation() == LOCATION_MZONE and tc:GetPosition()&POS_FACEUP ~= 0
 end
 function c33972299.rstop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()

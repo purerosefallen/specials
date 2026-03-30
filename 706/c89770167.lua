@@ -1,4 +1,4 @@
---炎熱刀プロミネンス
+--??????????????
 ---@param c Card
 function c89770167.initial_effect(c)
 	local elast = nil
@@ -48,17 +48,22 @@ function c89770167.atop(e,tp,eg,ep,ev,re,r,rp)
 			e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 			e_reset:SetCountLimit(1)
 			e_reset:SetLabelObject(elast)
+			e_reset:SetCondition(c89770167.rstcon)
 			e_reset:SetOperation(c89770167.rstop)
 			Duel.RegisterEffect(e_reset,tp)
 		end
 	end
 end
 
+function c89770167.rstcon(e,tp,eg,ep,ev,re,r,rp)
+    local ecur = e:GetLabelObject()
+    local tc = ecur:GetHandler()
+    return tc:GetLocation() == LOCATION_MZONE and tc:GetPosition()&POS_FACEUP ~= 0
+end
 function c89770167.rstop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
 	local ecur = e:GetLabelObject()
 	local tc = ecur:GetHandler()
-	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
 	local elast = nil
 	while ecur do
 		elast = ecur

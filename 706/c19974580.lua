@@ -1,4 +1,4 @@
---C・ドラゴ�?---@param c Card
+--C????????---@param c Card
 function c19974580.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
@@ -55,6 +55,7 @@ function c19974580.atop(e,tp,eg,ep,ev,re,r,rp)
 			e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 			e_reset:SetCountLimit(1)
 			e_reset:SetLabelObject(elast)
+			e_reset:SetCondition(c19974580.rstcon)
 			e_reset:SetOperation(c19974580.rstop)
 			Duel.RegisterEffect(e_reset,tp)
 		end
@@ -70,11 +71,15 @@ end
 function c19974580.ddop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.DiscardDeck(1-tp,3,REASON_EFFECT)
 end
+function c19974580.rstcon(e,tp,eg,ep,ev,re,r,rp)
+    local ecur = e:GetLabelObject()
+    local tc = ecur:GetHandler()
+    return tc:GetLocation() == LOCATION_MZONE and tc:GetPosition()&POS_FACEUP ~= 0
+end
 function c19974580.rstop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
 	local ecur = e:GetLabelObject()
 	local tc = ecur:GetHandler()
-	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
 	local elast = nil
 	while ecur do
 		elast = ecur

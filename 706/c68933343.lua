@@ -1,4 +1,4 @@
---音響戦士ベーシス
+--????????????
 ---@param c Card
 function c68933343.initial_effect(c)
 	--lv up
@@ -60,16 +60,21 @@ function c68933343.operation(e,tp,eg,ep,ev,re,r,rp)
 			e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 			e_reset:SetCountLimit(1)
 			e_reset:SetLabelObject(elast)
+			e_reset:SetCondition(c68933343.rstcon)
 			e_reset:SetOperation(c68933343.rstop)
 			Duel.RegisterEffect(e_reset,tp)
 		end
 	end
 end
+function c68933343.rstcon(e,tp,eg,ep,ev,re,r,rp)
+    local ecur = e:GetLabelObject()
+    local tc = ecur:GetHandler()
+    return tc:GetLocation() == LOCATION_MZONE and tc:GetPosition()&POS_FACEUP ~= 0
+end
 function c68933343.rstop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
 	local ecur = e:GetLabelObject()
 	local tc = ecur:GetHandler()
-	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
 	local elast = nil
 	while ecur do
 		elast = ecur

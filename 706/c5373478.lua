@@ -3,12 +3,13 @@
 function c5373478.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)
-	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetCondition(c5373478.atkcon)
-	e1:SetValue(c5373478.atkval)
+	e1:SetTarget(c5373478.atktg)
+	e1:SetValue(300)
 	c:RegisterEffect(e1)
 	--change code
 	local e2=Effect.CreateEffect(c)
@@ -22,9 +23,8 @@ function c5373478.initial_effect(c)
 	--code
 	aux.EnableChangeCode(c,70095154,LOCATION_GRAVE)
 end
-function c5373478.atkval(e,c)
-	local atk=c:GetAttack()
-	return atk+300
+function c5373478.atktg(e,c)
+	return c==e:GetHandler()
 end
 function c5373478.atkcon(e)
 	local phase=Duel.GetCurrentPhase()
@@ -62,15 +62,20 @@ function c5373478.cdop(e,tp,eg,ep,ev,re,r,rp)
 		e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e_reset:SetCountLimit(1)
 		e_reset:SetLabelObject(elast)
+		e_reset:SetCondition(c5373478.rstcon)
 		e_reset:SetOperation(c5373478.rstop)
 		Duel.RegisterEffect(e_reset,tp)
 	end
+end
+function c5373478.rstcon(e,tp,eg,ep,ev,re,r,rp)
+    local ecur = e:GetLabelObject()
+    local tc = ecur:GetHandler()
+    return tc:GetLocation() == LOCATION_MZONE and tc:GetPosition()&POS_FACEUP ~= 0
 end
 function c5373478.rstop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
 	local ecur = e:GetLabelObject()
 	local tc = ecur:GetHandler()
-	if tc:GetLocation() ~= LOCATION_MZONE or tc:GetPosition()&POS_FACEUP == 0 then return end
 	local elast = nil
 	while ecur do
 		elast = ecur

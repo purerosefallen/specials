@@ -38,6 +38,7 @@ function c87102774.reccost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e_reset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e_reset:SetCountLimit(1)
 	e_reset:SetLabelObject(elast)
+	e_reset:SetCondition(c87102774.rstcon)
 	e_reset:SetOperation(c87102774.rstop)
 	Duel.RegisterEffect(e_reset,tp)
 end
@@ -51,11 +52,15 @@ function c87102774.recop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Recover(p,d,REASON_EFFECT)
 end
+function c87102774.rstcon(e,tp,eg,ep,ev,re,r,rp)
+    local ecur = e:GetLabelObject()
+    local tc = ecur:GetHandler()
+    return tc:GetLocation() == LOCATION_HAND and tc:GetPosition()&POS_FACEUP ~= 0
+end
 function c87102774.rstop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
 	local ecur = e:GetLabelObject()
 	local tc = ecur:GetHandler()
-	if tc:GetLocation() ~= LOCATION_HAND or tc:GetPosition()&POS_FACEUP == 0 then return end
 	local elast = nil
 	while ecur do
 		elast = ecur
