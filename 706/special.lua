@@ -1,18 +1,18 @@
+-- 解决光道武僧踢反转怪的问题跟反转召唤被神警不算场上送墓的问题
 Auxiliary.__flip_effect_list = Auxiliary.__flip_effect_list or {}
 
 function Auxiliary.PreloadUds()
+
     local flip_effect_list = Auxiliary.__flip_effect_list
-
     local base = {}
-
 	
 	base.IsPreviousLocation = Card.IsPreviousLocation
 	base.GetPreviousLocation = Card.GetPreviousLocation
 	base.IsFaceup = Card.IsFaceup
 	base.GetPosition = Card.GetPosition
-
+	base.NegateSummon = Duel.NegateSummon
 	base.RegisterEffect = Card.RegisterEffect
-
+    
 	base.redirect_effects = {
 		[EFFECT_LEAVE_FIELD_REDIRECT] = true,
 		[EFFECT_TO_HAND_REDIRECT] = true,
@@ -20,7 +20,6 @@ function Auxiliary.PreloadUds()
 		[EFFECT_TO_GRAVE_REDIRECT] = true,
 		[EFFECT_REMOVE_REDIRECT] = true,
 	}
-
 
 	--hook下面这四个方法使涉及反转召唤被召唤无效的卡的位置按旧裁定显示
 	Card.IsPreviousLocation = function(c,location)
@@ -52,6 +51,17 @@ function Auxiliary.PreloadUds()
 		return base.GetPosition(c)
 	end
 
+	--book NegateSummon给反转召唤被无效的怪兽取消完成苏生限制使其不能被苏生
+	Duel.NegateSummon = function(eg)
+		if eg:GetCount() == 1 then
+			local re = Duel.GetChainInfo(0, CHAININFO_TRIGGERING_EFFECT)
+			if re.GetCode(re) == EVENT_FLIP_SUMMON then 
+				eg:GetFirst():SetStatus(STATUS_PROC_COMPLETE, false)
+			end
+		end
+		return base.NegateSummon(eg)
+	end
+
 	--hook RegisterEffect 以将注册的反转效果全部放进自行维护的数组中并且将离场不去原区域的效果全部加上反转召唤被神警则不触发的条件
     Card.RegisterEffect = function(c, e, forced)
 		if e and e.GetCode then
@@ -74,6 +84,7 @@ function Auxiliary.PreloadUds()
 		end
         return base.RegisterEffect(c, e, forced)
     end
+
 	-- provide Card.GetFlipEffect to retrieve the registered flip effect of a card
     Card.GetFlipEffect = function(c)
         local cid = c:GetCode()
