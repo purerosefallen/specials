@@ -12,7 +12,7 @@ function Auxiliary.PreloadUds()
 	base.GetPosition = Card.GetPosition
 	base.NegateSummon = Duel.NegateSummon
 	base.RegisterEffect = Card.RegisterEffect
-    
+
 	base.redirect_effects = {
 		[EFFECT_LEAVE_FIELD_REDIRECT] = true,
 		[EFFECT_TO_HAND_REDIRECT] = true,
@@ -72,14 +72,17 @@ function Auxiliary.PreloadUds()
 				table.insert(flip_effect_list[cid], e)
 			elseif base.redirect_effects[e_code] then
 				local cid = c:GetCode()
-				local old_condition = e:GetCondition()
-				e:SetCondition(function(e2,tp2,eg2,ep2,ev2,re2,r2,rp2)
-					local re = Duel.GetChainInfo(1, CHAININFO_TRIGGERING_EFFECT)
-					if c:IsLocation(LOCATION_ONFIELD) and c:IsSummonType(SUMMON_TYPE_FLIP) and re~=nil and re:GetCode() == EVENT_FLIP_SUMMON and re:GetCategory()&CATEGORY_DISABLE_SUMMON ~= 0 then
-						return false
-					end
-					return old_condition(e2,tp2,eg2,ep2,ev2,re2,r2,rp2)
-				end)
+				--非大宇宙类对全场起作用的效果才执行以避免bug
+				if not e:IsHasProperty(EFFECT_FLAG_IGNORE_RANGE) then
+					local old_condition = e:GetCondition()
+					e:SetCondition(function(e2,tp2,eg2,ep2,ev2,re2,r2,rp2)
+						local re = Duel.GetChainInfo(1, CHAININFO_TRIGGERING_EFFECT)
+						if c:IsLocation(LOCATION_ONFIELD) and c:IsSummonType(SUMMON_TYPE_FLIP) and re~=nil and re:GetCode() == EVENT_FLIP_SUMMON and re:GetCategory()&CATEGORY_DISABLE_SUMMON ~= 0 then
+							return false
+						end
+						return old_condition(e2,tp2,eg2,ep2,ev2,re2,r2,rp2)
+					end)
+				end
 			end
 		end
         return base.RegisterEffect(c, e, forced)
