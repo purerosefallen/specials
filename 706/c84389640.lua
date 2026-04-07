@@ -12,9 +12,9 @@ function c84389640.initial_effect(c)
 	e2:SetDescription(aux.Stringid(84389640,0))
 	e2:SetCategory(CATEGORY_ATKCHANGE)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetHintTiming(TIMING_DAMAGE_STEP)
+	e2:SetHintTiming(TIMING_DAMAGE_STEP+TIMING_DAMAGE_CAL)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetCondition(c84389640.condition)
 	e2:SetCost(c84389640.cost)
 	e2:SetTarget(c84389640.target)
@@ -23,7 +23,7 @@ function c84389640.initial_effect(c)
 end
 function c84389640.condition(e,tp,eg,ep,ev,re,r,rp)
 	local phase=Duel.GetCurrentPhase()
-	if phase~=PHASE_DAMAGE or Duel.IsDamageCalculated() then return false end
+	if (phase~=PHASE_DAMAGE and phase~=PHASE_DAMAGE_CAL) or Duel.IsDamageCalculated() then return false end
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
 	if not d then return false end

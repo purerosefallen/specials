@@ -90,6 +90,11 @@ end
 function c54977057.activate(e, tp, eg, ep, ev, re, r, rp)
     Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_REMOVE)
     local g = Duel.SelectMatchingCard(tp, c54977057.filter, tp, LOCATION_HAND, 0, 1, 1, nil)
-    Duel.Remove(g, POS_FACEUP, REASON_EFFECT)
-    Duel.Draw(tp, 2, REASON_EFFECT)
+    if Duel.Remove(g, POS_FACEUP, REASON_EFFECT)>0 then
+        Duel.Draw(tp, 2, REASON_EFFECT)
+    else
+        Duel.ConfirmCards(1-tp, Duel.GetFieldGroup(tp, LOCATION_HAND, 0))
+        Duel.ShuffleHand(tp)
+    end
+
 end
