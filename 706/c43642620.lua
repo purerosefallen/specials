@@ -19,12 +19,24 @@ function c43642620.initial_effect(c)
 	e2:SetTarget(c43642620.dmtg)
 	e2:SetOperation(c43642620.dmop)
 	c:RegisterEffect(e2)
+	--临时增加一个被破坏回卡组必发效果来还原被人鱼洗回卡组也能发效果的旧裁定
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_TO_DECK)
+	e3:SetCondition(c43642620.dmcon2)
+	c:RegisterEffect(e3)
 end
 function c43642620.sdcon(e)
 	return not Duel.IsExistingMatchingCard(Card.IsRace,e:GetHandlerPlayer(),LOCATION_GRAVE,0,1,nil,RACE_ZOMBIE)
 end
 function c43642620.dmcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	local pos=c:GetPreviousPosition()
+	if c:IsReason(REASON_BATTLE) then pos=c:GetBattlePosition() end
+	return c:IsReason(REASON_DESTROY) and bit.band(pos,POS_FACEUP)~=0
+end
+function c43642620.dmcon2(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsReason(REASON_DESTROY) then return false end
 	local pos=c:GetPreviousPosition()
 	if c:IsReason(REASON_BATTLE) then pos=c:GetBattlePosition() end
 	return c:IsReason(REASON_DESTROY) and bit.band(pos,POS_FACEUP)~=0
