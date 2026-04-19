@@ -30,7 +30,7 @@ function c94886282.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	else 
 		if not Duel.IsPlayerAffectedByEffect(tp, EFFECT_CANNOT_TO_HAND) then
-			Duel.ConfirmCards(1-tp,Duel.GetFieldGroup(tp,0,LOCATION_DECK))
+			Duel.ConfirmCards(1-tp,Duel.GetFieldGroup(tp,LOCATION_DECK,0))
 			Duel.ShuffleDeck(tp)
 		end
 	end

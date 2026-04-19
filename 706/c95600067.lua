@@ -25,7 +25,10 @@ function c95600067.atktg(e,c)
 end
 function c95600067.repcon(e)
 	local c=e:GetHandler()
-	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsReason(REASON_DESTROY)
+	if c:GetLeaveFieldDest()~=0 then
+		c:RegisterFlagEffect(95600067, RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_DAMAGE, 0, 1)
+	end
+	return c:GetFlagEffect(95600067)==0 and c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsReason(REASON_DESTROY)
 end
 function c95600067.repop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

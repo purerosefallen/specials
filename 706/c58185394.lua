@@ -19,6 +19,11 @@ function c58185394.initial_effect(c)
 	e2:SetTarget(c58185394.dmtg)
 	e2:SetOperation(c58185394.dmop)
 	c:RegisterEffect(e2)
+	--临时增加一个被破坏回卡组必发效果来还原被人鱼洗回卡组也能发效果的旧裁定
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_TO_DECK)
+	e3:SetCondition(c58185394.dmcon2)
+	c:RegisterEffect(e3)
 end
 function c58185394.sdfilter(c)
 	return c:IsFaceup() and c:IsCode(99171160)
@@ -29,6 +34,13 @@ function c58185394.sdcon(e)
 end
 function c58185394.dmcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	local pos=c:GetPreviousPosition()
+	if c:IsReason(REASON_BATTLE) then pos=c:GetBattlePosition() end
+	return c:IsReason(REASON_DESTROY) and bit.band(pos,POS_FACEUP)~=0
+end
+function c58185394.dmcon2(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsReason(REASON_DESTROY) then return false end
 	local pos=c:GetPreviousPosition()
 	if c:IsReason(REASON_BATTLE) then pos=c:GetBattlePosition() end
 	return c:IsReason(REASON_DESTROY) and bit.band(pos,POS_FACEUP)~=0
