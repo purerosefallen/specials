@@ -26,7 +26,7 @@ function c57774843.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCategory(CATEGORY_DECKDES)
 	e3:SetDescription(aux.Stringid(57774843,2))
-	e3:SetCountLimit(1,EFFECT_COUNT_CODE_OATH)
+	e3:SetCountLimit(1000)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCondition(c57774843.condition2)
@@ -39,6 +39,14 @@ function c57774843.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e4:SetCode(EFFECT_SPSUMMON_CONDITION)
 	c:RegisterEffect(e4)
+	--监听堆墓效果被发动无效时去掉已发动标记
+	local e5=Effect.CreateEffect(c)
+    e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS) -- 设置为连续效果
+    e5:SetCode(EVENT_CHAIN_NEGATED) -- 特殊监听链被无效事件
+    e5:SetRange(LOCATION_MZONE) -- 此效果以字段上存在为范围
+    e5:SetOperation(c57774843.disflagcheck) -- 触发时，调用 negated_check 函数
+	e5:SetLabelObject(e4)
+    c:RegisterEffect(e5)
 end
 function c57774843.spfilter(c)
 	return c:IsSetCard(0x38) and c:IsType(TYPE_MONSTER)
@@ -65,12 +73,24 @@ function c57774843.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(sg,REASON_EFFECT)
 end
 function c57774843.condition2(e,tp,eg,ep,ev,re,r,rp)
-	return tp==Duel.GetTurnPlayer()
+	local c = e:GetHandler()
+	local fid = c:GetFieldID()
+	return tp==Duel.GetTurnPlayer() and c:GetFlagEffect(fid)==0
 end
 function c57774843.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,4)
+	local c = e:GetHandler()
+	local fid = c:GetFieldID()
+	c:RegisterFlagEffect(fid,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 end
 function c57774843.operation2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.DiscardDeck(tp,4,REASON_EFFECT)
+end
+function c57774843.disflagcheck(e,tp,eg,ep,ev,re,r,rp)
+	local c = e:GetHandler()
+	local fid = c:GetFieldID()
+	if e:GetLabelObject():GetFieldID() == re:GetFieldID() then
+		c:ResetFlagEffect(fid)
+	end
 end
