@@ -27,34 +27,8 @@ function c86938484.initial_effect(c)
 	e2:SetTarget(c86938484.sptg2)
 	e2:SetOperation(c86938484.spop2)
 	c:RegisterEffect(e2)
-	--tohand
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(86938484,2))
-	e3:SetCategory(CATEGORY_TOHAND)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY)
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetCountLimit(1,86938485+1)
-	e3:SetCondition(c86938484.thcon)
-	e3:SetTarget(c86938484.thtg)
-	e3:SetOperation(c86938484.thop)
-	c:RegisterEffect(e3)
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetCode(EFFECT_MATERIAL_CHECK)
-	e5:SetValue(c86938484.valcheck)
-	e5:SetLabelObject(e3)
-	c:RegisterEffect(e5)
 end
 c86938484.fusion_effect=true
-function c86938484.valcheck(e,c)
-	local mg=c:GetMaterial()
-	if mg:IsExists(Card.IsSetCard,1,nil,0x9d) then
-		e:GetLabelObject():SetLabel(1)
-	else
-		e:GetLabelObject():SetLabel(0)
-	end
-end
 function c86938484.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetLabel()==1 and e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
 end

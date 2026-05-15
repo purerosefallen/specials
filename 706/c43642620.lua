@@ -1,0 +1,54 @@
+--マンモス・ゾンビ
+---@param c Card
+function c43642620.initial_effect(c)
+	--self destroy
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EFFECT_SELF_DESTROY)
+	e1:SetCondition(c43642620.sdcon)
+	c:RegisterEffect(e1)
+	--damage
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(43642620,0))
+	e2:SetCategory(CATEGORY_DAMAGE)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e2:SetCode(EVENT_LEAVE_FIELD)
+	e2:SetCondition(c43642620.dmcon)
+	e2:SetTarget(c43642620.dmtg)
+	e2:SetOperation(c43642620.dmop)
+	c:RegisterEffect(e2)
+	--临时增加一个被破坏回卡组必发效果来还原被人鱼洗回卡组也能发效果的旧裁定
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_TO_DECK)
+	e3:SetCondition(c43642620.dmcon2)
+	c:RegisterEffect(e3)
+end
+function c43642620.sdcon(e)
+	return not Duel.IsExistingMatchingCard(Card.IsRace,e:GetHandlerPlayer(),LOCATION_GRAVE,0,1,nil,RACE_ZOMBIE)
+end
+function c43642620.dmcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local pos=c:GetPreviousPosition()
+	if c:IsReason(REASON_BATTLE) then pos=c:GetBattlePosition() end
+	return c:IsReason(REASON_DESTROY) and bit.band(pos,POS_FACEUP)~=0
+end
+function c43642620.dmcon2(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsReason(REASON_DESTROY) then return false end
+	local pos=c:GetPreviousPosition()
+	if c:IsReason(REASON_BATTLE) then pos=c:GetBattlePosition() end
+	return c:IsReason(REASON_DESTROY) and bit.band(pos,POS_FACEUP)~=0
+end
+function c43642620.dmtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	local c=e:GetHandler()
+	Duel.SetTargetPlayer(c:GetPreviousControler())
+	Duel.SetTargetParam(1900)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,c:GetPreviousControler(),1900)
+end
+function c43642620.dmop(e,tp,eg,ep,ev,re,r,rp)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Damage(p,d,REASON_EFFECT)
+end

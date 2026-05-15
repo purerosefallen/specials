@@ -1,6 +1,7 @@
 --ライディング・デュエル！アクセラレーション！
 ---@param c Card
 function c31006879.initial_effect(c)
+	aux.AddCodeList(c,63977008)
 	--activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
@@ -39,14 +40,32 @@ function c31006879.filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x1017) and c:IsAbleToHand()
 end
 function c31006879.acfilter(c,tp)
-	return c:IsCode(36742774,1003840) and c:IsType(TYPE_FIELD) and c:GetActivateEffect():IsActivatable(tp,true,true)
+	return c:IsCode(36742774) and c:IsType(TYPE_FIELD) and c:GetActivateEffect():IsActivatable(tp,true,true)
 end
 function c31006879.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_ONFIELD,0,1,e:GetHandler()) then
-		if Duel.IsExistingMatchingCard(c31006879.acfilter,tp,LOCATION_DECK,0,1,nil,tp) and Duel.SelectYesNo(tp,aux.Stringid(31006879,1)) then
+	if true then
+		local g=Duel.GetMatchingGroup(c31006879.filter,tp,LOCATION_DECK,0,nil)
+		if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(31006879,0)) then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+			local sg=g:Select(tp,1,1,nil)
+			Duel.SendtoHand(sg,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,sg)
+			if Duel.IsPlayerCanSummon(tp) and Duel.IsPlayerCanAdditionalSummon(tp) and Duel.GetFlagEffect(tp,31006879)==0 then
+				local e2=Effect.CreateEffect(e:GetHandler())
+				e2:SetDescription(aux.Stringid(31006879,2))
+				e2:SetType(EFFECT_TYPE_FIELD)
+				e2:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
+				e2:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
+				e2:SetTarget(aux.TargetBoolFunction(Card.IsCode,63977008))
+				e2:SetReset(RESET_PHASE+PHASE_END)
+				Duel.RegisterEffect(e2,tp)
+				Duel.RegisterFlagEffect(tp,31006879,RESET_PHASE+PHASE_END,0,1)
+			end
+		end
+		if Duel.IsExistingMatchingCard(aux.NecroValleyFilter(c31006879.acfilter),tp,LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE,0,1,nil,tp) and Duel.SelectYesNo(tp,aux.Stringid(31006879,1)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
 			if e:GetLabel()==1 then Duel.RegisterFlagEffect(tp,15248873,RESET_CHAIN,0,1) end
-			local g=Duel.SelectMatchingCard(tp,c31006879.acfilter,tp,LOCATION_DECK,0,1,1,nil,tp)
+			local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c31006879.acfilter),tp,LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,tp)
 			Duel.ResetFlagEffect(tp,15248873)
 			local tc=g:GetFirst()
 			if tc then
@@ -67,14 +86,6 @@ function c31006879.activate(e,tp,eg,ep,ev,re,r,rp)
 				if cost then cost(te,tep,eg,ep,ev,re,r,rp,1) end
 				Duel.RaiseEvent(tc,4179255,te,0,tp,tp,Duel.GetCurrentChain())
 			end
-		end
-	else
-		local g=Duel.GetMatchingGroup(c31006879.filter,tp,LOCATION_DECK,0,nil)
-		if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(31006879,0)) then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-			local sg=g:Select(tp,1,1,nil)
-			Duel.SendtoHand(sg,nil,REASON_EFFECT)
-			Duel.ConfirmCards(1-tp,sg)
 		end
 	end
 end

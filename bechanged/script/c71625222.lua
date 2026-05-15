@@ -2,17 +2,6 @@
 ---@param c Card
 function c71625222.initial_effect(c)
 	aux.AddCodeList(c,46986414)
-	--Special Summon
-	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_HAND)
-	e2:SetCountLimit(1,71625222)
-	e2:SetCost(c71625222.spcost)
-	e2:SetCondition(c71625222.spcon)
-	e2:SetTarget(c71625222.sptg)
-	e2:SetOperation(c71625222.spop)
-	c:RegisterEffect(e2)
 	--destroy
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(71625222,0))
@@ -96,6 +85,9 @@ function c71625222.fusfilter2(c,e,tp,m,f,gc,chkf)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,gc,chkf)
 		and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
 end
+function c71625222.sspfilter(c,e,tp)
+	return not c:IsSummonableCard() and c:IsSetCard(RACE_SPELLCASTER) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+end
 function c71625222.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_COIN)
 	local coin=Duel.AnnounceCoin(tp)
@@ -145,8 +137,17 @@ function c71625222.desop(e,tp,eg,ep,ev,re,r,rp)
 			end
 			tc:CompleteProcedure()
 		end
-	elseif dg:IsExists(Card.IsRace,1,nil,RACE_WINDBEAST) then
-		local g=Duel.GetMatchingGroup(c71625222.desfilter,tp,LOCATION_SZONE,LOCATION_SZONE,nil)
-		Duel.Destroy(g,REASON_EFFECT)
+	end
+	if dg:IsExists(Card.IsRace,1,nil,RACE_WINDBEAST) then
+		local g=Duel.GetMatchingGroup(Card.IsRace,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil,RACE_WINDBEAST)
+		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+	end
+	if dg:IsExists(Card.IsRace,1,nil,RACE_SPELLCASTER) then
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local g=Duel.SelectMatchingCard(tp,c71625222.sspfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+		if g:GetCount()>0 then
+			Duel.SpecialSummon(g,0,tp,tp,true,false,POS_FACEUP)
+		end
 	end
 end

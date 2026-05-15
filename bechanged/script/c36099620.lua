@@ -56,17 +56,17 @@ function c36099620.setcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c36099620.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return not c:IsForbidden() and c:CheckUniqueOnField(tp) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
+	if chk==0 then return not c:IsForbidden() end
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,e:GetHandler(),1,0,0)
 end
 function c36099620.setop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 then
-		Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+	if c:IsRelateToEffect(e) then
+		Duel.MoveToField(c,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
 	end
 end
 function c36099620.tgfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x38) and c:IsAbleToGrave()
+	return c:IsSetCard(0x38) and c:IsAbleToGrave()
 end
 function c36099620.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c36099620.tgfilter,tp,LOCATION_DECK,0,1,nil) end

@@ -15,18 +15,14 @@ function c64631466.initial_effect(c)
 	--atk/def
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EFFECT_SET_ATTACK)
-	e2:SetCondition(c64631466.adcon)
 	e2:SetValue(c64631466.atkval)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCode(EFFECT_SET_DEFENSE)
-	e3:SetCondition(c64631466.adcon)
+	--def
+	local e3=e2:Clone()
+	e3:SetCode(EFFECT_UPDATE_DEFENSE)
 	e3:SetValue(c64631466.defval)
 	c:RegisterEffect(e3)
 	--damage
@@ -43,15 +39,11 @@ function c64631466.initial_effect(c)
 	e5:SetCost(c64631466.spcost)
 	c:RegisterEffect(e5)
 end
-function c64631466.eqcon(e,tp,eg,ep,ev,re,r,rp)
-	return c64631466.can_equip_monster(e:GetHandler())
-end
 function c64631466.eqfilter(c)
 	return c:GetFlagEffect(64631466)~=0
 end
 function c64631466.can_equip_monster(c)
-	local g=c:GetEquipGroup():Filter(c64631466.eqfilter,nil)
-	return g:GetCount()==0
+	return true
 end
 function c64631466.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsAbleToChangeControler() end
@@ -65,10 +57,6 @@ function c64631466.eqlimit(e,c)
 	return e:GetOwner()==c
 end
 function c64631466.equip_monster(c,tp,tc)
-	if c:IsLocation(LOCATION_MZONE) and c:IsFaceup() then
-		Duel.SendtoGrave(tc,REASON_RULE)
-		return
-	end
 	if not Duel.Equip(tp,tc,c,false) then return end
 	--Add Equip limit
 	tc:RegisterFlagEffect(64631466,RESET_EVENT+RESETS_STANDARD,0,0)
@@ -107,31 +95,6 @@ end
 function c64631466.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(1-tp,ev,REASON_EFFECT)
 end
-function c64631466.adcon(e)
-	local c=e:GetHandler()
-	local g=c:GetEquipGroup():Filter(c64631466.eqfilter,nil)
-	return g:GetCount()>0
-end
-function c64631466.atkval(e,c)
-	local c=e:GetHandler()
-	local g=c:GetEquipGroup():Filter(c64631466.eqfilter,nil)
-	local atk=g:GetFirst():GetTextAttack()
-	if g:GetFirst():IsFacedown() or bit.band(g:GetFirst():GetOriginalType(),TYPE_MONSTER)==0 or atk<0 then
-		return 0
-	else
-		return atk
-	end
-end
-function c64631466.defval(e,c)
-	local c=e:GetHandler()
-	local g=c:GetEquipGroup():Filter(c64631466.eqfilter,nil)
-	local def=g:GetFirst():GetTextDefense()
-	if g:GetFirst():IsFacedown() or bit.band(g:GetFirst():GetOriginalType(),TYPE_MONSTER)==0 or def<0 then
-		return 0
-	else
-		return def
-	end
-end
 function c64631466.filter(c,e,tp,chk)
 	return c==e:GetHandler() and c:IsType(TYPE_RITUAL)
 end
@@ -143,4 +106,28 @@ function c64631466.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c64631466.costfilter,tp,LOCATION_DECK,0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_COST)
+end
+function c64631466.atkval(e,c)
+	local atk=0
+	local g=c:GetEquipGroup()
+	local tc=g:GetFirst()
+	while tc do
+		if tc:GetFlagEffect(64631466)~=0 and tc:IsFaceup() and tc:GetAttack()>=0 then
+			atk=atk+tc:GetAttack()
+		end
+		tc=g:GetNext()
+	end
+	return atk
+end
+function c64631466.defval(e,c)
+	local atk=0
+	local g=c:GetEquipGroup()
+	local tc=g:GetFirst()
+	while tc do
+		if tc:GetFlagEffect(64631466)~=0 and tc:IsFaceup() and tc:GetDefense()>=0 then
+			atk=atk+tc:GetDefense()
+		end
+		tc=g:GetNext()
+	end
+	return atk
 end

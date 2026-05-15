@@ -3,13 +3,13 @@ CUNGUI.disabled={}
 CUNGUI.RuleCards=Group.CreateGroup()
 CUNGUI._IsSetCard=Card.IsSetCard
 
-function Card.IsSetCard(c,setcode)
+function Card.IsSetCard(c,...)
     if c:GetFlagEffect(98765432)>0 then return false end
-    return CUNGUI._IsSetCard(c, setcode)
+    return CUNGUI._IsSetCard(c, ...)
 end
 
-function Card.IsOrigSetCard(c,setcode)
-    return CUNGUI._IsSetCard(c, setcode)
+function Card.IsOrigSetCard(c,...)
+    return CUNGUI._IsSetCard(c, ...)
 end
 
 CUNGUI._Exile = Duel.Exile
@@ -178,7 +178,6 @@ function CUNGUI.RegisterRuleEffect(c,tp)
 	c:RegisterEffect(e1)
 end
 function CUNGUI.bdnexcon(e,tp,eg,ep,ev,re,r,rp)
-	Debug.Message(Duel.GetCurrentChain())
 	return Duel.GetCurrentChain()<2
 end
 function CUNGUI.bdnextg(e,tp,eg,ep,ev,re,r,rp,chk)

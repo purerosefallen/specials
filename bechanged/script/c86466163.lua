@@ -49,11 +49,9 @@ end
 function c86466163.xyzlv(e,c,rc)
 	return 0x30050000+c:GetLevel()
 end
-function c86466163.spcfilter(c,tp)
-	return ec:IsControler(tp) and ec:IsSetCard(0x9c)
-end
 function c86466163.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c86466163.spcfilter,1,nil,tp)
+	local ec=eg:GetFirst()
+	return ec:IsControler(tp) and ec:IsSetCard(0x9c)
 end
 function c86466163.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

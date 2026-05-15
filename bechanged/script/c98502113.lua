@@ -3,6 +3,7 @@
 function c98502113.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
+	aux.AddMaterialCodeList(c,46986414,78193831)
 	aux.AddFusionProcFun2(c,c98502113.ffilter,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER+RACE_WARRIOR),true)
 	--negate
 	local e1=Effect.CreateEffect(c)

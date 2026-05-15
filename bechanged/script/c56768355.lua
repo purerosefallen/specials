@@ -51,7 +51,4 @@ function c56768355.indcon(e)
 	return e:GetHandler():GetEquipCount()>0
 end
 function c56768355.indval(e,re)
-	if not re then return false end
-	local ty=re:GetActiveType()
-	return bit.band(ty,TYPE_SPELL+TYPE_TRAP)~=0 and bit.band(ty,TYPE_EQUIP)==0
-end
+	return true end

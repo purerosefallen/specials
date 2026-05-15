@@ -1,7 +1,9 @@
 --アルカナフォース0－THE FOOL
 ---@param c Card
 function c62892347.initial_effect(c)
+	aux.AddCodeList(c,73206827)
 	local e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(62892347,1))
 	e0:SetType(EFFECT_TYPE_FIELD)
 	e0:SetCode(EFFECT_SPSUMMON_PROC)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SPSUM_PARAM)
@@ -49,6 +51,17 @@ function c62892347.initial_effect(c)
 	e5:SetCondition(aux.ArcanaCondition)
 	e5:SetTarget(c62892347.distg)
 	c:RegisterEffect(e5)
+	local e6=Effect.CreateEffect(c)
+	e6:SetDescription(aux.Stringid(62892347,2))
+	e6:SetType(EFFECT_TYPE_FIELD)
+	e6:SetCode(EFFECT_SPSUMMON_PROC)
+	e6:SetProperty(EFFECT_FLAG_SPSUM_PARAM+EFFECT_FLAG_UNCOPYABLE)
+	e6:SetTargetRange(POS_FACEUP_ATTACK,0)
+	e6:SetRange(LOCATION_HAND)
+	e6:SetCondition(c62892347.spcon3)
+	e6:SetOperation(c62892347.spop)
+	e6:SetValue(SUMMON_VALUE_SELF)
+	c:RegisterEffect(e6)
 end
 function c62892347.poscon(e)
 	return e:GetHandler():IsPosition(POS_FACEUP_ATTACK)
@@ -75,10 +88,18 @@ function c62892347.disop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(re:GetHandler(),REASON_EFFECT)
 	end
 end
+function c62892347.cspfilter(c)
+	return c:IsFaceup() and c:IsLevel(10) and c:IsRace(RACE_FAIRY)
+end
+function c62892347.csfffilter(c)
+	return c:IsFaceup() and c:IsCode(73206827)
+end
 function c62892347.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)>0
+		and (Duel.IsExistingMatchingCard(c62892347.csfffilter,tp,LOCATION_ONFIELD,0,1,nil)
+		or Duel.IsExistingMatchingCard(c62892347.cspfilter,tp,LOCATION_MZONE,0,1,nil))
 end
 function c62892347.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local e1=Effect.CreateEffect(c)
@@ -86,6 +107,7 @@ function c62892347.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EVENT_CHAIN_SOLVING)
 	e1:SetOperation(c62892347.disop1)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e1)
 end
 function c62892347.disop1(e,tp,eg,ep,ev,re,r,rp)
@@ -95,4 +117,8 @@ function c62892347.disop1(e,tp,eg,ep,ev,re,r,rp)
 			Duel.Destroy(rc,REASON_EFFECT)
 		end
 	end
+end
+function c62892347.spcon3(e,c)
+	if c==nil then return true end
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end

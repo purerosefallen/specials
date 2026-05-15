@@ -51,6 +51,18 @@ function c65976795.initial_effect(c)
 	e5:SetTarget(c65976795.tg)
 	e5:SetOperation(c65976795.op)
 	c:RegisterEffect(e5)
+	local e6=e5:Clone()
+	e6:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e6:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_SET_AVAILABLE)
+	e6:SetCode(EVENT_FLIP)
+	e6:SetCondition(c65976795.poscon)
+	c:RegisterEffect(e2)
+end
+function c65976795.pcfilter2(c,tp)
+	return c:IsSetCard(0x10ed) and c:IsControler(tp)
+end
+function c65976795.poscon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(c65976795.pcfilter2,1,nil,tp)
 end
 function c65976795.con(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsFacedown() and eg:IsContains(e:GetHandler())

@@ -21,12 +21,14 @@ function c98049038.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetCountLimit(1,98049039)
+	e2:SetCost(c98049038.thcost2)
 	e2:SetTarget(c98049038.thtg2)
 	e2:SetOperation(c98049038.thop2)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_SUMMON_SUCCESS)
 	c:RegisterEffect(e3)
+	Duel.AddCustomActivityCounter(98049038,ACTIVITY_SPSUMMON,c98049038.counterfilter)
 	-------Des
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(98049038,2))
@@ -38,7 +40,9 @@ function c98049038.initial_effect(c)
 	e4:SetOperation(c98049038.desop)
 	c:RegisterEffect(e4)
 end
-
+function c98049038.counterfilter(c)
+	return not c:IsSummonLocation(LOCATION_EXTRA) or c:IsType(TYPE_FUSION)
+end
 
 -------1
 function c98049038.costfilter(c)
@@ -64,12 +68,26 @@ function c98049038.spop1(e,tp,eg,ep,ev,re,r,rp)
 end
 
 
---------2
-function c98049038.spfilter2(c,fc)
+function c98049038.thcost2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetCustomActivityCount(98049038,tp,ACTIVITY_SPSUMMON)==0 end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(c98049038.splimit)
+	Duel.RegisterEffect(e1,tp)
+end
+function c98049038.splimit(e,c,sump,sumtype,sumpos,targetp,se)
+	return not c:IsType(TYPE_FUSION) and c:IsLocation(LOCATION_EXTRA)
+end
+
+function c98049038.thfilter2(c,fc)
 	return aux.IsMaterialListCode(fc,c:GetCode()) and c:IsAbleToHand()
 end
 function c98049038.gfilter2(c)
-	return c:IsSetCard(0x1016) and c:IsType(TYPE_MONSTER) and c:IsType(TYPE_FUSION)and Duel.IsExistingMatchingCard(c98049038.spfilter2,c:GetOwner(),LOCATION_DECK,0,1,nil,c)
+	return c:IsSetCard(0x1016) and c:IsType(TYPE_MONSTER) and c:IsType(TYPE_FUSION)and Duel.IsExistingMatchingCard(c98049038.thfilter2,c:GetOwner(),LOCATION_DECK,0,1,nil,c)
 end
 function c98049038.thtg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE+LOCATION_MZONE) and chkc:IsControler(tp) and c98049038.gfilter2(chkc) end
@@ -80,8 +98,8 @@ function c98049038.thtg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c98049038.thop2(e,tp,eg,ep,ev,re,r,rp)
 	local fc=Duel.GetFirstTarget()
-   Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c98049038.spfilter2,tp,LOCATION_DECK,0,1,1,nil,fc)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,c98049038.thfilter2,tp,LOCATION_DECK,0,1,1,nil,fc)
 	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)

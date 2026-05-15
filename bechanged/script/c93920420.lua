@@ -68,9 +68,9 @@ function c93920420.costfilter(c)
 	return (c:IsSetCard(0x11b) or not c:IsCode(93920420) and c:IsSetCard(0xfe)) and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()
 end
 function c93920420.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c93920420.costfilter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c93920420.costfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c93920420.costfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c93920420.costfilter,tp,LOCATION_HAND,0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function c93920420.sptg0(e,tp,eg,ep,ev,re,r,rp,chk)

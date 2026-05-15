@@ -1,5 +1,6 @@
 --マジシャン・オブ・ブラックカオス
 function c30208479.initial_effect(c)
+	aux.AddCodeList(c,79791878)
 	c:EnableReviveLimit()
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(30208479,0))
@@ -56,7 +57,7 @@ function c30208479.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c30208479.thfilter2(c)
-	return c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+	return c:IsType(TYPE_SPELL) and c:IsAbleToHand() and aux.IsCodeListed(c,79791878)
 end
 function c30208479.thtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c30208479.thfilter2,tp,LOCATION_GRAVE,0,1,nil) end

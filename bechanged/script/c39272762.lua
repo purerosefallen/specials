@@ -1,9 +1,9 @@
 --超银河眼光子龙
 local s,id,o=GetID()
 function s.initial_effect(c)
-    c:SetSPSummonOnce(id)
+	c:SetSPSummonOnce(id)
 	--xyz summon
-	aux.AddXyzProcedure(c,nil,8,3,s.ovfilter,aux.Stringid(id,2))
+	aux.AddXyzProcedure(c,nil,8,3,s.ovfilter,aux.Stringid(id,2),3,s.xyzop)
 	c:EnableReviveLimit()
 	--negate
 	local e1=Effect.CreateEffect(c)
@@ -37,6 +37,14 @@ function s.initial_effect(c)
 end
 function s.ovfilter(c)
 	return c:IsFaceup() and c:IsCode(93717133) and c:IsType(TYPE_MONSTER)
+end
+function s.cfilter(c)
+	return ((c:IsSetCard(0x95) and c:IsType(TYPE_SPELL) or c:IsSetCard(0x7b,0x55)) and c:IsDiscardable())
+end
+function s.xyzop(e,tp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil) and Duel.GetFlagEffect(tp,id)==0 end
+	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+	Duel.DiscardHand(tp,s.cfilter,1,1,REASON_COST+REASON_DISCARD)
 end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ)
@@ -105,7 +113,7 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.mfilter),tp,LOCATION_GRAVE,0,1,3,nil)
 	if c:IsRelateToEffect(e) and c:IsFaceup() and #g>0 then
 		Duel.Overlay(c,g)

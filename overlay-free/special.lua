@@ -1,4 +1,5 @@
 function aux.PreloadUds()
+--[[
   local e1=Effect.GlobalEffect()
 	e1:SetDescription(aux.Stringid(58600555,2))
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -14,13 +15,19 @@ function aux.PreloadUds()
     end
   end
   local params={aux.FALSE,13,2,2,alterf,aux.Stringid(58600555,2),nil}
+  local function getAlterMethod(methodName)
+    local fullName = "Xyz" .. methodName .. "Alter"
+    local fullName2 = "Xyz" .. methodName
+    local func = aux[fullName] or aux[fullName2]
+    return func(table.unpack(params))
+  end
 	e1:SetCondition(function(e,tp,...)
-    return Duel.GetFlagEffect(tp,e:GetHandler():GetOriginalCode()+10)==0 and Auxiliary.XyzConditionAlter(table.unpack(params))(e,tp,...)
+    return Duel.GetFlagEffect(tp,e:GetHandler():GetOriginalCode()+10)==0 and getAlterMethod("Condition")(e,tp,...)
   end)
-	e1:SetTarget(Auxiliary.XyzTargetAlter(table.unpack(params)))
+	e1:SetTarget(getAlterMethod("Target"))
 	e1:SetOperation(function(e,tp,...)
     Duel.RegisterFlagEffect(tp,e:GetHandler():GetOriginalCode()+10,RESET_PHASE+PHASE_END,0,1)
-    return Auxiliary.XyzOperationAlter(table.unpack(params))(e,tp,...)
+    return getAlterMethod("Operation")(e,tp,...)
   end)
   e1:SetValue(SUMMON_TYPE_XYZ)
 
@@ -33,6 +40,7 @@ function aux.PreloadUds()
   e2:SetLabelObject(e1)
   e2:SetValue(1)
   Duel.RegisterEffect(e2,0)
+]]
 
   local e = Effect.GlobalEffect()
   e:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -41,6 +49,7 @@ function aux.PreloadUds()
   e:SetOperation(function (this_e)
     for tp = 0, 1, 1 do
       for c in aux.Next(Duel.GetFieldGroup(tp, LOCATION_ALL, 0)) do
+--[[
         RITUAL.SP(c)
         if c:IsType(TYPE_RITUAL) then
           if c:IsType(TYPE_MONSTER) then
@@ -49,6 +58,7 @@ function aux.PreloadUds()
             RITUAL.CHK_LIST[tp][TYPE_SPELL] = RITUAL.CHK_LIST[tp][TYPE_SPELL] + 1
           end
         end
+]]
         if c:IsCode(38445524) then
           c_38445524.CannotActivate(c)
           c_38445524.ATK(c)
@@ -81,6 +91,7 @@ c_38445524 = {
   end
 }
 
+--[[
 RITUAL = {
   CHK_LIST = {
     [0] = {
@@ -106,10 +117,10 @@ RITUAL = {
     e:SetCondition(function (this_e)
       local this_c = this_e:GetHandler()
       if not RITUAL.CHK_FUNC(this_e:GetHandlerPlayer()) then return false end
-      return this_c:IsType(TYPE_RITUAL) and this_c:IsType(TYPE_MONSTER) and this_c:IsRace(RACE_WARRIOR + RACE_FAIRY)
+      return this_c:IsType(TYPE_RITUAL) and this_c:IsType(TYPE_MONSTER) and this_c:IsRace(RACE_WARRIOR + RACE_FAIRY + RACE_REPTILE)
     end)
     e:SetTarget(function (this_e,tp,eg,ep,ev,re,r,rp,chk,this_c)
-      local lp = this_c:GetLevel() * 500
+      local lp = this_c:GetLevel() * 100
       if Duel.CheckLPCost(tp, lp) then
         e:SetLabel(lp)
         return true
@@ -121,3 +132,4 @@ RITUAL = {
     c:RegisterEffect(e)
   end
 }
+]]

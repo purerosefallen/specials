@@ -1,7 +1,6 @@
 --ブルーアイズ・トゥーン・ドラゴン
 function c53183600.initial_effect(c)
 	aux.AddCodeList(c,15259703)
-	c:EnableReviveLimit()
 	c:SetUniqueOnField(1,1,c53183600.uqfilter,LOCATION_MZONE)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(53183600,0))

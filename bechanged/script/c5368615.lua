@@ -39,7 +39,7 @@ function s.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_NO_TURN_RESET)
 	e4:SetHintTiming(TIMINGS_CHECK_MONSTER+TIMING_CHAIN_END+TIMING_END_PHASE)
 	e4:SetCondition(s.condition)
-	e4:SetCountLimit(1,id)
+	e4:SetCountLimit(1,id+EFFECT_COUNT_CODE_DUEL)
 	e4:SetCost(s.cost)
 	e4:SetTarget(s.target)
 	e4:SetOperation(s.operation)
@@ -64,11 +64,11 @@ end
 function s.sprcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.mfilter),tp,LOCATION_GRAVE+LOCATION_MZONE,0,2,nil,c) and Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.mfilter2),tp,LOCATION_GRAVE+LOCATION_MZONE,0,1,nil,c)
+	return Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.mfilter),tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_MZONE,0,2,nil,c) and Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.mfilter2),tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_MZONE,0,1,nil,c)
 end
 function s.sprop(e,tp,eg,ep,ev,re,r,rp,chk,c)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.mfilter),tp,LOCATION_GRAVE+LOCATION_MZONE,0,nil,c)
+	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.mfilter),tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_MZONE,0,nil,c)
 	if chk==0 then return g:CheckSubGroup(s.fselect,2,2,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g1=g:SelectSubGroup(tp,s.fselect,false,2,2,c)
@@ -117,9 +117,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	te:SetLabelObject(e:GetLabelObject())
 	e:SetLabelObject(te)
 	Duel.ClearOperationInfo(0)
-	e:GetHandler():RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,3))
 end
-
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local te=e:GetLabelObject()
 	if not te then return end

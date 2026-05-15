@@ -1,0 +1,47 @@
+--宝玉獣 トパーズ・タイガー
+---@param c Card
+function c95600067.initial_effect(c)
+	--send replace
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_TO_GRAVE_REDIRECT_CB)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCondition(c95600067.repcon)
+	e1:SetOperation(c95600067.repop)
+	c:RegisterEffect(e1)
+	--atkup
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetTargetRange(LOCATION_MZONE,0)
+	e2:SetCondition(c95600067.condition)
+	e2:SetTarget(c95600067.atktg)
+	e2:SetValue(400)
+	c:RegisterEffect(e2)
+end
+function c95600067.atktg(e,c)
+	return c==e:GetHandler()
+end
+function c95600067.repcon(e)
+	local c=e:GetHandler()
+	if c:GetLeaveFieldDest()~=0 then
+		c:RegisterFlagEffect(95600067, RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_DAMAGE, 0, 1)
+	end
+	return c:GetFlagEffect(95600067)==0 and c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsReason(REASON_DESTROY)
+end
+function c95600067.repop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local e1=Effect.CreateEffect(c)
+	e1:SetCode(EFFECT_CHANGE_TYPE)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
+	e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
+	c:RegisterEffect(e1)
+end
+function c95600067.condition(e)
+	local phase=Duel.GetCurrentPhase()
+	return (phase==PHASE_DAMAGE or phase==PHASE_DAMAGE_CAL)
+		and Duel.GetAttacker()==e:GetHandler() and Duel.GetAttackTarget()~=nil
+end

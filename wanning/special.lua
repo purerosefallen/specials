@@ -21,7 +21,7 @@ local function registerSkillForPlayer(tp, code)
   for _,skill in ipairs(skills) do
 	local e1=Effect.GlobalEffect()
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
-	skill(e1)
+	skill(e1,tp)
 	Duel.RegisterEffect(e1,tp)
   end
 end
@@ -1526,22 +1526,30 @@ end)
 local function initialize()
   local skillCodes=getAllSkillCodes()
   for tp=0,1 do
-	local codes={}
-	for _,code in ipairs(skillCodes) do
-		table.insert(codes,code)
-	end
-	table.sort(codes)
-	local afilter={codes[1],OPCODE_ISCODE}
-	if #codes>1 then
-		for i=2,#codes do
-			table.insert(afilter,codes[i])
-			table.insert(afilter,OPCODE_ISCODE)
-			table.insert(afilter,OPCODE_OR)
+		local codes={}
+		for _,code in ipairs(skillCodes) do
+			table.insert(codes,code)
 		end
-	end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CODE)
-	local ac=Duel.AnnounceCardSilent(tp,table.unpack(afilter))
-	skillSelections[tp]=ac
+		table.sort(codes)
+		local afilter={codes[1],OPCODE_ISCODE}
+		if #codes>1 then
+			for i=2,#codes do
+				table.insert(afilter,codes[i])
+				table.insert(afilter,OPCODE_ISCODE)
+				table.insert(afilter,OPCODE_OR)
+			end
+		end
+		local player_type = Duel.GetRegistryValue("player_type_" .. tostring(tp))
+		local skillKey = "selected_skill_" .. player_type
+		local prevSkill = Duel.GetRegistryValue(skillKey)
+		if prevSkill then
+			skillSelections[tp]=tonumber(prevSkill)
+		else
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CODE)
+			local ac=Duel.AnnounceCardSilent(tp,table.unpack(afilter))
+			skillSelections[tp]=ac
+			Duel.SetRegistryValue(skillKey,ac)
+		end
   end
   for tp=0,1 do
 		registerSkillForPlayer(tp,skillSelections[tp])

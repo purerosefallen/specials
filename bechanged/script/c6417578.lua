@@ -3,10 +3,10 @@
 function c6417578.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON+CATEGORY_TOHAND)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMING_END_PHASE)
+	e1:SetHintTiming(0,TIMING_END_PHASE+TIMING_BATTLE_START+TIMING_DRAW_PHASE+TIMING_STANDBY_PHASE)
 	e1:SetCountLimit(1,6417578+EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(c6417578.fstg)
 	e1:SetOperation(c6417578.fsop)
@@ -76,18 +76,4 @@ function c6417578.fsop(e,tp,eg,ep,ev,re,r,rp)
 		end
 		tc:CompleteProcedure()
 	end
-	aux.FCheckAdditional=nil
-	local thg=Duel.GetMatchingGroup(aux.NecroValleyFilter(c6417578.thfilter),tp,LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
-	if ck==1 and #thg>0 and Duel.IsExistingMatchingCard(c6417578.ccfilter,tp,LOCATION_MZONE,0,1,nil)
-		and Duel.SelectYesNo(tp,aux.Stringid(6417578,0)) then
-		Duel.BreakEffect()
-		local sthg=thg:Select(tp,1,1,nil)
-		Duel.SendtoHand(sthg,nil,0x40)
-	end
-end
-function c6417578.ccfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:IsSetCard(0x9d)
-end
-function c6417578.thfilter(c)
-	return c:IsFaceupEx() and c:IsSetCard(0x9d) and c:IsAbleToHand()
 end

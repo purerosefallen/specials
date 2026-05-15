@@ -1,8 +1,8 @@
---炼狱之骑士 多禄某
+--煉獄の騎士 ヴァトライムス
 local s,id,o=GetID()
 function s.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,nil,4,2)
+	aux.AddXyzProcedure(c,nil,4,2,nil,nil,99)
 	c:EnableReviveLimit()
 	--attribute
 	local e1=Effect.CreateEffect(c)
@@ -17,34 +17,36 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,EFFECT_COUNT_CODE_CHAIN)
 	e2:SetCost(s.spcost)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
-	--immune
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_IMMUNE_EFFECT)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetRange(LOCATION_MZONE)
-    e3:SetCondition(s.econ)
-	e3:SetValue(s.efilter)
-	c:RegisterEffect(e3)
-    --get effect
 	local e4=e1:Clone()
 	e4:SetType(EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCondition(s.overcon)
 	c:RegisterEffect(e4)
 end
+function s.cfilter(c)
+	return c:IsCode(18326736)
+end
+function s.overcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local ct=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_GRAVE+LOCATION_ONFIELD,0,nil)
+	return ct:GetClassCount(Card.GetCode)>=1
+	and c:IsSetCard(0x9c,0x53) and c:IsType(TYPE_XYZ)
+end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:CheckRemoveOverlayCard(tp,1,REASON_COST)end
+	if chk==0 then return c:CheckRemoveOverlayCard(tp,1,REASON_COST)
+		and Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
 	c:RemoveOverlayCard(tp,1,1,REASON_COST)
+	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function s.spfilter(c,e,tp,mc)
-	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsSetCard(0x9c,0x53) and mc:IsCanBeXyzMaterial(c)
+	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsSetCard(0x9c) and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -71,18 +73,15 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			end
 		end
 	end
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(s.splimit)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
 end
-function s.cfilter(c)
-	return c:IsSetCard(0x9c) and c:IsType(TYPE_MONSTER)
-end
-function s.econ(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_GRAVE,0,nil)
-	return ct:GetClassCount(Card.GetCode)>=7
-end
-function s.efilter(e,te)
-	return te:GetOwner()~=e:GetOwner()
-end
-function s.overcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsSetCard(0x109c,0x53) and c:IsType(TYPE_XYZ)
+function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
+	return bit.band(sumtype,SUMMON_TYPE_XYZ)==SUMMON_TYPE_XYZ
 end

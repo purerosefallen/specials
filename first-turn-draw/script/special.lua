@@ -1,0 +1,10 @@
+aux.PreloadUds = function ()
+	local e = Effect.GlobalEffect()
+		e:SetType(EFFECT_TYPE_FIELD + EFFECT_TYPE_CONTINUOUS)
+		e:SetCode(EVENT_ADJUST)
+		e:SetOperation(function (e)
+			Duel.Draw(0, 1, REASON_RULE)
+			e:Reset()
+		end)
+	Duel.RegisterEffect(e, 0)
+end

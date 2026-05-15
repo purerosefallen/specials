@@ -45,6 +45,14 @@ function c28292031.initial_effect(c)
 	e0:SetCost(aux.bfgcost)
 	e0:SetOperation(c28292031.damop)
 	c:RegisterEffect(e0)
+	--act in set turn
+	local e8=Effect.CreateEffect(c)
+	e8:SetType(EFFECT_TYPE_SINGLE)
+	e8:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+	e8:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e8:SetCost(c28292031.stcost)
+	e8:SetDescription(aux.Stringid(28292031,1))
+	c:RegisterEffect(e8)
 end
 function c28292031.cfilter(c)
 	return c:IsSetCard(0x173)  and c:IsFaceup()
@@ -97,4 +105,8 @@ function c28292031.damop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTargetRange(1,0)
 	e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
 	Duel.RegisterEffect(e1,tp)
+end
+function c28292031.stcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
 end

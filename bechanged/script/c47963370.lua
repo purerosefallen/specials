@@ -4,14 +4,14 @@ function c47963370.initial_effect(c)
 	c:EnableReviveLimit()
 	--change name
 	aux.EnableChangeCode(c,46986414,LOCATION_MZONE+LOCATION_GRAVE)
+	--to hand
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(47963370,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_HANDES)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCost(c47963370.spcost2)
-	e1:SetTarget(c47963370.sptg2)
-	e1:SetOperation(c47963370.spop2)
+	e1:SetCountLimit(1,47963370)
+	e1:SetTarget(c47963370.thtg)
+	e1:SetOperation(c47963370.thop)
 	c:RegisterEffect(e1)
 	--destroy
 	local e2=Effect.CreateEffect(c)
@@ -37,35 +37,60 @@ function c47963370.initial_effect(c)
 	e3:SetOperation(c47963370.spop)
 	c:RegisterEffect(e3)
 end
+function c47963370.hand(c)
+	return aux.IsCodeListed(c,46986414,38033121) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
+end
+function c47963370.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local race=e:GetLabel()
+	if chk==0 then return Duel.IsExistingMatchingCard(c47963370.hand,tp,LOCATION_DECK,0,1,nil,race) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
+end
+function c47963370.thop(e,tp,eg,ep,ev,re,r,rp)
+	local race=e:GetLabel()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,c47963370.hand,tp,LOCATION_DECK,0,1,1,nil,race)
+	if g:GetCount()>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 and g:GetFirst():IsLocation(LOCATION_HAND) then
+		Duel.ConfirmCards(1-tp,g)
+		Duel.ShuffleHand(tp)
+		Duel.BreakEffect()
+		Duel.DiscardHand(tp,nil,1,1,REASON_EFFECT+REASON_DISCARD)
+	end
+end
 function c47963370.costfilter(c)
+	if c:IsType(TYPE_CONTINUOUS+TYPE_EQUIP+TYPE_FIELD) then return false end
 	return aux.IsCodeListed(c,46986414) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToGraveAsCost()
+		and c:CheckActivateEffect(false,true,false)
 end
 function c47963370.spcost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c47963370.costfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c47963370.costfilter,tp,LOCATION_DECK,0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_COST)
-end
-function c47963370.crfilter(c,tp)
-	return c:IsFaceup() and c:IsCode(46986414) and c:IsAbleToRemove() and Duel.GetMZoneCount(tp,c)>0
+	local tc=g:GetFirst()
+	local te,ceg,cev,cre,cr,crp=tc:CheckActivateEffect(false,true,true)
+	Duel.ClearTargetCard()
+	tc:CreateEffectRelation(e)
+	local tg=te:GetTarget()
+	if tg then tg(e,tp,ceg,cev,cre,cr,crp,1) end
+	te:SetLabelObject(e:GetLabelObject())
+	e:SetLabelObject(te)
+	Duel.ClearOperationInfo(0)
 end
 function c47963370.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c47963370.crfilter,tp,LOCATION_ONFIELD+LOCATION_GRAVE,LOCATION_ONFIELD+LOCATION_GRAVE,1,nil,tp)
-		and e:GetHandler():IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,true) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and e:GetHandler():IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,true) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c47963370.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local sg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c47963370.crfilter),tp,LOCATION_ONFIELD+LOCATION_GRAVE,LOCATION_ONFIELD+LOCATION_GRAVE,1,1,nil)
-	if #sg>0 then
-		Duel.HintSelection(sg)
-		local tc=sg:GetFirst()
-		if Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)~=0 and tc:IsLocation(LOCATION_REMOVED)
-			and c:IsRelateToEffect(e) then
-			Duel.SpecialSummon(c,SUMMON_TYPE_RITUAL,tp,tp,true,true,POS_FACEUP)
-			c:CompleteProcedure()
-		end
+	if c:IsRelateToEffect(e) then
+		Duel.SpecialSummon(c,SUMMON_TYPE_RITUAL,tp,tp,true,true,POS_FACEUP)
+		c:CompleteProcedure()
+		local te=e:GetLabelObject()
+		if not (te and te:GetHandler():IsRelateToEffect(e)) then return end
+		e:SetLabelObject(te:GetLabelObject())
+		local op=te:GetOperation()
+		if op then op(e,tp,eg,ep,ev,re,r,rp) end
 	end
 end
 function c47963370.descon(e,tp,eg,ep,ev,re,r,rp)

@@ -26,7 +26,7 @@ function s.initial_effect(c)
 end
 function s.sfilter(c,e,tp)
 	return c:IsSetCard(0xc4,0xb4) and ((not c:IsType(TYPE_RITUAL) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)) 
-	or (c:IsType(TYPE_RITUAL) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,false)))
+	or (c:IsType(TYPE_RITUAL) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true)))
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -40,7 +40,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.sfilter),tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()
 	if tc:IsType(TYPE_RITUAL) then
-		Duel.SpecialSummon(g,SUMMON_TYPE_RITUAL,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummon(g,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
 		Duel.BreakEffect()
 		Duel.Destroy(c,REASON_EFFECT)
 	else
@@ -58,10 +58,10 @@ function s.filter(c,tp)
 		or c:IsPreviousLocation(LOCATION_PZONE))
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.filter,1,nil,tp) and (c:IsFaceup() or c:IsLocation(LOCATION_HAND))
+	return eg:IsExists(s.filter,1,nil,tp)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-    local c=e:GetHandler()
+	local c=e:GetHandler()
 	if chk==0 then return (Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)) or c:IsAbleToHand() end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON+LOCATION_HAND,c,1,0,0)
@@ -69,13 +69,13 @@ end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-    local b1=c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-    local b2=c:IsAbleToHand()
-    local op=aux.SelectFromOptions(tp,{b1,aux.Stringid(id,2)},{b2,aux.Stringid(id,3)})
-    if op==1 then
-	    Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-    end
-    if op==2 then
-        Duel.SendtoHand(c,nil,REASON_EFFECT)
-    end
+	local b1=c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	local b2=c:IsAbleToHand()
+	local op=aux.SelectFromOptions(tp,{b1,aux.Stringid(id,2)},{b2,aux.Stringid(id,3)})
+	if op==1 then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end
+	if op==2 then
+		Duel.SendtoHand(c,nil,REASON_EFFECT)
+	end
 end

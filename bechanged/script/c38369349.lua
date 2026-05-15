@@ -1,7 +1,6 @@
 --トゥーン・ドラゴン・エッガー
 function c38369349.initial_effect(c)
 	aux.AddCodeList(c,15259703)
-	c:EnableReviveLimit()
 	c:SetUniqueOnField(1,1,c38369349.uqfilter,LOCATION_MZONE)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(38369349,0))
