@@ -71,7 +71,7 @@ function c44178886.attach_temp_todeck_flip(e, tp, t)
         return
     end
     local fe = t:GetFlipEffect()
-    if not fe then
+    if not fe or bit.band(t:GetBattlePosition(),POS_FACEUP)~=0 then
         return
     end
 
