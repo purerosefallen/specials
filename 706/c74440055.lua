@@ -1,0 +1,27 @@
+--サボウ・ファイター
+---@param c Card
+function c74440055.initial_effect(c)
+	--special summon
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(74440055,0))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetCode(EVENT_DAMAGE_STEP_END)
+	e1:SetLabel(65703851) --相杀算场上发动统一使用透破拔卡片密码标记处理类透破拔条件
+	e1:SetCondition(aux.dserodcon)
+	e1:SetTarget(c74440055.target)
+	e1:SetOperation(c74440055.operation)
+	c:RegisterEffect(e1)
+end
+function c74440055.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,tp,0)
+end
+function c74440055.operation(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,74440056,0,TYPES_TOKEN_MONSTER,500,500,1,RACE_PLANT,ATTRIBUTE_EARTH,POS_FACEUP_DEFENSE,1-tp) then
+		local token=Duel.CreateToken(tp,74440056)
+		Duel.SpecialSummon(token,0,tp,1-tp,false,false,POS_FACEUP_DEFENSE)
+	end
+end

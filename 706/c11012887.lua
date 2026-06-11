@@ -1,19 +1,16 @@
 --ジュラック・グアイバ
 function c11012887.initial_effect(c)
-	--special summon
+	-- special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(11012887,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_DAMAGE_STEP_END)
-	e1:SetCondition(c11012887.condition)
+	e1:SetLabel(65703851) --相杀算场上发动统一使用透破拔卡片密码标记处理类透破拔条件
+	e1:SetCondition(aux.dserodcon)
 	e1:SetTarget(c11012887.target)
 	e1:SetOperation(c11012887.operation)
 	c:RegisterEffect(e1)
-end
-function c11012887.condition(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetBattleMonster(1-tp)
-	return tc:IsReason(REASON_BATTLE)
 end
 function c11012887.filter(c,e,tp)
 	return c:IsSetCard(0x22) and c:IsAttackBelow(1700) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

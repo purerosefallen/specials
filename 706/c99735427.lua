@@ -15,10 +15,10 @@ function c99735427.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c99735427.disop(e,tp,eg,ep,ev,re,r,rp)
-	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-	-- 临时添加被武僧洗回卡组的反转效果无效
+	local loc,eff=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION,CHAININFO_TRIGGERING_EFFECT)
+	-- 临时添加被武僧洗回卡组的反转效果无效 相杀算场上发动统一使用透破拔卡片密码标记处理类透破拔条件
 	local c=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_EFFECT):GetHandler()
-	if re:IsActiveType(TYPE_MONSTER) and (loc==LOCATION_MZONE or loc==LOCATION_GRAVE or (loc==LOCATION_DECK and c:GetFlagEffect(44178886)>0))
+	if re:IsActiveType(TYPE_MONSTER) and (loc==LOCATION_MZONE or loc==LOCATION_GRAVE or (loc==LOCATION_DECK and c:GetFlagEffect(44178886)>0) or ((loc==LOCATION_GRAVE or loc==LOCATION_REMOVED) and eff:GetLabel()==65703851) )
 		and re:GetHandler():IsAttribute(ATTRIBUTE_DARK) then
 		Duel.NegateEffect(ev)
 	end
