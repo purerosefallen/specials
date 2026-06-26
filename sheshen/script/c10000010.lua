@@ -192,7 +192,7 @@ function c10000010.thop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		local dg=g:RandomSelect(tp,1)
 		if Duel.SendtoDeck(dg,nil,2,REASON_EFFECT)>0 and c:IsRelateToEffect(e) then
-			local op=aux.SelectFromOptions(tp,{c:IsAbleToHand(),aux.Stringid(10000010,3),1},{c:IsAbleToGrave(),aux.Stringid(10000010,4),2})
+			local op=aux.SelectFromOptions(tp,{c:IsAbleToHand(),1190,1},{c:IsAbleToGrave(),1191,2})
 			if op==1 then
 				Duel.SendtoHand(c,nil,REASON_EFFECT)
 			elseif op==2 then
