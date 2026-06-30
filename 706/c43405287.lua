@@ -96,8 +96,9 @@ function c43405287.damfilter(c,rc)
 	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE) and c:GetReasonCard()==rc
 end
 function c43405287.damcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetHandler():GetEquipTarget()
-	return tc and eg:IsExists(c43405287.damfilter,1,nil,tc)
+	local c = e:GetHandler()
+	local tc=c:GetEquipTarget()
+	return tc and eg:IsExists(c43405287.damfilter,1,nil,tc) and c:GetControler() == tc:GetControler()
 end
 function c43405287.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

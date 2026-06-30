@@ -1,0 +1,23 @@
+--タイム・イーター
+---@param c Card
+function c44913552.initial_effect(c)
+	--skip draw
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(44913552,0))
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e2:SetCode(EVENT_DAMAGE_STEP_END)
+	e2:SetLabel(65703851) --相杀算场上发动统一使用透破拔卡片密码标记处理类透破拔条件
+	e2:SetCondition(aux.dserodcon)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetOperation(c44913552.skipop)
+	c:RegisterEffect(e2)
+end
+function c44913552.skipop(e,tp,eg,ep,ev,re,r,rp)
+	local e2=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetTargetRange(0,1)
+	e1:SetCode(EFFECT_SKIP_M1)
+	e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
+	Duel.RegisterEffect(e1,tp)
+end

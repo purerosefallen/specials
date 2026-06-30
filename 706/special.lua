@@ -80,7 +80,7 @@ function Auxiliary.PreloadUds()
 						if c:IsLocation(LOCATION_ONFIELD) and c:IsSummonType(SUMMON_TYPE_FLIP) and re~=nil and re:GetCode() == EVENT_FLIP_SUMMON and re:GetCategory()&CATEGORY_DISABLE_SUMMON ~= 0 then
 							return false
 						end
-						return old_condition == nil or old_condition(e2,tp2,eg2,ep2,ev2,re2,r2,rp2)
+                        return old_condition == nil or old_condition(e2,tp2,eg2,ep2,ev2,re2,r2,rp2)
 					end)
 				end
 			end
@@ -102,3 +102,10 @@ function Auxiliary.PreloadUds()
     end
 
 end	
+
+--condition of EVENT_DAMAGE_STEP_END + this monster is releate to battle + opponent monster destroyed by battle
+function Auxiliary.dserodcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	return bc~=nil and bc:IsReason(REASON_BATTLE)
+end
