@@ -15,9 +15,10 @@ function c94538053.initial_effect(c)
 	e2:SetDescription(aux.Stringid(94538053,0))
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCategory(CATEGORY_ATKCHANGE)
-	e2:SetCode(EVENT_BATTLE_DESTROYING)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(c94538053.atkcon)
+	e2:SetCode(EVENT_DAMAGE_STEP_END)
+	e2:SetLabel(65703851) --相杀算场上发动统一使用透破拔卡片密码标记处理类透破拔条件
+	e2:SetCondition(aux.dserodcon)
+	e2:SetRange(LOCATION_MZONE + LOCATION_GRAVE + LOCATION_REMOVED)
 	e2:SetOperation(c94538053.atkop)
 	c:RegisterEffect(e2)
 end
@@ -25,9 +26,6 @@ function c94538053.condtion(e)
 	local ph=Duel.GetCurrentPhase()
 	return (ph==PHASE_DAMAGE or ph==PHASE_DAMAGE_CAL)
 		and Duel.GetAttacker()==e:GetHandler() and Duel.GetAttackTarget()~=nil
-end
-function c94538053.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsRelateToBattle() and e:GetHandler():IsFaceup()
 end
 function c94538053.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

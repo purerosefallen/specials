@@ -99,7 +99,8 @@ function c6112401.eqlimit(e,c)
 	return g:GetCount()==1 and tc==c and c:IsSetCard(0x100d)
 end
 function c6112401.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsContains(e:GetHandler():GetEquipTarget())
+	local c = e:GetHandler()
+	return eg:IsContains(c:GetEquipTarget()) and c:GetControler() == c:GetEquipTarget():GetControler()
 end
 function c6112401.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

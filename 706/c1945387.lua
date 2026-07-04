@@ -18,16 +18,13 @@ function c1945387.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetCode(EVENT_DAMAGE_STEP_END)
-	e2:SetCondition(c1945387.drcon)
+	e2:SetLabel(65703851) --相杀算场上发动统一使用透破拔卡片密码标记处理类透破拔条件
+	e2:SetCondition(aux.dserodcon)
 	e2:SetTarget(c1945387.drtg)
 	e2:SetOperation(c1945387.drop)
 	c:RegisterEffect(e2)
 end
 c1945387.material_setcode=0x8
-function c1945387.drcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetBattleMonster(1-tp)
-	return tc:IsReason(REASON_BATTLE)
-end
 function c1945387.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(tp)

@@ -97,7 +97,8 @@ function c21350571.drfilter(c,rc)
 	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE) and c:GetReasonCard()==rc
 end
 function c21350571.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c21350571.drfilter,1,nil,e:GetHandler():GetEquipTarget())
+	local c = e:GetHandler()
+	return eg:IsExists(c21350571.drfilter,1,nil,e:GetHandler():GetEquipTarget()) and c:GetControler() == c:GetEquipTarget():GetControler()
 end
 function c21350571.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
