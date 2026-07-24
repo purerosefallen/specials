@@ -44,12 +44,14 @@ function c10000010.initial_effect(c)
 	e6:SetCost(c10000010.atkcost)
 	e6:SetOperation(c10000010.atkop)
 	c:RegisterEffect(e6)
+	local e6_1=e6:Clone()
+	e6_1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e6_1)
 	--destroy
 	local e7=Effect.CreateEffect(c)
 	e7:SetDescription(aux.Stringid(10000010,1))
 	e7:SetCategory(CATEGORY_DESTROY)
 	e7:SetType(EFFECT_TYPE_QUICK_O)
-	e7:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e7:SetRange(LOCATION_MZONE)
 	e7:SetCode(EVENT_FREE_CHAIN)
 	e7:SetCountLimit(1)
@@ -106,13 +108,13 @@ function c10000010.initial_effect(c)
 	e12:SetOperation(c10000010.recop)
 	c:RegisterEffect(e12)
 	local this_e1=Effect.CreateEffect(c)
-    this_e1:SetType(EFFECT_TYPE_SINGLE)
-    this_e1:SetCode(EFFECT_SET_BASE_ATTACK)
-    this_e1:SetValue(3999)
-    c:RegisterEffect(this_e1)
-    local this_e2 = this_e1:Clone()
-    this_e2:SetCode(EFFECT_SET_BASE_DEFENSE)
-    c:RegisterEffect(this_e2)
+	this_e1:SetType(EFFECT_TYPE_SINGLE)
+	this_e1:SetCode(EFFECT_SET_BASE_ATTACK)
+	this_e1:SetValue(3999)
+	c:RegisterEffect(this_e1)
+	local this_e2 = this_e1:Clone()
+	this_e2:SetCode(EFFECT_SET_BASE_DEFENSE)
+	c:RegisterEffect(this_e2)
 end
 function c10000010.ttcon(e,c,minc)
 	if c==nil then return true end
@@ -164,22 +166,18 @@ function c10000010.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end
 	Duel.PayLPCost(tp,1000)
 end
-function c10000010.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) end
-	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
+function c10000010.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,0,0)
 	Duel.SetChainLimit(c10000010.chlimit)
 end
 function c10000010.chlimit(e,ep,tp)
 	return tp==ep
 end
 function c10000010.desop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		Duel.Destroy(tc,REASON_EFFECT)
-	end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.Destroy(g,REASON_EFFECT)
 end
 function c10000010.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,LOCATION_HAND,0,1,nil) and (e:GetHandler():IsAbleToHand() or e:GetHandler():IsAbleToGrave()) end
