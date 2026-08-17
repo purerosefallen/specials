@@ -53,7 +53,7 @@ function Auxiliary.PreloadUds()
 
 	--book NegateSummon给反转召唤被无效的怪兽取消完成苏生限制使其不能被苏生
 	Duel.NegateSummon = function(eg)
-		if eg:GetCount() == 1 then
+		if eg.GetCount==nil or eg:GetCount() == 1 then
 			local re = Duel.GetChainInfo(0, CHAININFO_TRIGGERING_EFFECT)
 			if re.GetCode(re) == EVENT_FLIP_SUMMON then 
 				eg:GetFirst():SetStatus(STATUS_PROC_COMPLETE, false)
