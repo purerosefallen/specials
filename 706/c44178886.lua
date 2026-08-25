@@ -50,17 +50,16 @@ function c44178886.op(e, tp, eg, ep, ev, re, r, rp)
         return
     end
 
-    -- 仅对守墓侦察者这个特例临时增加一个对方玩家不能在伤害计算前发反转效果的永续效果以还原旧裁定
-    if t:GetCode() == 24317029 then -- 替换为守墓侦察者的实际卡片代码
-        local e1 = Effect.CreateEffect(c)
-        e1:SetType(EFFECT_TYPE_FIELD)
-        e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-        e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-        e1:SetTargetRange(0, 1) -- 只影响对方玩家
-        e1:SetValue(c44178886.aclimit)
-        e1:SetReset(RESET_PHASE + PHASE_DAMAGE)
-        Duel.RegisterEffect(e1, tp)
-    end
+    -- 对所有被武僧攻击的反转怪兽临时增加一个对方玩家不能在伤害计算前发反转效果的永续效果以避免可能的二次发动
+
+    local e1 = Effect.CreateEffect(c)
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+    e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+    e1:SetTargetRange(0, 1) -- 只影响对方玩家
+    e1:SetValue(c44178886.aclimit)
+    e1:SetReset(RESET_PHASE + PHASE_DAMAGE)
+    Duel.RegisterEffect(e1, tp)
 
     c44178886.attach_temp_todeck_flip(e, tp, t)
 
