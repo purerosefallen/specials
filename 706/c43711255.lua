@@ -1,0 +1,93 @@
+--禁止令
+function c43711255.initial_effect(c)
+	--Activate
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetProperty(EFFECT_FLAG_CONTINUOUS_TARGET)
+	e1:SetTarget(c43711255.target)
+	e1:SetOperation(c43711255.activate)
+	c:RegisterEffect(e1)
+end
+function c43711255.bantg(e,c)
+	local fcode=e:GetLabel()
+	return c:IsOriginalCodeRule(fcode) and (not c:IsOnField() or c:GetRealFieldID()>e:GetFieldID())
+end
+function c43711255.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CODE)
+	local ac=Duel.AnnounceCard(tp)
+	Duel.SetTargetParam(ac)
+	Duel.SetOperationInfo(0,CATEGORY_ANNOUNCE,nil,0,tp,0)
+end
+function c43711255.cannot_spsummon_self(e,c,sump,sumtype,sumpos,targetp,se)
+	local fcode=e:GetLabel()
+	if not c:IsOriginalCodeRule(fcode) then return false end
+	if se==nil then return true end
+	-- 若触发来源是卡自身的效果，则禁止
+	local sh=se:GetHandler()
+	if sh and sh==c then return true end
+	return false
+end
+--不用底层的禁止令专用常数改为脚本层分开实现各逻辑以绕开底层实现旧裁定
+function c43711255.activate(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local ac=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
+	c:SetHint(CHINT_CARD,ac)
+	--forbidden
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e2:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+	e2:SetRange(LOCATION_SZONE)
+	e2:SetTargetRange(0xff,0xff)
+	e2:SetTarget(c43711255.bantg)
+	e2:SetLabel(ac)
+	e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
+	c:RegisterEffect(e3)
+	local e4=e2:Clone()
+	e4:SetCode(EFFECT_CANNOT_TRIGGER)
+	c:RegisterEffect(e4)
+	local e5=e2:Clone()
+	e5:SetCode(EFFECT_DISABLE)
+	c:RegisterEffect(e5)
+	local e6=e2:Clone()
+	e6:SetValue(aux.TRUE)
+	e6:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)
+	c:RegisterEffect(e6)
+	local e7=e2:Clone()
+	e7:SetValue(aux.TRUE)
+	e7:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
+	c:RegisterEffect(e7)
+	local e8=e2:Clone()
+	e8:SetValue(aux.TRUE)
+	e8:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
+	c:RegisterEffect(e8)
+	local e9=e2:Clone()
+	e9:SetValue(aux.TRUE)
+	e9:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
+	c:RegisterEffect(e9)
+	local e10=e2:Clone()
+	e10:SetCode(EFFECT_CANNOT_SUMMON)
+	c:RegisterEffect(e10)
+	local e11=e2:Clone()
+	e11:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
+	c:RegisterEffect(e11)
+	local e12=e2:Clone()
+	e12:SetCode(EFFECT_CANNOT_MSET)
+	c:RegisterEffect(e12)
+	local e13=e2:Clone()
+	e13:SetCode(EFFECT_CANNOT_SSET)
+	c:RegisterEffect(e13)
+
+	local e14=e2:Clone()
+	e14:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e14:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e14:SetTarget(c43711255.cannot_spsummon_self)
+	c:RegisterEffect(e14)
+
+	Duel.AdjustInstantly(c)
+end
